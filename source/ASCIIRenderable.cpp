@@ -27,6 +27,12 @@ ASCIIRenderable::~ASCIIRenderable() {
 
 /// Reset the renderable, releasing all used content and pipelines            
 void ASCIIRenderable::Detach() {
+   for (auto& lod : mLOD) {
+      lod.mGeometry.Reset();
+      lod.mTexture.Reset();
+      lod.mPipeline.Reset();
+   }
+
    mMaterialContent.Reset();
    mGeometryContent.Reset();
    mTextureContent.Reset();
@@ -39,6 +45,42 @@ void ASCIIRenderable::Detach() {
 ///   @return a pointer to the renderer                                       
 ASCIIRenderer* ASCIIRenderable::GetRenderer() const noexcept {
    return GetProducer()->GetProducer();
+}
+
+/// Get VRAM geometry corresponding to an octave of this renderable           
+/// This is the point where content might be generated upon request           
+///   @param lod - information used to extract the best LOD                   
+///   @return the VRAM geometry or nullptr if content is not available        
+A::Mesh* ASCIIRenderable::GetGeometry(const LOD& lod) const {
+   const auto i = lod.GetAbsoluteIndex();
+   if (not mLOD[i].mGeometry and mGeometryContent) {
+      // Cache geometry to VRAM                                         
+      Verbs::Create creator {
+         Construct::From<A::Mesh>(mGeometryContent->GetLOD(lod))
+      };
+      mProducer->Create(creator);
+      mLOD[i].mGeometry = creator->template As<A::Mesh*>();
+   }
+
+   return mLOD[i].mGeometry;
+}
+
+/// Get VRAM texture corresponding to an octave of this renderable            
+/// This is the point where content might be generated upon request           
+///   @param lod - information used to extract the best LOD                   
+///   @return the VRAM texture or nullptr if content is not available         
+A::Image* ASCIIRenderable::GetTexture(const LOD& lod) const {
+   const auto i = lod.GetAbsoluteIndex();
+   if (not mLOD[i].mTexture and mTextureContent) {
+      // Cache texture to VRAM                                          
+      Verbs::Create creator {
+         Construct::From<A::Image>(mTextureContent->GetLOD(lod))
+      };
+      mProducer->Create(creator);
+      mLOD[i].mTexture = creator->template As<A::Image*>();
+   }
+
+   return mLOD[i].mTexture;
 }
 
 /// Create GPU pipeline able to utilize geometry, textures and shaders        
@@ -60,6 +102,7 @@ ASCIIPipeline* ASCIIRenderable::GetOrCreatePipeline(
    // Construct a pipeline                                              
    bool usingGlobalPipeline = false;
    auto construct = Construct::From<ASCIIPipeline>();
+
    if (mMaterialContent) {
       construct << mMaterialContent;
       usingGlobalPipeline = true;

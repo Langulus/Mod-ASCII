@@ -33,11 +33,20 @@ protected:
    Ref<A::Image> mTextureContent;
    mutable Ref<ASCIIPipeline> mPredefinedPipeline;
 
+   // Precompiled content, updated on Refresh()                         
+   mutable struct {
+      Ref<A::Mesh> mGeometry;
+      Ref<A::Image> mTexture;
+      Ref<ASCIIPipeline> mPipeline;
+   } mLOD[LOD::IndexCount];
+
 public:
    ASCIIRenderable(ASCIILayer*, const Neat&);
    ~ASCIIRenderable();
 
    NOD() ASCIIRenderer* GetRenderer() const noexcept;
+   NOD() A::Mesh*       GetGeometry(const LOD&) const;
+   NOD() A::Image*      GetTexture(const LOD&) const;
    NOD() ASCIIPipeline* GetOrCreatePipeline(const LOD&, const ASCIILayer*) const;
 
    void Refresh();

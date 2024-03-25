@@ -26,7 +26,7 @@ ASCIIPipeline::ASCIIPipeline(ASCIIRenderer* producer, const Neat& descriptor)
       },
       [this, &predefinedMaterial](const A::Material& material) {
          // Create from predefined material generator                   
-         GenerateShaders(material);
+         TODO();
          predefinedMaterial = true;
          return Loop::Break;
       }
@@ -36,25 +36,14 @@ ASCIIPipeline::ASCIIPipeline(ASCIIRenderer* producer, const Neat& descriptor)
       // We must generate the material ourselves                        
       Construct material;
       descriptor.ForEach(
-         [&](const A::File& file) {
-            // Create from file                                         
-            material = FromFile(file);
-            return Loop::Break;
-         },
          [&](const Text& text) {
-            // Create from any text, including filenames and code       
-            const auto file = GetRuntime()->GetFile(text);
-            material = file ? FromFile(*file) : FromCode(text);
+            // Create from file                                         
+            material = FromText(text);
             return Loop::Break;
          },
          [&](const A::Mesh& mesh) {
             // Adapt to a mesh                                          
             material = FromMesh(mesh);
-            return Loop::Break;
-         },
-         [&](const A::Image& image) {
-            // Adapt to an image                                        
-            material = FromImage(image);
             return Loop::Break;
          }
       );
@@ -71,22 +60,10 @@ ASCIIPipeline::ASCIIPipeline(ASCIIRenderer* producer, const Neat& descriptor)
       Verbs::Create creator {Abandon(material)};
       producer->RunIn(creator)->ForEach(
          [this](const A::Material& generator) {
-            GenerateShaders(generator);
+            TODO();
          }
       );
    }
-}
-
-/// Create a pipeline from a file                                             
-///   @param file - the file interface                                        
-Construct ASCIIPipeline::FromFile(const A::File& file) {
-   try {
-      // Check if file is a text file, and attempt using it             
-      return FromCode(file.ReadAs<Text>());
-   }
-   catch (...) { throw; }
-
-   //TODO handle other kinds of files
 }
 
 /// Create a pipeline capable of rendering a mesh                             

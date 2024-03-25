@@ -41,7 +41,7 @@ namespace Catch
 
 }
 
-/*SCENARIO("Renderer creation inside a window", "[renderer]") {
+SCENARIO("Renderer creation inside a window", "[renderer]") {
    static Allocator::State memoryState;
 
    for (int repeat = 0; repeat != 10; ++repeat) {
@@ -51,7 +51,7 @@ namespace Catch
          root.SetName("ROOT");
 
          root.CreateRuntime();
-         root.LoadMod("GLFW");
+         root.LoadMod("FTXUI");
          root.LoadMod("Vulkan");
          
          WHEN("A renderer is created via abstractions") {
@@ -103,8 +103,8 @@ SCENARIO("Drawing an empty window", "[renderer]") {
       root.SetName("ROOT");
 
       root.CreateRuntime();
-      root.LoadMod("GLFW");
-      root.LoadMod("Vulkan");
+      root.LoadMod("FTXUI");
+      root.LoadMod("ASCII");
       root.LoadMod("AssetsImages");
 
       root.CreateUnit<A::Window>(Traits::Size(640, 480));
@@ -147,7 +147,7 @@ SCENARIO("Drawing an empty window", "[renderer]") {
 
    // Check for memory leaks after each initialization cycle            
    REQUIRE(memoryState.Assert());
-}*/
+}
 
 SCENARIO("Drawing solid polygons", "[renderer]") {
    static Allocator::State memoryState;
@@ -158,8 +158,8 @@ SCENARIO("Drawing solid polygons", "[renderer]") {
       root.SetName("ROOT");
 
       root.CreateRuntime();
-      root.LoadMod("GLFW");
-      root.LoadMod("Vulkan");
+      root.LoadMod("FTXUI");
+      root.LoadMod("ASCII");
       root.LoadMod("FileSystem");
       root.LoadMod("AssetsImages");
       root.LoadMod("AssetsGeometry");

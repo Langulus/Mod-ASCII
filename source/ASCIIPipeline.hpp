@@ -29,7 +29,6 @@ private:
    // Subscribers                                                       
    TAny<const ASCIIRenderable*> mSubscribers;
 
-   static Construct FromFile(const A::File&);
    static Construct FromMesh(const A::Mesh&);
    static Construct FromText(const Text&);
 

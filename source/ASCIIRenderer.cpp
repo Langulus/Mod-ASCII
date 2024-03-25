@@ -26,6 +26,7 @@ ASCIIRenderer::ASCIIRenderer(ASCII* producer, const Neat& descriptor)
    LANGULUS_ASSERT(mWindow, Construct,
       "No window available for renderer - did you create a window component "
       "_before_ creating the renderer?");
+
    if (not SeekValueAux<Traits::Size>(descriptor, mResolution))
       mResolution = mWindow->GetSize();
 
@@ -103,18 +104,7 @@ void ASCIIRenderer::Draw() {
    }
    else {
       // No layers available, so just clear screen                      
-      VkViewport viewport {};
-      viewport.width = (*mResolution)[0];
-      viewport.height = (*mResolution)[1];
-
-      VkRect2D scissor {};
-      scissor.extent.width = static_cast<uint32_t>(viewport.width);
-      scissor.extent.height = static_cast<uint32_t>(viewport.height);
-
-      vkCmdBeginRenderPass(config.mCommands, &config.mPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
-      vkCmdSetViewport(config.mCommands, 0, 1, &viewport);
-      vkCmdSetScissor(config.mCommands, 0, 1, &scissor);
-      vkCmdEndRenderPass(config.mCommands);
+      TODO();
    }
 }
 
