@@ -13,7 +13,7 @@
 ///   @param producer - the light producer                                    
 ///   @param descriptor - the light descriptor                                
 ASCIILight::ASCIILight(ASCIILayer* producer, const Neat& descriptor)
-   : Graphics {MetaOf<ASCIILight>()}
+   : Resolvable {MetaOf<ASCIILight>()}
    , ProducedFrom {producer, descriptor} {
    VERBOSE_ASCII("Initializing...");
    Couple(descriptor);

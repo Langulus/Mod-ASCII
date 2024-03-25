@@ -13,7 +13,7 @@
 ///   @param producer - the pipeline producer                                 
 ///   @param descriptor - the pipeline descriptor                             
 ASCIIPipeline::ASCIIPipeline(ASCIIRenderer* producer, const Neat& descriptor)
-   : Graphics {MetaOf<ASCIIPipeline>()}
+   : Resolvable {MetaOf<ASCIIPipeline>()}
    , ProducedFrom {producer, descriptor} {
    VERBOSE_ASCII("Initializing graphics pipeline from: ", descriptor);
    bool predefinedMaterial = false;

@@ -1,7 +1,7 @@
 file(GLOB_RECURSE
 	LANGULUS_MOD_ASCII_TEST_SOURCES 
 	LIST_DIRECTORIES FALSE CONFIGURE_DEPENDS
-	*.cpp *.hpp
+	*.cpp
 )
 
 add_executable(LangulusModASCIITest ${LANGULUS_MOD_ASCII_TEST_SOURCES})
@@ -15,7 +15,6 @@ add_dependencies(LangulusModASCIITest
 	LangulusModASCII
 	LangulusModFTXUI
 	LangulusModFileSystem
-	LangulusModAssetsImages
 	LangulusModAssetsGeometry
 	LangulusModAssetsMaterials
 	LangulusModPhysics

@@ -52,7 +52,7 @@ SCENARIO("Renderer creation inside a window", "[renderer]") {
 
          root.CreateRuntime();
          root.LoadMod("FTXUI");
-         root.LoadMod("Vulkan");
+         root.LoadMod("ASCII");
          
          WHEN("A renderer is created via abstractions") {
             auto window = root.CreateUnit<A::Window>(Traits::Size(640, 480));
@@ -105,7 +105,6 @@ SCENARIO("Drawing an empty window", "[renderer]") {
       root.CreateRuntime();
       root.LoadMod("FTXUI");
       root.LoadMod("ASCII");
-      root.LoadMod("AssetsImages");
 
       root.CreateUnit<A::Window>(Traits::Size(640, 480));
       root.CreateUnit<A::Renderer>();
@@ -161,7 +160,6 @@ SCENARIO("Drawing solid polygons", "[renderer]") {
       root.LoadMod("FTXUI");
       root.LoadMod("ASCII");
       root.LoadMod("FileSystem");
-      root.LoadMod("AssetsImages");
       root.LoadMod("AssetsGeometry");
       root.LoadMod("AssetsMaterials");
       root.LoadMod("Physics");

@@ -14,7 +14,7 @@
 ///   @param producer - the camera producer                                   
 ///   @param descriptor - the camera descriptor                               
 ASCIICamera::ASCIICamera(ASCIILayer* producer, const Neat& descriptor)
-   : Graphics {MetaOf<ASCIICamera>()}
+   : Resolvable {MetaOf<ASCIICamera>()}
    , ProducedFrom {producer, descriptor} {
    VERBOSE_ASCII("Initializing...");
    Couple(descriptor);

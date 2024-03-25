@@ -15,7 +15,7 @@
 ///   @param producer - the renderer producer                                 
 ///   @param descriptor - the renderer descriptor                             
 ASCIIRenderer::ASCIIRenderer(ASCII* producer, const Neat& descriptor)
-   : Renderer {MetaOf<ASCIIRenderer>()}
+   : Resolvable {MetaOf<ASCIIRenderer>()}
    , ProducedFrom {producer, descriptor}
    , mLayers {this}
    , mPipelines {this} {
