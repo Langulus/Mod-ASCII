@@ -140,9 +140,6 @@ Construct ASCIIPipeline::FromText(const Text& text) {
 ///   @param offset - the subscriber to start from                            
 ///   @return the number of rendered subscribers                              
 Count ASCIIPipeline::RenderLevel(Offset offset) const {
-   // Get the initial state to check for interrupts                     
-   const auto& initial = mSubscribers[offset];
-
    // And for each subscriber...                                        
    auto i = offset;
    for (; i < mSubscribers.GetCount() - 1; ++i)
