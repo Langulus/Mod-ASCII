@@ -19,7 +19,7 @@ LANGULUS_DEFINE_MODULE(
 ///   @param system - the system that owns the module instance                
 ///   @param handle - the library handle                                      
 ASCII::ASCII(Runtime* runtime, const Neat&)
-   : Resolvable {MetaOf<ASCII>()}
+   : Resolvable {this}
    , Module {runtime}
    , mRenderers {this} {
    VERBOSE_ASCII("Initializing...");

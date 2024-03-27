@@ -14,7 +14,7 @@
 ///   @param producer - the renderable producer                               
 ///   @param descriptor - the renderable descriptor                           
 ASCIIRenderable::ASCIIRenderable(ASCIILayer* producer, const Neat& descriptor)
-   : Resolvable {MetaOf<ASCIIRenderable>()}
+   : Resolvable {this}
    , ProducedFrom {producer, descriptor} {
    VERBOSE_ASCII("Initializing...");
    Couple(descriptor);

@@ -15,7 +15,7 @@
 ///   @param producer - the camera producer                                   
 ///   @param descriptor - the camera descriptor                               
 ASCIILayer::ASCIILayer(ASCIIRenderer* producer, const Neat& descriptor)
-   : Resolvable {MetaOf<ASCIILayer>()}
+   : Resolvable {this}
    , ProducedFrom {producer, descriptor}
    , mCameras {this}
    , mRenderables {this}
