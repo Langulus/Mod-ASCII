@@ -39,10 +39,10 @@ ASCIIRenderer::ASCIIRenderer(ASCII* producer, const Neat& descriptor)
 
 /// Destroy anything created                                                  
 void ASCIIRenderer::Detach() {
+   mBackbuffer.Detach();
    mLayers.Reset();
    mWindow.Reset();
-   ProducedFrom<ASCII>::Detach();
-   mBackbuffer.Reset();
+   ProducedFrom::Detach();
 }
 
 /// Renderer destruction                                                      
@@ -93,6 +93,8 @@ void ASCIIRenderer::Draw() {
       layer.Generate(relevantPipes);
 
    RenderConfig config { " ", 1_real };
+   mBackbuffer.Resize(mWindow->GetSize().x, mWindow->GetSize().y);
+
    if (mLayers) {
       // Render all layers                                              
       for (const auto& layer : mLayers)
@@ -100,13 +102,7 @@ void ASCIIRenderer::Draw() {
    }
    else {
       // No layers available, so just clear screen                      
-      mBackbuffer.Clear();
-      for (int y = 0; y < mWindow->GetSize().y; ++y) {
-         for (int x = 0; x < mWindow->GetSize().x; ++x)
-            mBackbuffer += " ";
-         mBackbuffer += "\n";
-      }
-      mBackbuffer += '\0';
+      mBackbuffer.Fill(U' ', Colors::White, Colors::Red);
    }
 
    mWindow->Draw(&mBackbuffer);

@@ -25,6 +25,7 @@ struct ASCIICamera;
 struct ASCIILight;
 struct ASCIIRenderable;
 struct ASCIIPipeline;
+struct ASCIIImage;
 
 #if 1
    #define VERBOSE_ASCII_ENABLED() 1

@@ -26,6 +26,7 @@ ASCIIPipeline::ASCIIPipeline(ASCIIRenderer* producer, const Neat& descriptor)
       },
       [this, &predefinedMaterial](const A::Material& material) {
          // Create from predefined material generator                   
+         (void) this;
          TODO();
          predefinedMaterial = true;
          return Loop::Break;

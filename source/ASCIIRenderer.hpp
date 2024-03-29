@@ -9,6 +9,7 @@
 #pragma once
 #include "ASCIIPipeline.hpp"
 #include "ASCIILayer.hpp"
+#include "inner/ASCIIImage.hpp"
 #include <Flow/Verbs/Create.hpp>
 #include <Flow/Verbs/Interpret.hpp>
 #include <Math/Gradient.hpp>
@@ -53,7 +54,7 @@ protected:
    TFactoryUnique<ASCIIPipeline> mPipelines;
 
    // Backbuffer                                                        
-   Text mBackbuffer;
+   ASCIIImage mBackbuffer;
 
 public:
    ASCIIRenderer(ASCII*, const Neat&);
