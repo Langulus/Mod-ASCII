@@ -42,6 +42,7 @@ void ASCIIRenderer::Detach() {
    mLayers.Reset();
    mWindow.Reset();
    ProducedFrom<ASCII>::Detach();
+   mBackbuffer.Reset();
 }
 
 /// Renderer destruction                                                      
@@ -55,10 +56,6 @@ void ASCIIRenderer::Refresh() {
    const Scale2 previousResolution = *mResolution;
    if (not SeekValue<Traits::Size>(mResolution))
       mResolution = mWindow->GetSize();
-
-   if (*mResolution != previousResolution) {
-      TODO();
-   }
 
    // Refresh time and mouse properties                                 
    SeekValue<Traits::Time>(mTime);
@@ -96,7 +93,6 @@ void ASCIIRenderer::Draw() {
       layer.Generate(relevantPipes);
 
    RenderConfig config { " ", 1_real };
-
    if (mLayers) {
       // Render all layers                                              
       for (const auto& layer : mLayers)
@@ -104,8 +100,16 @@ void ASCIIRenderer::Draw() {
    }
    else {
       // No layers available, so just clear screen                      
-      TODO();
+      mBackbuffer.Clear();
+      for (int y = 0; y < mWindow->GetSize().y; ++y) {
+         for (int x = 0; x < mWindow->GetSize().x; ++x)
+            mBackbuffer += " ";
+         mBackbuffer += "\n";
+      }
+      mBackbuffer += '\0';
    }
+
+   mWindow->Draw(&mBackbuffer);
 }
 
 /// Get the window interface                                                  

@@ -32,7 +32,6 @@ protected:
    friend struct ASCIICamera;
    friend struct ASCIILayer;
 
-protected:
    //                                                                   
    // Runtime updatable variables                                       
    //                                                                   
@@ -52,6 +51,9 @@ protected:
    TFactory<ASCIILayer> mLayers;
    // Pipelines                                                         
    TFactoryUnique<ASCIIPipeline> mPipelines;
+
+   // Backbuffer                                                        
+   Text mBackbuffer;
 
 public:
    ASCIIRenderer(ASCII*, const Neat&);

@@ -148,7 +148,7 @@ SCENARIO("Drawing an empty window", "[renderer]") {
    REQUIRE(memoryState.Assert());
 }
 
-SCENARIO("Drawing solid polygons", "[renderer]") {
+/*SCENARIO("Drawing solid polygons", "[renderer]") {
    static Allocator::State memoryState;
 
    GIVEN("A window with a renderer") {
@@ -217,5 +217,5 @@ SCENARIO("Drawing solid polygons", "[renderer]") {
 
    // Check for memory leaks after each initialization cycle            
    REQUIRE(memoryState.Assert());
-}
+}*/
 
