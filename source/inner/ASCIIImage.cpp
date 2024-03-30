@@ -36,7 +36,7 @@ void ASCIIImage::Resize(int x, int y) {
 
    const auto count = x * y;
    mSymbols.Clear();
-   mSymbols.New(count, U' ');
+   mSymbols.New(count, ' ');
 
    mFgColors.Clear();
    mFgColors.New(count, Colors::White);
@@ -71,11 +71,11 @@ ASCIIImage::Pixel ASCIIImage::GetPixel(int x, int y) {
 }
 
 /// Fill the image with a single symbol and style                             
-///   @param s - the unicode symbol that will be displayed everywhere         
+///   @param s - the utf8 encoded symbol that will be displayed everywhere    
 ///   @param fg - the color that will be used for the background              
 ///   @param bg - the color that will be used for the foreground              
 ///   @param f - the emphasis that will be used                               
-void ASCIIImage::Fill(char32_t s, RGB fg, RGB bg, Style f) {
+void ASCIIImage::Fill(const Text& s, RGB fg, RGB bg, Style f) {
    mSymbols.Fill(s);
    mFgColors.Fill(fg);
    mBgColors.Fill(bg);

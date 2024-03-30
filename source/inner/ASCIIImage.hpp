@@ -14,14 +14,14 @@
 ///                                                                           
 ///   An ASCII image                                                          
 ///                                                                           
-/// Used for a backbuffer by the ASCII renderer, as well as a target type     
+///   Used for a backbuffer by the ASCII renderer, as well as a target type   
 /// to Verbs::Interpret as, in order to render ASCII graphics                 
 ///                                                                           
 struct ASCIIImage final : A::Image {
    using Style = Logger::Emphasis;
 
 private:
-   TAny<char32_t> mSymbols;   // Array of symbols for each pixel        
+   TAny<Text>     mSymbols;   // Array of utf8 encoded symbols          
    TAny<RGB>      mBgColors;  // Array of foreground colors             
    TAny<RGB>      mFgColors;  // Array of background colors             
    TAny<Style>    mStyle;     // Array of styles for each pixel         
@@ -34,7 +34,7 @@ public:
 
    /// A single pixel from the image                                          
    struct Pixel {
-      char32_t& mSymbol;
+      Text&     mSymbol;
       RGB&      mFgColor;
       RGB&      mBgColor;
       Style&    mStyle;
@@ -42,7 +42,7 @@ public:
 
    void  Resize(int x, int y);
    Pixel GetPixel(int x, int y);
-   void  Fill(char32_t, RGB fg = Colors::White, RGB bg = Colors::Black, Style = {});
+   void  Fill(const Text&, RGB fg = Colors::White, RGB bg = Colors::Black, Style = {});
 
    Ref<Image> GetLOD(const Math::LOD&) const { return {}; }
    void* GetGPUHandle() const noexcept { return nullptr; }
