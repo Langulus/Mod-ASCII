@@ -293,7 +293,7 @@ void ASCIILayer::Render(const RenderConfig& config) const {
 /// This is used only for Batched style layers, and relies on previously      
 /// compiled set of pipelines                                                 
 ///   @param config - where to render to                                      
-void ASCIILayer::RenderBatched(const RenderConfig& config) const {
+void ASCIILayer::RenderBatched(const RenderConfig&) const {
    // Iterate all valid cameras                                         
    TUnorderedMap<const ASCIIPipeline*, Count> done;
 
@@ -331,7 +331,7 @@ void ASCIILayer::RenderBatched(const RenderConfig& config) const {
 /// This is used only for Hierarchical style layers, and relies on locally    
 /// compiled subscribers, rendering them in their respective order            
 ///   @param config - where to render to                                      
-void ASCIILayer::RenderHierarchical(const RenderConfig& config) const {
+void ASCIILayer::RenderHierarchical(const RenderConfig&) const {
    Count subscribersDone = 0;
    auto subscriberCountPerLevel = &mSubscriberCountPerLevel[0];
 

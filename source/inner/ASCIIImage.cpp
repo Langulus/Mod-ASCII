@@ -30,7 +30,8 @@ ASCIIImage::ASCIIImage()
 ///   @param y - new height                                                   
 void ASCIIImage::Resize(int x, int y) {
    LANGULUS_ASSUME(DevAssumes, x and y, "Invalid resize dimensions");
-   if (x == mView.mWidth and y == mView.mHeight)
+   if (x == static_cast<int>(mView.mWidth)
+   and y == static_cast<int>(mView.mHeight))
       return;
 
    const auto count = x * y;
@@ -46,8 +47,8 @@ void ASCIIImage::Resize(int x, int y) {
    mStyle.Clear();
    mStyle.New(count);
 
-   mView.mWidth = x;
-   mView.mHeight = y;
+   mView.mWidth  = static_cast<uint32_t>(x);
+   mView.mHeight = static_cast<uint32_t>(y);
 }
 
 /// Get a pixel at coordinates x, y                                           

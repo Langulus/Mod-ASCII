@@ -75,8 +75,8 @@ void ASCIICamera::Compile() {
 
    mProjectionInverted = mProjection.Invert();
 
-   const auto viewport = mViewport.Length();
-   const auto offset = mViewport.mMin;
+   //const auto viewport = mViewport.Length();
+   //const auto offset   = mViewport.mMin;
 }
 
 /// Recompile the camera                                                      

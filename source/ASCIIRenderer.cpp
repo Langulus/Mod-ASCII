@@ -105,7 +105,7 @@ void ASCIIRenderer::Draw() {
       mBackbuffer.Fill(U' ', Colors::White, Colors::Red);
    }
 
-   mWindow->Draw(&mBackbuffer);
+   (void) mWindow->Draw(&mBackbuffer);
 }
 
 /// Get the window interface                                                  

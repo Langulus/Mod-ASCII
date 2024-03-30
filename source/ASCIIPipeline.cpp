@@ -26,7 +26,8 @@ ASCIIPipeline::ASCIIPipeline(ASCIIRenderer* producer, const Neat& descriptor)
       },
       [this, &predefinedMaterial](const A::Material& material) {
          // Create from predefined material generator                   
-         (void) this;
+         (void)this;
+         (void)material;
          TODO();
          predefinedMaterial = true;
          return Loop::Break;
@@ -61,6 +62,8 @@ ASCIIPipeline::ASCIIPipeline(ASCIIRenderer* producer, const Neat& descriptor)
       Verbs::Create creator {Abandon(material)};
       producer->RunIn(creator)->ForEach(
          [this](const A::Material& generator) {
+            (void)this;
+            (void)generator;
             TODO();
          }
       );
@@ -132,7 +135,7 @@ Construct ASCIIPipeline::FromMesh(const A::Mesh& mesh) {
 
 /// Directly initialize the back buffer using an ASCII "screenshot"           
 ///   @param text - the formatted screenshot                                  
-Construct ASCIIPipeline::FromText(const Text& text) {
+Construct ASCIIPipeline::FromText(const Text&) {
    TODO();
    return {};
 }
@@ -150,6 +153,6 @@ Count ASCIIPipeline::RenderLevel(Offset offset) const {
 
 /// Draw a single renderable (used in hierarchical drawing)                   
 ///   @param sub - the subscriber to render                                   
-void ASCIIPipeline::Render(const ASCIIRenderable& sub) const {
+void ASCIIPipeline::Render(const ASCIIRenderable&) const {
    TODO(); // this is where rasterization happens
 }
