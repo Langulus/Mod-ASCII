@@ -37,6 +37,7 @@ ASCIIRenderer::ASCIIRenderer(ASCII* producer, const Neat& descriptor)
 /// Destroy anything created                                                  
 void ASCIIRenderer::Detach() {
    mBackbuffer.Detach();
+   mPipelines.Reset();
    mLayers.Reset();
    mWindow.Reset();
    ProducedFrom::Detach();
@@ -94,7 +95,7 @@ void ASCIIRenderer::Draw() {
    }
    else {
       // No layers available, so just clear screen                      
-      mBackbuffer.Fill(U' ', Colors::White, Colors::Red);
+      mBackbuffer.Fill(' ', Colors::White, Colors::Red);
    }
 
    (void) mWindow->Draw(&mBackbuffer);
