@@ -45,8 +45,6 @@ protected:
    Ref<Grad2v2> mMousePosition;
    // Mouse scroll, can be passed to shaders                            
    Ref<Grad2v2> mMouseScroll;
-   // Previous resolution (for detecting change)                        
-   Pin<Scale2> mResolution;
 
    // Layers                                                            
    TFactory<ASCIILayer> mLayers;
@@ -68,5 +66,5 @@ public:
    void Interpret(Verb&);
 
    NOD() const A::Window* GetWindow() const noexcept;
-   NOD() const Scale2& GetResolution() const noexcept;
+   NOD() Scale2 GetResolution() const noexcept;
 };

@@ -56,12 +56,12 @@ void ASCIIImage::Resize(int x, int y) {
 ///   @param y - the y coordinate                                             
 ///   @return the pixel interface                                             
 ASCIIImage::Pixel ASCIIImage::GetPixel(int x, int y) {
-   LANGULUS_ASSUME(DevAssumes, x < mView.mWidth and x >= 0,
+   LANGULUS_ASSUME(DevAssumes, x < static_cast<int>(mView.mWidth) and x >= 0,
       "Pixel out of horizontal limits");
-   LANGULUS_ASSUME(DevAssumes, y < mView.mHeight and y >= 0,
+   LANGULUS_ASSUME(DevAssumes, y < static_cast<int>(mView.mHeight) and y >= 0,
       "Pixel out of vertical limits");
 
-   const auto index = y * mView.mWidth + x;
+   const auto index = y * static_cast<int>(mView.mWidth) + x;
    return {
       mSymbols[index],
       mFgColors[index],

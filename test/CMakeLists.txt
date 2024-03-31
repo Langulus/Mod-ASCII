@@ -9,6 +9,7 @@ add_executable(LangulusModASCIITest ${LANGULUS_MOD_ASCII_TEST_SOURCES})
 target_link_libraries(LangulusModASCIITest
 	PRIVATE		Langulus
 				Catch2
+				$<$<NOT:$<BOOL:${WIN32}>>:pthread>
 )
 
 add_dependencies(LangulusModASCIITest

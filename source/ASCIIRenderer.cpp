@@ -27,9 +27,6 @@ ASCIIRenderer::ASCIIRenderer(ASCII* producer, const Neat& descriptor)
       "No window available for renderer - did you create a window component "
       "_before_ creating the renderer?");
 
-   if (not SeekValueAux<Traits::Size>(descriptor, mResolution))
-      mResolution = mWindow->GetSize();
-
    SeekValueAux<Traits::Time>(descriptor, mTime);
    SeekValueAux<Traits::MousePosition>(descriptor, mMousePosition);
    SeekValueAux<Traits::MouseScroll>(descriptor, mMouseScroll);
@@ -52,11 +49,6 @@ ASCIIRenderer::~ASCIIRenderer() {
 
 /// React to changes in environment                                           
 void ASCIIRenderer::Refresh() {
-   // Resize swapchain from the environment                             
-   const Scale2 previousResolution = *mResolution;
-   if (not SeekValue<Traits::Size>(mResolution))
-      mResolution = mWindow->GetSize();
-
    // Refresh time and mouse properties                                 
    SeekValue<Traits::Time>(mTime);
    SeekValue<Traits::MousePosition>(mMousePosition);
@@ -116,6 +108,6 @@ const A::Window* ASCIIRenderer::GetWindow() const noexcept {
 
 /// Get the current resolution                                                
 ///   @return the resolution                                                  
-const Scale2& ASCIIRenderer::GetResolution() const noexcept {
-   return *mResolution;
+Scale2 ASCIIRenderer::GetResolution() const noexcept {
+   return {mBackbuffer.GetView().mWidth, mBackbuffer.GetView().mHeight};
 }
