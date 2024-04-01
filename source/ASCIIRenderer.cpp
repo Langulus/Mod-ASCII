@@ -86,7 +86,10 @@ void ASCIIRenderer::Draw() {
       layer.Generate(relevantPipes);
 
    RenderConfig config { " ", 1_real };
-   mBackbuffer.Resize(mWindow->GetSize().x, mWindow->GetSize().y);
+   mBackbuffer.Resize(
+      static_cast<int>(mWindow->GetSize().x),
+      static_cast<int>(mWindow->GetSize().y)
+   );
 
    if (mLayers) {
       // Render all layers                                              
