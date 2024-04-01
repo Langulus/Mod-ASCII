@@ -9,19 +9,17 @@
 #include "../ASCII.hpp"
 
 
-/// Descriptor constructor                                                    
-///   @param producer - the light producer                                    
-///   @param descriptor - the light descriptor                                
+/// Default constructor                                                       
 ASCIIImage::ASCIIImage()
    : Resolvable {this} {
    VERBOSE_ASCII("Initializing...");
    // Member arrays are commited as references to reduce boilerplate    
    // but beware of descriptor-content disparity if this Image class    
    // is produced from factories at some point                          
-   Commit(Any {&mSymbols});
-   Commit<Traits::Color>(Any {&mFgColors});
-   Commit<Traits::Color>(Any {&mBgColors});
-   Commit(Any {&mStyle});
+   Commit(&mSymbols);
+   Commit<Traits::Color>(&mFgColors);
+   Commit<Traits::Color>(&mBgColors);
+   Commit(&mStyle);
    VERBOSE_ASCII("Initialized");
 }
 

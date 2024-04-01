@@ -55,7 +55,7 @@ SCENARIO("Renderer creation inside a window", "[renderer]") {
          root.LoadMod("ASCII");
          
          WHEN("A renderer is created via abstractions") {
-            auto window = root.CreateUnit<A::Window>(Traits::Size(640, 480));
+            auto window = root.CreateUnit<A::Window>();
             auto renderer = root.CreateUnit<A::Renderer>();
             root.DumpHierarchy();
                
@@ -72,7 +72,7 @@ SCENARIO("Renderer creation inside a window", "[renderer]") {
 
       #if LANGULUS_FEATURE(MANAGED_REFLECTION)
          WHEN("A renderer is created via tokens") {
-            auto window = root.CreateUnitToken("A::Window", Traits::Size(640, 480));
+            auto window = root.CreateUnitToken("A::Window");
             auto renderer = root.CreateUnitToken("Renderer");
             root.DumpHierarchy();
                
@@ -106,7 +106,7 @@ SCENARIO("Drawing an empty window", "[renderer]") {
       root.LoadMod("FTXUI");
       root.LoadMod("ASCII");
 
-      root.CreateUnit<A::Window>(Traits::Size(640, 480));
+      root.CreateUnit<A::Window>();
       root.CreateUnit<A::Renderer>();
 
       static Allocator::State memoryState2;
@@ -164,18 +164,18 @@ SCENARIO("Drawing an empty window", "[renderer]") {
       root.LoadMod("AssetsMaterials");
       root.LoadMod("Physics");
 
-      root.CreateUnit<A::Window>(Traits::Size(640, 480));
+      root.CreateUnit<A::Window>();
       root.CreateUnit<A::Renderer>();
       root.CreateUnit<A::Layer>();
       root.CreateUnit<A::World>();
 
-      auto rect = root.CreateChild({Traits::Size {100}, Traits::Name {"Rectangles"}});
+      auto rect = root.CreateChild({Traits::Size {10}, Traits::Name {"Rectangles"}});
       auto renderable = rect->CreateUnit<A::Renderable>();
       auto mesh = rect->CreateUnit<A::Mesh>(Math::Box2 {});
-      auto topLeft  = rect->CreateUnit<A::Instance>(Traits::Place(100, 100), Colors::Black);
-      auto topRight = rect->CreateUnit<A::Instance>(Traits::Place(540, 100), Colors::Green);
-      auto botLeft  = rect->CreateUnit<A::Instance>(Traits::Place(100, 380), Colors::Blue);
-      auto botRight = rect->CreateUnit<A::Instance>(Traits::Place(540, 380), Colors::White);
+      auto topLeft  = rect->CreateUnit<A::Instance>(Traits::Place(10, 10), Colors::Black);
+      auto topRight = rect->CreateUnit<A::Instance>(Traits::Place(54, 10), Colors::Green);
+      auto botLeft  = rect->CreateUnit<A::Instance>(Traits::Place(10, 38), Colors::Blue);
+      auto botRight = rect->CreateUnit<A::Instance>(Traits::Place(54, 38), Colors::White);
       root.DumpHierarchy();
 
       static Allocator::State memoryState2;
