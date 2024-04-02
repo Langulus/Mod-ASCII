@@ -39,7 +39,8 @@ ASCIIRenderer::ASCIIRenderer(ASCII* producer, const Neat& descriptor)
 
 /// Destroy anything created                                                  
 void ASCIIRenderer::Detach() {
-   mBackbuffer.Reset();
+   mBackbuffer->Detach();  // ASCIIImage self-refers in asset contents  
+   mBackbuffer.Reset();    // and if not detached before reset it leaks 
    mPipelines.Reset();
    mLayers.Reset();
    mWindow.Reset();
