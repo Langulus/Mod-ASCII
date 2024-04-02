@@ -98,7 +98,6 @@ SCENARIO("Drawing an empty window", "[renderer]") {
    static Allocator::State memoryState;
 
    GIVEN("A window with a renderer") {
-      static Allocator::State memoryState2;
 
       // Create the scene                                               
       Thing root;
@@ -111,6 +110,7 @@ SCENARIO("Drawing an empty window", "[renderer]") {
       root.CreateUnit<A::Window>();
       root.CreateUnit<A::Renderer>();
 
+      static Allocator::State memoryState2;
 
       for (int repeat = 0; repeat != 10; ++repeat) {
          WHEN(std::string("Update cycle #") + std::to_string(repeat)) {

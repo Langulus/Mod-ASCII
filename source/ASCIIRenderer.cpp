@@ -30,6 +30,9 @@ ASCIIRenderer::ASCIIRenderer(ASCII* producer, const Neat& descriptor)
    SeekValueAux<Traits::Time>(descriptor, mTime);
    SeekValueAux<Traits::MousePosition>(descriptor, mMousePosition);
    SeekValueAux<Traits::MouseScroll>(descriptor, mMouseScroll);
+
+   mBackbuffer.New();
+
    Couple(descriptor);
    VERBOSE_ASCII("Initialized");
 }
@@ -86,9 +89,6 @@ void ASCIIRenderer::Draw() {
       layer.Generate(relevantPipes);
 
    RenderConfig config { " ", 1_real };
-   if (not mBackbuffer)
-      mBackbuffer.New();
-
    mBackbuffer->Resize(
       static_cast<int>(mWindow->GetSize().x),
       static_cast<int>(mWindow->GetSize().y)
