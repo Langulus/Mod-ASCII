@@ -40,6 +40,7 @@ public:
       Style&    mStyle;
    };
 
+   void  Detach();
    void  Resize(int x, int y);
    Pixel GetPixel(int x, int y);
    void  Fill(const Text&, RGB fg = Colors::White, RGB bg = Colors::Black, Style = {});
