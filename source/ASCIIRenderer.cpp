@@ -37,10 +37,7 @@ ASCIIRenderer::ASCIIRenderer(ASCII* producer, const Neat& descriptor)
 /// Destroy anything created                                                  
 void ASCIIRenderer::Detach() {
    auto e = Fractalloc::Instance.Find(nullptr, &mBackbuffer);
-   Logger::Info("Image ref before detaching: ", e->GetUses());
    mBackbuffer.Detach();
-   Logger::Info("Image ref after detaching: ", e->GetUses());
-
    mPipelines.Reset();
    mLayers.Reset();
    mWindow.Reset();
@@ -49,8 +46,6 @@ void ASCIIRenderer::Detach() {
 
 /// Renderer destruction                                                      
 ASCIIRenderer::~ASCIIRenderer() {
-   auto e = Fractalloc::Instance.Find(nullptr, &mBackbuffer);
-   Logger::Info("Image ref before destroyng renderer: ", e->GetUses());
    Detach();
 }
 
@@ -107,6 +102,10 @@ void ASCIIRenderer::Draw() {
       mBackbuffer.Fill(' ', Colors::White, Colors::Red);
    }
 
+   Logger::Info(
+      "Drawing: ", mBackbuffer.GetView().mWidth,
+      'x', mBackbuffer.GetView().mHeight
+   );
    (void) mWindow->Draw(&mBackbuffer);
 }
 

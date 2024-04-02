@@ -31,7 +31,6 @@ public:
    LANGULUS_BASES(A::Graphics);
 
    ASCIIImage();
-   ~ASCIIImage();
 
    /// A single pixel from the image                                          
    struct Pixel {

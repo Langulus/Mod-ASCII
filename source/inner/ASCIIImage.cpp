@@ -16,25 +16,11 @@ ASCIIImage::ASCIIImage()
    // Member arrays are commited as references to reduce boilerplate    
    // but beware of descriptor-content disparity if this Image class    
    // is produced from factories at some point                          
-   auto e = Fractalloc::Instance.Find(nullptr, this);
-   Logger::Info("Image ref before commiting symbols: ", e->GetUses());
    Commit(&mSymbols);
-   Logger::Info("Image ref after commiting symbols: ", e->GetUses());
    Commit<Traits::Color>(&mFgColors);
-   Logger::Info("Image ref after commiting mFgColors: ", e->GetUses());
    Commit<Traits::Color>(&mBgColors);
-   Logger::Info("Image ref after commiting mBgColors: ", e->GetUses());
    Commit(&mStyle);
-   Logger::Info("Image ref after commiting mStyle: ", e->GetUses());
    VERBOSE_ASCII("Initialized");
-}
-
-ASCIIImage::~ASCIIImage() {
-   // Member arrays are commited as references to reduce boilerplate    
-   // but beware of descriptor-content disparity if this Image class    
-   // is produced from factories at some point                          
-   auto e = Fractalloc::Instance.Find(nullptr, this);
-   Logger::Info("Image ref before destroying: ", e->GetUses());
 }
 
 /// Resize the image                                                          
