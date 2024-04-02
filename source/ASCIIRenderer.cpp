@@ -36,8 +36,7 @@ ASCIIRenderer::ASCIIRenderer(ASCII* producer, const Neat& descriptor)
 
 /// Destroy anything created                                                  
 void ASCIIRenderer::Detach() {
-   auto e = Fractalloc::Instance.Find(nullptr, &mBackbuffer);
-   mBackbuffer.Detach();
+   mBackbuffer.Reset();
    mPipelines.Reset();
    mLayers.Reset();
    mWindow.Reset();
@@ -87,7 +86,10 @@ void ASCIIRenderer::Draw() {
       layer.Generate(relevantPipes);
 
    RenderConfig config { " ", 1_real };
-   mBackbuffer.Resize(
+   if (not mBackbuffer)
+      mBackbuffer.New();
+
+   mBackbuffer->Resize(
       static_cast<int>(mWindow->GetSize().x),
       static_cast<int>(mWindow->GetSize().y)
    );
@@ -99,14 +101,14 @@ void ASCIIRenderer::Draw() {
    }
    else {
       // No layers available, so just clear screen                      
-      mBackbuffer.Fill(' ', Colors::White, Colors::Red);
+      mBackbuffer->Fill(' ', Colors::White, Colors::Red);
    }
 
    Logger::Info(
-      "Drawing: ", mBackbuffer.GetView().mWidth,
-      'x', mBackbuffer.GetView().mHeight
+      "Drawing: ", mBackbuffer->GetView().mWidth,
+      'x', mBackbuffer->GetView().mHeight
    );
-   (void) mWindow->Draw(&mBackbuffer);
+   (void) mWindow->Draw(mBackbuffer);
 }
 
 /// Get the window interface                                                  
@@ -118,5 +120,5 @@ const A::Window* ASCIIRenderer::GetWindow() const noexcept {
 /// Get the current resolution                                                
 ///   @return the resolution                                                  
 Scale2 ASCIIRenderer::GetResolution() const noexcept {
-   return {mBackbuffer.GetView().mWidth, mBackbuffer.GetView().mHeight};
+   return {mBackbuffer->GetView().mWidth, mBackbuffer->GetView().mHeight};
 }
