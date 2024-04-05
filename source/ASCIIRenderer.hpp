@@ -52,7 +52,7 @@ protected:
    TFactoryUnique<ASCIIPipeline> mPipelines;
 
    // Backbuffer                                                        
-   Ref<ASCIIImage> mBackbuffer;
+   ASCIIImage mBackbuffer;
 
 public:
    ASCIIRenderer(ASCII*, const Neat&);

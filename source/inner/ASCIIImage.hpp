@@ -9,6 +9,7 @@
 #pragma once
 #include "../Common.hpp"
 #include <Langulus/Image.hpp>
+#include <Flow/Verbs/Compare.hpp>
 
 
 ///                                                                           
@@ -21,16 +22,22 @@ struct ASCIIImage final : A::Image {
    using Style = Logger::Emphasis;
 
 private:
-   TAny<Text>     mSymbols;   // Array of utf8 encoded symbols          
-   TAny<RGB>      mBgColors;  // Array of foreground colors             
-   TAny<RGB>      mFgColors;  // Array of background colors             
-   TAny<Style>    mStyle;     // Array of styles for each pixel         
+   mutable TAny<Text>     mSymbols;   // Array of utf8 encoded symbols  
+   mutable TAny<RGB>      mBgColors;  // Array of foreground colors     
+   mutable TAny<RGB>      mFgColors;  // Array of background colors     
+   mutable TAny<Style>    mStyle;     // Array of styles for each pixel 
+
+   ASCIIRenderer* mRenderer;
+
+   bool CompareInner(const A::Image&) const;
 
 public:
    LANGULUS(ABSTRACT) false;
-   LANGULUS_BASES(A::Graphics);
+   LANGULUS_BASES(A::Image);
+   LANGULUS_VERBS(Verbs::Compare);
 
-   ASCIIImage();
+   ASCIIImage() = delete;
+   ASCIIImage(ASCIIRenderer*);
 
    /// A single pixel from the image                                          
    struct Pixel {
@@ -38,12 +45,15 @@ public:
       RGB&      mFgColor;
       RGB&      mBgColor;
       Style&    mStyle;
+
+      bool operator == (const RGBA&) const noexcept;
    };
 
-   void  Detach();
    void  Resize(int x, int y);
-   Pixel GetPixel(int x, int y);
+   Pixel GetPixel(int x, int y) const;
    void  Fill(const Text&, RGB fg = Colors::White, RGB bg = Colors::Black, Style = {});
+   void  Compare(Verb&) const;
+   auto  ForEachPixel(auto&&) const;
 
    Ref<Image> GetLOD(const Math::LOD&) const { return {}; }
    void* GetGPUHandle() const noexcept { return nullptr; }

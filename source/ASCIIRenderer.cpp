@@ -18,7 +18,8 @@ ASCIIRenderer::ASCIIRenderer(ASCII* producer, const Neat& descriptor)
    : Resolvable {this}
    , ProducedFrom {producer, descriptor}
    , mLayers {this}
-   , mPipelines {this} {
+   , mPipelines {this}
+   , mBackbuffer {this} {
    VERBOSE_ASCII("Initializing...");
 
    // Retrieve relevant traits from the environment                     
@@ -31,16 +32,13 @@ ASCIIRenderer::ASCIIRenderer(ASCII* producer, const Neat& descriptor)
    SeekValueAux<Traits::MousePosition>(descriptor, mMousePosition);
    SeekValueAux<Traits::MouseScroll>(descriptor, mMouseScroll);
 
-   mBackbuffer.New();
-
    Couple(descriptor);
    VERBOSE_ASCII("Initialized");
 }
 
 /// Destroy anything created                                                  
 void ASCIIRenderer::Detach() {
-   mBackbuffer->Detach();  // ASCIIImage self-refers in asset contents  
-   mBackbuffer.Reset();    // and if not detached before reset it leaks 
+   mBackbuffer.Detach();
    mPipelines.Reset();
    mLayers.Reset();
    mWindow.Reset();
@@ -68,12 +66,12 @@ void ASCIIRenderer::Create(Verb& verb) {
    mPipelines.Create(verb);
 }
 
-/// Interpret the renderer as Text, i.e. take a "screenshot"                  
+/// Interpret the renderer as an image, i.e. take an ascii "screenshot"       
 ///   @param verb - interpret verb                                            
 void ASCIIRenderer::Interpret(Verb& verb) {
    verb.ForEach([&](DMeta meta) {
-      if (meta->template CastsTo<Text>())
-         TODO();
+      if (meta->template CastsTo<A::Image>())
+         verb << &mBackbuffer;
    });
 }
 
@@ -90,7 +88,7 @@ void ASCIIRenderer::Draw() {
       layer.Generate(relevantPipes);
 
    RenderConfig config { " ", 1_real };
-   mBackbuffer->Resize(
+   mBackbuffer.Resize(
       static_cast<int>(mWindow->GetSize().x),
       static_cast<int>(mWindow->GetSize().y)
    );
@@ -102,14 +100,10 @@ void ASCIIRenderer::Draw() {
    }
    else {
       // No layers available, so just clear screen                      
-      mBackbuffer->Fill(' ', Colors::White, Colors::Red);
+      mBackbuffer.Fill(' ', Colors::White, Colors::Red);
    }
 
-   Logger::Info(
-      "Drawing: ", mBackbuffer->GetView().mWidth,
-      'x', mBackbuffer->GetView().mHeight
-   );
-   (void) mWindow->Draw(mBackbuffer);
+   (void) mWindow->Draw(&mBackbuffer);
 }
 
 /// Get the window interface                                                  
@@ -121,5 +115,8 @@ const A::Window* ASCIIRenderer::GetWindow() const noexcept {
 /// Get the current resolution                                                
 ///   @return the resolution                                                  
 Scale2 ASCIIRenderer::GetResolution() const noexcept {
-   return {mBackbuffer->GetView().mWidth, mBackbuffer->GetView().mHeight};
+   return {
+      mBackbuffer.GetView().mWidth,
+      mBackbuffer.GetView().mHeight
+   };
 }

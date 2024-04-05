@@ -119,7 +119,7 @@ SCENARIO("Drawing an empty window", "[renderer]") {
 
             // And interpret the scene as an image, i.e. taking a       
             // screenshot                                               
-            /*Verbs::InterpretAs<A::Image> interpret;
+            Verbs::InterpretAs<A::Image> interpret;
             root.Run(interpret);
 
             REQUIRE(root.GetUnits().GetCount() == 2);
@@ -135,7 +135,7 @@ SCENARIO("Drawing an empty window", "[renderer]") {
             REQUIRE(compare.IsDone());
             REQUIRE(compare->GetCount() == 1);
             REQUIRE(compare->IsDense());
-            REQUIRE(compare.GetOutput() == Compared::Equal);*/
+            REQUIRE(compare.GetOutput() == Compared::Equal);
 
             root.DumpHierarchy();
 
