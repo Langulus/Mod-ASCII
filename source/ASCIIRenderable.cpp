@@ -33,12 +33,11 @@ void ASCIIRenderable::Detach() {
       lod.mPipeline.Reset();
    }
 
-   mMaterialContent.Reset();
    mGeometryContent.Reset();
    mTextureContent.Reset();
    mInstances.Reset();
    mPredefinedPipeline.Reset();
-   ProducedFrom<ASCIILayer>::Detach();
+   ProducedFrom::Detach();
 }
 
 /// Get the renderer                                                          
@@ -53,15 +52,8 @@ ASCIIRenderer* ASCIIRenderable::GetRenderer() const noexcept {
 ///   @return the VRAM geometry or nullptr if content is not available        
 A::Mesh* ASCIIRenderable::GetGeometry(const LOD& lod) const {
    const auto i = lod.GetAbsoluteIndex();
-   if (not mLOD[i].mGeometry and mGeometryContent) {
-      // Cache geometry to VRAM                                         
-      Verbs::Create creator {
-         Construct::From<A::Mesh>(mGeometryContent->GetLOD(lod))
-      };
-      mProducer->Create(creator);
-      mLOD[i].mGeometry = creator->template As<A::Mesh*>();
-   }
-
+   if (not mLOD[i].mGeometry and mGeometryContent)
+      mLOD[i].mGeometry = mGeometryContent->GetLOD(lod);
    return mLOD[i].mGeometry;
 }
 
@@ -71,16 +63,15 @@ A::Mesh* ASCIIRenderable::GetGeometry(const LOD& lod) const {
 ///   @return the VRAM texture or nullptr if content is not available         
 A::Image* ASCIIRenderable::GetTexture(const LOD& lod) const {
    const auto i = lod.GetAbsoluteIndex();
-   if (not mLOD[i].mTexture and mTextureContent) {
-      // Cache texture to VRAM                                          
-      Verbs::Create creator {
-         Construct::From<A::Image>(mTextureContent->GetLOD(lod))
-      };
-      mProducer->Create(creator);
-      mLOD[i].mTexture = creator->template As<A::Image*>();
-   }
-
+   if (not mLOD[i].mTexture and mTextureContent)
+      mLOD[i].mTexture = mTextureContent->GetLOD(lod);
    return mLOD[i].mTexture;
+}
+
+/// Get uniform color                                                         
+///   @return the color                                                       
+RGBA ASCIIRenderable::GetColor() const {
+   return *mColor;
 }
 
 /// Create GPU pipeline able to utilize geometry, textures and shaders        
@@ -102,36 +93,9 @@ ASCIIPipeline* ASCIIRenderable::GetOrCreatePipeline(
    // Construct a pipeline                                              
    bool usingGlobalPipeline = false;
    auto construct = Construct::From<ASCIIPipeline>();
-
-   if (mMaterialContent) {
-      construct << mMaterialContent;
-      usingGlobalPipeline = true;
-   }
-   else {
-      if (mGeometryContent)
-         construct << mGeometryContent->GetLOD(lod);
-      if (mTextureContent)
-         construct << mTextureContent;
-   }
-
-   // Add shaders if any such trait exists in unit environment          
-   auto shader = SeekTrait<Traits::Shader>();
-   if (shader)
-      construct << shader;
-
-   // Add colorization if available                                     
    auto color = SeekTrait<Traits::Color>();
    if (color)
       construct << color;
-
-   // If at this point the construct is empty, then nothing to draw     
-   if (not construct.GetDescriptor()) {
-      Logger::Warning(Self(), "No contents available for generating pipeline");
-      return nullptr;
-   }
-   
-   // Add the layer, too, if available                                  
-   // This is intentionally added after the above check                 
    if (layer)
       construct << layer;
 
@@ -155,7 +119,7 @@ ASCIIPipeline* ASCIIRenderable::GetOrCreatePipeline(
 void ASCIIRenderable::Refresh() {
    // Just reset - new resources will be regenerated or reused upon     
    // request if they need be                                           
-   Detach();
+   /*Detach();
 
    // Gather all instances for this renderable, and calculate levels    
    mInstances = GatherUnits<A::Instance, Seek::Here>();
@@ -172,19 +136,5 @@ void ASCIIRenderable::Refresh() {
    if (pipeline) {
       mPredefinedPipeline = pipeline;
       return;
-   }
-
-   const auto material = SeekUnit<A::Material, Seek::Here>();
-   if (material) {
-      mMaterialContent = material;
-      return;
-   }
-
-   const auto geometry = SeekUnit<A::Mesh, Seek::Here>();
-   if (geometry)
-      mGeometryContent = geometry;
-
-   const auto texture = SeekUnit<A::Image, Seek::Here>();
-   if (texture)
-      mTextureContent = texture;
+   }*/
 }

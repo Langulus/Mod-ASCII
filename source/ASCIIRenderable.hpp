@@ -26,9 +26,9 @@ protected:
    friend struct ASCIILayer;
 
    // Precompiled instances and levels, updated on Refresh()            
+   RTTI::Tag<Pin<RGBA>, Traits::Color> mColor = Colors::White;
    TAny<const A::Instance*> mInstances;
    TRange<Level> mLevelRange;
-   Ref<A::Material> mMaterialContent;
    Ref<A::Mesh> mGeometryContent;
    Ref<A::Image> mTextureContent;
    mutable Ref<ASCIIPipeline> mPredefinedPipeline;
@@ -47,6 +47,7 @@ public:
    NOD() ASCIIRenderer* GetRenderer() const noexcept;
    NOD() A::Mesh*       GetGeometry(const LOD&) const;
    NOD() A::Image*      GetTexture(const LOD&) const;
+   NOD() RGBA           GetColor() const;
    NOD() ASCIIPipeline* GetOrCreatePipeline(const LOD&, const ASCIILayer*) const;
 
    void Refresh();

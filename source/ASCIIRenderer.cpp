@@ -39,8 +39,8 @@ ASCIIRenderer::ASCIIRenderer(ASCII* producer, const Neat& descriptor)
 /// Destroy anything created                                                  
 void ASCIIRenderer::Detach() {
    mBackbuffer.Detach();
-   mPipelines.Reset();
    mLayers.Reset();
+   mPipelines.Reset();
    mWindow.Reset();
    ProducedFrom::Detach();
 }
@@ -83,26 +83,26 @@ void ASCIIRenderer::Draw() {
 
    // Generate the draw lists for all layers                            
    // This will populate uniform buffers for all relevant pipelines     
-   PipelineSet relevantPipes;
    for (auto& layer : mLayers)
-      layer.Generate(relevantPipes);
+      layer.Generate();
 
-   RenderConfig config { " ", 1_real };
-   mBackbuffer.Resize(
-      static_cast<int>(mWindow->GetSize().x),
-      static_cast<int>(mWindow->GetSize().y)
-   );
+   // Prepare the backbuffer                                            
+   const int sizex = static_cast<int>(mWindow->GetSize().x);
+   const int sizey = static_cast<int>(mWindow->GetSize().y);
 
-   if (mLayers) {
-      // Render all layers                                              
-      for (const auto& layer : mLayers)
-         layer.Render(config);
-   }
-   else {
-      // No layers available, so just clear screen                      
-      mBackbuffer.Fill(' ', Colors::White, Colors::Red);
-   }
+   mBackbuffer.Resize(sizex, sizey);
+   mBackbuffer.Fill(' ', Colors::White, Colors::Red);
 
+   // Resize and clear the pipelines                                    
+   for (auto& pipe : mPipelines)
+      pipe.Resize(sizex, sizey);
+
+   // Render all layers (if any)                                        
+   RenderConfig config {" ", 1_real};
+   for (const auto& layer : mLayers)
+      layer.Render(config);
+
+   // Send the rendered backbuffer to the window                        
    (void) mWindow->Draw(&mBackbuffer);
 }
 

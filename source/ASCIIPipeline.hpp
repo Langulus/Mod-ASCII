@@ -1,4 +1,4 @@
-///                                                                           
+﻿///                                                                           
 /// Langulus::Module::ASCII                                                   
 /// Copyright (c) 2024 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
@@ -8,33 +8,97 @@
 ///                                                                           
 #pragma once
 #include "Common.hpp"
-#include <Math/Blend.hpp>
+#include "inner/ASCIIImage.hpp"
+#include <Math/Normal.hpp>
 #include <Langulus/Mesh.hpp>
-#include <Langulus/Image.hpp>
 #include <Langulus/IO.hpp>
 
 
+struct PipeSubscriber {
+   RGBA color;
+   Mat4 transform;
+   Ref<A::Mesh> mesh;
+   Ref<A::Image> texture;
+
+   PipeSubscriber(const PipeSubscriber&) = default;
+   PipeSubscriber(PipeSubscriber&&) = default;
+   PipeSubscriber(const RGBA& rgba, const Mat4& t, A::Mesh* m, A::Image* x)
+      : color {rgba}, transform {t}, mesh {m}, texture {x} {}
+};
+
+/// Defines how pixels are mapped onto symbols                                
+enum class ASCIIStyle {
+   Text = 0,      // Just for drawing text as it is                     
+
+   Fullblocks,    // ' ', '░', '▒', '▓', '█'                            
+
+   Halfblocks,    // ▖,	▗,	▘,	▙,	▚,	▛,	▜,	▝,	▞,	▟,                      
+
+   Braille        //  , ⠁, ⠂, ⠃, ⠄, ⠅, ⠆, ⠇, ⠈, ⠉, ⠊, ⠋, ⠌, ⠍, ⠎, ⠏,    
+                  // ⠐, ⠑, ⠒, ⠓, ⠔, ⠕, ⠖, ⠗, ⠘, ⠙, ⠚, ⠛, ⠜, ⠝, ⠞, ⠟,    
+                  // ⠠, ⠡, ⠢, ⠣, ⠤, ⠥, ⠦, ⠧, ⠨, ⠩, ⠪, ⠫, ⠬, ⠭, ⠮, ⠯,    
+                  // ⠰, ⠱, ⠲, ⠳, ⠴, ⠵, ⠶, ⠷, ⠸, ⠹, ⠺, ⠻, ⠼, ⠽, ⠾, ⠿     
+                  // ⡀, ⡁, ⡂, ⡃, ⡄, ⡅, ⡆, ⡇, ⡈, ⡉, ⡊, ⡋, ⡌, ⡍, ⡎, ⡏     
+                  // ⡐, ⡑, ⡒, ⡓, ⡔, ⡕, ⡖, ⡗, ⡘, ⡙, ⡚, ⡛, ⡜, ⡝, ⡞, ⡟,    
+                  // ⡠, ⡡, ⡢, ⡣, ⡤, ⡥, ⡦, ⡧, ⡨, ⡩, ⡪, ⡫, ⡬, ⡭, ⡮, ⡯,    
+                  // ⡰, ⡱, ⡲, ⡳, ⡴, ⡵, ⡶, ⡷, ⡸, ⡹, ⡺, ⡻, ⡼, ⡽, ⡾, ⡿,    
+                  // ⢀, ⢁, ⢂, ⢃, ⢄, ⢅, ⢆, ⢇, ⢈, ⢉, ⢊, ⢋, ⢌, ⢍, ⢎, ⢏,    
+                  // ⢐, ⢑, ⢒, ⢓, ⢔, ⢕, ⢖, ⢗, ⢘, ⢙, ⢚, ⢛, ⢜, ⢝, ⢞, ⢟,    
+                  // ⢠, ⢡, ⢢, ⢣, ⢤, ⢥, ⢦, ⢧, ⢨, ⢩, ⢪, ⢫, ⢬, ⢭, ⢮, ⢯,    
+                  // ⢰, ⢱, ⢲, ⢳, ⢴, ⢵, ⢶, ⢷, ⢸, ⢹, ⢺, ⢻, ⢼, ⢽, ⢾, ⢿,    
+                  // ⣀, ⣁, ⣂, ⣃, ⣄, ⣅, ⣆, ⣇, ⣈, ⣉, ⣊, ⣋, ⣌, ⣍, ⣎, ⣏,    
+                  // ⣐, ⣑, ⣒, ⣓, ⣔, ⣕, ⣖, ⣗, ⣘, ⣙, ⣚, ⣛, ⣜, ⣝, ⣞, ⣟,    
+                  // ⣠, ⣡, ⣢, ⣣, ⣤, ⣥, ⣦, ⣧, ⣨, ⣩, ⣪, ⣫, ⣬, ⣭, ⣮, ⣯,    
+                  // ⣰, ⣱, ⣲, ⣳, ⣴, ⣵, ⣶, ⣷, ⣸, ⣹, ⣺, ⣻, ⣼, ⣽, ⣾, ⣿     
+};
+
+
 ///                                                                           
-///   ASCII pipeline that rasterizes vector graphics into ASCII symbols       
+///   ASCII pipeline                                                          
+///                                                                           
+/// Rasterizes vector graphics into the backbuffer of an ASCIILayer           
 ///                                                                           
 struct ASCIIPipeline : A::Graphics, ProducedFrom<ASCIIRenderer> {
    LANGULUS(ABSTRACT) false;
    LANGULUS_BASES(A::Graphics);
 
 private:
-   // Blending mode (participates in hash)                              
-   Math::BlendMode mBlendMode = Math::BlendMode::Alpha;
    // Toggle depth testing and writing                                  
    bool mDepth = true;
-   // Subscribers                                                       
-   TAny<const ASCIIRenderable*> mSubscribers;
+   // Toggle light calculation                                          
+   bool mLit = true;
 
-   static Construct FromMesh(const A::Mesh&);
-   static Construct FromText(const Text&);
+   // Toggle culling                                                    
+   enum Cull {
+      NoCulling, CullBack, CullFront
+   } mCull = NoCulling;
+   
+   // Rendering style                                                   
+   ASCIIStyle mStyle = ASCIIStyle::Fullblocks;
+
+   // Some styles involve more pixels per character                     
+   // Halfblocks are 2x2 pixels per symbol, while Braille is 2x4        
+   int mBufferXScale = 1, mBufferYScale = 1;
+
+   // An intermediate render buffer, used only by the pipeline          
+   // This buffer is then compiled into an image inside ASCIILayer      
+   // Note: alpha channel acts as a stencil, to mark painted pixels     
+   mutable ASCIIBuffer<RGBA> mBuffer;
 
 public:
    ASCIIPipeline(ASCIIRenderer*, const Neat&);
 
-   NOD() Count RenderLevel(Offset) const;
-   void Render(const ASCIIRenderable&) const;
+   void Resize(int x, int y);
+   void Render(const ASCIILayer*, const Mat4&, const PipeSubscriber&) const;
+
+private:
+   struct CameraState {
+      const ASCIILayer* mLayer;
+      const Scale2 mResolution;
+      const Mat4& mProjectedView;
+      const Mat4& mTransform;
+   };
+
+   void RasterizeMesh(const CameraState&, const A::Mesh&) const;
+   void RasterizeTriangle(const CameraState&, const Triangle&, const Vec3&, const RGBA&) const;
 };

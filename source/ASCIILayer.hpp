@@ -12,26 +12,43 @@
 #include "ASCIILight.hpp"
 #include <Anyness/TSet.hpp>
 
-struct LayerSubscriber {
-   const ASCIIPipeline* pipeline {};
-   const ASCIIRenderable* sub {};
-};
-
-using LevelSet = TOrderedSet<Level>;
-using CameraSet = TUnorderedSet<const ASCIICamera*>;
-using PipelineSet = TUnorderedSet<ASCIIPipeline*>;
 
 struct RenderConfig {
-   Text mClearColor;
-   Real mClearDepth;
+   RGB   mClearColor;
+   float mClearDepth;
 };
+
+
+/// For each enabled camera, there exist N levels sorted in a descending      
+/// order. Each level contains something renderable.                          
+/// For each of these levels, there's a set of relevant pipelines             
+/// And each of these pipelines draws a list of collapsed renderables         
+using BatchSequence = 
+   TUnorderedMap<const ASCIICamera*,
+      TOrderedMap<Level,
+         TUnorderedMap<const ASCIIPipeline*, TAny<PipeSubscriber>>
+      >
+   >;
+
+
+/// For each enabled camera, there exist N levels sorted in a descending      
+/// order. Each level contains something renderable.                          
+/// For each of these levels, there's a list of pipe-renderable pairs that    
+/// have to be drawn in the order they appear                                 
+using HierarchicalSequence = 
+   TUnorderedMap<const ASCIICamera*,
+      TOrderedMap<Level,
+         TAny<TPair<const ASCIIPipeline*, PipeSubscriber>>
+      >
+   >;
 
 
 ///                                                                           
 ///   Graphics layer unit                                                     
 ///                                                                           
-/// A logical group of cameras, renderables, and lights, isolated from other  
-/// layers. Useful for capsulating a GUI, for example.                        
+///   A logical group of cameras, renderables, and lights, isolated from      
+/// other layers. Useful for capsulating a GUI, for example. Layers can blend 
+/// with each other, but never interact in any other way.                     
 ///                                                                           
 struct ASCIILayer : A::Layer, ProducedFrom<ASCIIRenderer> {
    LANGULUS(ABSTRACT) false;
@@ -47,22 +64,29 @@ protected:
 
    // List of cameras                                                   
    TFactory<ASCIICamera> mCameras;
+   // Fallback camera, for when no custom ones exist                    
+   ASCIICamera mFallbackCamera;
+
    // List of rendererables                                             
    TFactory<ASCIIRenderable> mRenderables;
    // List of lights                                                    
    TFactory<ASCIILight> mLights;
-   // A cache of relevant pipelines                                     
-   PipelineSet mRelevantPipelines;
-   // A cache of relevant levels                                        
-   LevelSet mRelevantLevels;
-   // A cache of relevant cameras                                       
-   CameraSet mRelevantCameras;
 
-   // Subscribers, used only for hierarchical styled layers             
-   // Otherwise, ASCIIPipeline::Subscriber is used                      
-   TAny<LayerSubscriber> mSubscribers;
-   TAny<Count> mSubscriberCountPerLevel;
-   TAny<Count> mSubscriberCountPerCamera;
+   // The compiled batch render sequence                                
+   BatchSequence mBatchSequence;
+   // The compiled hierarchical render sequence                         
+   HierarchicalSequence mHierarchicalSequence;
+
+   // Depth buffer                                                      
+   mutable ASCIIBuffer<float> mDepth;
+   // Normals buffer                                                    
+   mutable ASCIIBuffer<Vec3> mNormals;
+
+   // The final, combined rendered layer image, after all pipelines,    
+   // texturization and illumination. All layer's images are later      
+   // blended together into the final ASCIIRenderer's backbuffer        
+   ASCIIImage mImage;
+
 
    /// The layer style determines how the scene will be compiled              
    /// Combine these flags to configure the layer to your needs               
@@ -91,17 +115,12 @@ protected:
       // optimized as possible.                                         
       Multilevel = 2,
 
-      // If enabled, will separate light computation on a different pass
-      // Significantly improves performance on scenes with complex      
-      // lighting and shadowing, but does incur some memory costs.      
-      DeferredLights = 4,
-
       // If enabled will sort instances by distance to camera (depth),  
       // before committing them for rendering                           
-      Sorted = 8,
+      Sorted = 4,
 
       // The default visual layer style                                 
-      Default = Batched | Multilevel | DeferredLights
+      Default = Batched | Multilevel
    };
 
    Style mStyle = Style::Default;
@@ -111,7 +130,7 @@ public:
    ~ASCIILayer();
 
    void Create(Verb&);
-   bool Generate(PipelineSet&);
+   void Generate();
    void Render(const RenderConfig&) const;
    void Detach();
 
@@ -121,11 +140,12 @@ public:
 private:
    void CompileCameras();
 
-   Count CompileLevelBatched(const Mat4&, const Mat4&, Level, PipelineSet&);
-   Count CompileLevelHierarchical(const Mat4&, const Mat4&, Level, PipelineSet&);
-   Count CompileThing(const Thing*, LOD&, PipelineSet&);
-   NOD() ASCIIPipeline* CompileInstance(const ASCIIRenderable*, const A::Instance*, LOD&);
-   Count CompileLevels();
+   void CompileLevels();
+   void CompileLevelBatched(const ASCIICamera&, Level);
+   void CompileLevelHierarchical(const ASCIICamera&, Level);
+
+   void CompileThing(const Thing*, LOD&, const ASCIICamera&);
+   void CompileInstance(const ASCIIRenderable*, const A::Instance*, LOD&, const ASCIICamera&);
 
    void RenderBatched(const RenderConfig&) const;
    void RenderHierarchical(const RenderConfig&) const;

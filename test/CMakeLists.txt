@@ -17,7 +17,6 @@ add_dependencies(LangulusModASCIITest
 	LangulusModFTXUI
 	LangulusModFileSystem
 	LangulusModAssetsGeometry
-	LangulusModAssetsMaterials
 	LangulusModPhysics
 )
 

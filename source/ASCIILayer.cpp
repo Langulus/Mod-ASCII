@@ -19,27 +19,28 @@ ASCIILayer::ASCIILayer(ASCIIRenderer* producer, const Neat& descriptor)
    , ProducedFrom {producer, descriptor}
    , mCameras {this}
    , mRenderables {this}
-   , mLights {this} {
+   , mLights {this}
+   , mFallbackCamera {this}
+   , mImage {producer} {
    VERBOSE_ASCII("Initializing...");
    Couple(descriptor);
    VERBOSE_ASCII("Initialized");
 }
 
+/// Layer destruction                                                         
 ASCIILayer::~ASCIILayer() {
    Detach();
 }
 
+/// Detach layer from hierarchy                                               
 void ASCIILayer::Detach() {
-   mSubscribers.Reset();
-   mRelevantCameras.Reset();
-   mRelevantLevels.Reset();
-   mRelevantPipelines.Reset();
+   //mBatchSequence.Reset();
+   //mHierarchicalSequence.Reset();
 
    mCameras.Reset();
    mRenderables.Reset();
    mLights.Reset();
-
-   ProducedFrom<ASCIIRenderer>::Detach();
+   ProducedFrom::Detach();
 }
 
 /// Create/destroy renderables, cameras, lights                               
@@ -53,10 +54,12 @@ void ASCIILayer::Create(Verb& verb) {
 /// Generate the draw list for the layer                                      
 ///   @param pipelines - [out] a set of all used pipelines                    
 ///   @return true if anything renderable was generated                       
-bool ASCIILayer::Generate(PipelineSet& pipelines) {
+void ASCIILayer::Generate() {
+   mBatchSequence.Clear();
+   mHierarchicalSequence.Clear();
+
    CompileCameras();
    CompileLevels();
-   return 0 != pipelines.InsertBlock(mRelevantPipelines);
 }
 
 /// Compile the camera transformations                                        
@@ -65,219 +68,167 @@ void ASCIILayer::CompileCameras() {
       camera.Compile();
 }
 
-/// Compile a single renderable instance, culling it if able                  
-/// This will create or reuse a pipeline, capable of rendering it             
-///   @param renderable - the renderable to compile                           
-///   @param instance - the instance to compile                               
-///   @param lod - the lod state to use                                       
-///   @return the pipeline if instance is relevant                            
-ASCIIPipeline* ASCIILayer::CompileInstance(
-   const ASCIIRenderable* renderable, const A::Instance* instance, LOD& lod
-) {
-   if (not instance) {
-      // No instances, so culling based only on default level           
-      if (lod.mLevel != Level::Default)
-         return nullptr;
-      lod.Transform();
+/// Compile all levels and their instances                                    
+///   @return the number of relevant cameras                                  
+void ASCIILayer::CompileLevels() {
+   if (not mCameras) {
+      // No camera, so just render default level on the whole screen    
+      if (mStyle & Style::Hierarchical)
+         CompileLevelHierarchical(mFallbackCamera, Level::Default);
+      else
+         CompileLevelBatched(mFallbackCamera, Level::Default);
    }
-   else {
-      // Instance available, so cull                                    
-      if (instance->Cull(lod))
-         return nullptr;
-      lod.Transform(instance->GetModelTransform(lod));
+   else for (const auto& cam : mCameras) {
+      if (mStyle & Style::Multilevel) {
+         // Multilevel style - tests all camera-visible levels          
+         for (auto level  = cam.mObservableRange.mMax;
+                   level >= cam.mObservableRange.mMin; --level) {
+            if (mStyle & Style::Hierarchical)
+               CompileLevelHierarchical(cam, level);
+            else
+               CompileLevelBatched(cam, level);
+         }
+      }
+      else if (cam.mObservableRange.Inside(Level::Default)) {
+         // Default level style - checks only if camera sees default    
+         if (mStyle & Style::Hierarchical)
+            CompileLevelHierarchical(cam, Level::Default);
+         else
+            CompileLevelBatched(cam, Level::Default);
+      }
    }
+}
 
-   // Get relevant pipeline                                             
-   return renderable->GetOrCreatePipeline(lod, this);
+/// Compile a single level's instances hierarchical style                     
+///   @param cam - the camera to compile                                      
+///   @param level - the level to compile                                     
+void ASCIILayer::CompileLevelHierarchical(const ASCIICamera& cam, Level level) {
+   // Construct view and frustum for culling                            
+   LOD lod {level, cam.GetViewTransform(level), cam.mProjection};
+
+   // Nest-iterate all children of the layer owner                      
+   for (const auto& owner : GetOwners())
+      CompileThing(owner, lod, cam);
+}
+
+/// Compile a single level's instances batched style                          
+///   @param cam - the camera to compile                                      
+///   @param level - the level to compile                                     
+void ASCIILayer::CompileLevelBatched(const ASCIICamera& cam, Level level) {
+   // Construct view and frustum for culling                            
+   LOD lod {level, cam.GetViewTransform(level), cam.mProjection};
+
+   // Iterate all renderables                                           
+   for (const auto& renderable : mRenderables) {
+      if (not renderable.mInstances)
+         CompileInstance(&renderable, nullptr, lod, cam);
+      else for (auto instance : renderable.mInstances)
+         CompileInstance(&renderable, instance, lod, cam);
+   }
 }
 
 /// Compile an entity and all of its children entities                        
 /// Used only for hierarchical styled layers                                  
 ///   @param thing - entity to compile                                        
 ///   @param lod - the lod state to use                                       
-///   @param pipesPerCamera - [out] pipelines used by the hierarchy           
-///   @return 1 if something from the hierarchy was rendered                  
-Count ASCIILayer::CompileThing(const Thing* thing, LOD& lod, PipelineSet& pipesPerCamera) {
+///   @param cam - the camera to compile                                      
+void ASCIILayer::CompileThing(const Thing* thing, LOD& lod, const ASCIICamera& cam) {
    // Iterate all renderables of the entity, which are part of this     
-   // layer - disregard all others                                      
-   auto relevantRenderables = thing->GatherUnits<ASCIIRenderable, Seek::Here>();
+   // layer - disregard all others layers                               
+   auto renderables = thing->GatherUnits<ASCIIRenderable, Seek::Here>();
 
    // Compile the instances associated with these renderables           
-   Count renderedInstances = 0;
-   for (auto renderable : relevantRenderables) {
-      if (not renderable->mInstances) {
-         // Imagine a default instance                                  
-         auto pipeline = CompileInstance(renderable, nullptr, lod);
-         if (pipeline) {
-            pipesPerCamera << pipeline;
-            mRelevantPipelines << pipeline;
-            mSubscribers << LayerSubscriber {pipeline, renderable};
+   for (auto renderable : renderables) {
+      if (not mRenderables.Owns(renderable))
+         continue;
 
-            ++mSubscriberCountPerLevel.Last();
-            ++mSubscriberCountPerCamera.Last();
-            ++renderedInstances;
-         }
-      }
-      else for (auto instance : renderable->mInstances) {
-         // Compile each available instance                             
-         auto pipeline = CompileInstance(renderable, instance, lod);
-         if (pipeline) {
-            pipesPerCamera << pipeline;
-            mRelevantPipelines << pipeline;
-            mSubscribers << LayerSubscriber {pipeline, renderable};
-
-            ++mSubscriberCountPerLevel.Last();
-            ++mSubscriberCountPerCamera.Last();
-            ++renderedInstances;
-         }
-      }
+      if (not renderable->mInstances)
+         CompileInstance(renderable, nullptr, lod, cam);
+      else for (auto instance : renderable->mInstances)
+         CompileInstance(renderable, instance, lod, cam);
    }
 
    // Nest to children                                                  
    for (auto child : thing->GetChildren())
-      renderedInstances += CompileThing(child, lod, pipesPerCamera);
-
-   return renderedInstances > 0;
+      CompileThing(child, lod, cam);
 }
 
-/// Compile a single level's instances hierarchical style                     
-///   @param view - the camera view matrix                                    
-///   @param projection - the camera projection matrix                        
-///   @param level - the level to compile                                     
-///   @param pipesPerCamera - [out] pipeline set for the current level only   
-///   @return the number of compiled entities                                 
-Count ASCIILayer::CompileLevelHierarchical(
-   const Mat4& view, const Mat4& projection, 
-   Level level, PipelineSet& pipesPerCamera
+/// Compile a single renderable instance, culling it if able                  
+/// This will create or reuse a pipeline, capable of rendering it             
+///   @param renderable - the renderable to compile                           
+///   @param instance - the instance to compile                               
+///   @param lod - the lod state to use                                       
+///   @param cam - the camera to compile                                      
+void ASCIILayer::CompileInstance(
+   const ASCIIRenderable* renderable,
+   const A::Instance* instance,
+   LOD& lod, const ASCIICamera& cam
 ) {
-   // Construct view and frustum for culling                            
-   LOD lod {level, view, projection};
-
-   // Nest-iterate all children of the layer owner                      
-   Count renderedEntities {};
-   for (const auto& owner : GetOwners())
-      renderedEntities += CompileThing(owner, lod, pipesPerCamera);
-   
-   if (renderedEntities) {
-      mSubscriberCountPerLevel.New();
-
-      // Store the negative level in the set, so they're always in      
-      // a descending order                                             
-      mRelevantLevels << -level;
+   if (not instance) {
+      // No instances, so culling based only on default level           
+      if (lod.mLevel != Level::Default)
+         return;
+      lod.Transform();
+   }
+   else {
+      // Instance available, so cull                                    
+      if (instance->Cull(lod))
+         return;
+      lod.Transform(instance->GetModelTransform(lod));
    }
 
-   return renderedEntities;
-}
+   // Get relevant pipeline                                             
+   const auto* pipeline = renderable->GetOrCreatePipeline(lod, this);
 
-/// Compile a single level's instances batched style                          
-///   @param view - the camera view matrix                                    
-///   @param projection - the camera projection matrix                        
-///   @param level - the level to compile                                     
-///   @param pipesPerCamera - [out] pipeline set for the current level only   
-///   @return 1 if anything was rendered, zero otherwise                      
-Count ASCIILayer::CompileLevelBatched(
-   const Mat4& view, const Mat4& projection, 
-   Level level, PipelineSet& pipesPerCamera
-) {
-   // Construct view and frustum   for culling                          
-   LOD lod {level, view, projection};
-
-   // Iterate all renderables                                           
-   Count renderedInstances = 0;
-   for (const auto& renderable : mRenderables) {
-      if (not renderable.mInstances) {
-         auto pipeline = CompileInstance(&renderable, nullptr, lod);
-         if (pipeline) {
-            pipesPerCamera << pipeline;
-            mRelevantPipelines << pipeline;
-            ++renderedInstances;
-         }
-      }
-      else for (auto instance : renderable.mInstances) {
-         auto pipeline = CompileInstance(&renderable, instance, lod);
-         if (pipeline) {
-            pipesPerCamera << pipeline;
-            mRelevantPipelines << pipeline;
-            ++renderedInstances;
-         }
-      }
-   }
-
-   if (renderedInstances) {
-      for (auto pipeline : pipesPerCamera) {
-         // Store the negative level in the set, so they're always in   
-         // a descending order                                          
-         mRelevantLevels << -level;
-      }
-
-      return 1;
-   }
-
-   return 0;
-}
-
-/// Compile all levels and their instances                                    
-///   @return the number of relevant cameras                                  
-Count ASCIILayer::CompileLevels() {
-   Count renderedCameras = 0;
-   mRelevantLevels.Clear();
-   mRelevantPipelines.Clear();
-
+   // Cache the instance in the appropriate sequence                    
    if (mStyle & Style::Hierarchical) {
-      mSubscribers.Clear();
-      mSubscribers.New(1);
-      mSubscriberCountPerLevel.Clear();
-      mSubscriberCountPerLevel.New(1);
-      mSubscriberCountPerCamera.Clear();
-      mSubscriberCountPerCamera.New(1);
+      auto cachedCam = mHierarchicalSequence.FindIt(&cam);
+      if (not cachedCam) {
+         mHierarchicalSequence.Insert(&cam);
+         cachedCam = mHierarchicalSequence.FindIt(&cam);
+      }
+
+      auto cachedLvl = cachedCam.mValue->FindIt(-lod.mLevel);
+      if (not cachedLvl) {
+         cachedCam.mValue->Insert(-lod.mLevel);
+         cachedLvl = cachedCam.mValue->FindIt(-lod.mLevel);
+      }
+
+      auto& cachedPipes = *cachedLvl.mValue;
+      cachedPipes << TPair { pipeline, PipeSubscriber {
+         renderable->GetColor(),
+         lod.mModel,
+         renderable->GetGeometry(lod),
+         renderable->GetTexture(lod)
+      }};
    }
-
-   if (not mCameras) {
-      // No camera, so just render default level on the whole screen    
-      PipelineSet pipesPerCamera;
-      if (mStyle & Style::Hierarchical)
-         CompileLevelHierarchical({}, {}, {}, pipesPerCamera);
-      else
-         CompileLevelBatched({}, {}, {}, pipesPerCamera);
-
-      if (pipesPerCamera) {
-         if (mStyle & Style::Hierarchical)
-            mSubscriberCountPerCamera.New();
-         ++renderedCameras;
+   else {
+      auto cachedCam = mBatchSequence.FindIt(&cam);
+      if (not cachedCam) {
+         mBatchSequence.Insert(&cam);
+         cachedCam = mBatchSequence.FindIt(&cam);
       }
+
+      auto cachedLvl = cachedCam.mValue->FindIt(-lod.mLevel);
+      if (not cachedLvl) {
+         cachedCam.mValue->Insert(-lod.mLevel);
+         cachedLvl = cachedCam.mValue->FindIt(-lod.mLevel);
+      }
+
+      auto cachedPipe = cachedLvl.mValue->FindIt(pipeline);
+      if (not cachedPipe) {
+         cachedLvl.mValue->Insert(pipeline);
+         cachedPipe = cachedLvl.mValue->FindIt(pipeline);
+      }
+
+      auto& cachedRends = *cachedPipe.mValue;
+      cachedRends << PipeSubscriber {
+         renderable->GetColor(),
+         lod.mModel,
+         renderable->GetGeometry(lod),
+         renderable->GetTexture(lod)
+      };
    }
-   else for (const auto& camera : mCameras) {
-      // Iterate all levels per camera                                  
-      PipelineSet pipesPerCamera;
-      if (mStyle & Style::Multilevel) {
-         // Multilevel style - tests all camera-visible levels          
-         for (auto level = camera.mObservableRange.mMax; level >= camera.mObservableRange.mMin; --level) {
-            const auto view = camera.GetViewTransform(level);
-            if (mStyle & Style::Hierarchical)
-               CompileLevelHierarchical(view, camera.mProjection, level, pipesPerCamera);
-            else
-               CompileLevelBatched(view, camera.mProjection, level, pipesPerCamera);
-         }
-      }
-      else if (camera.mObservableRange.Inside(Level::Default)) {
-         // Default level style - checks only if camera sees default    
-         const auto view = camera.GetViewTransform();
-         if (mStyle & Style::Hierarchical)
-            CompileLevelHierarchical(view, camera.mProjection, {}, pipesPerCamera);
-         else
-            CompileLevelBatched(view, camera.mProjection, {}, pipesPerCamera);
-      }
-      else continue;
-
-      if (pipesPerCamera) {
-         if (mStyle & Style::Hierarchical)
-            mSubscriberCountPerCamera.New(1);
-         mRelevantCameras << &camera;
-         ++renderedCameras;
-      }
-   }
-
-   return renderedCameras;
 }
 
 /// Render the layer to a specific command buffer and framebuffer             
@@ -289,88 +240,58 @@ void ASCIILayer::Render(const RenderConfig& config) const {
       RenderBatched(config);
 }
 
-/// Render the layer to a specific command buffer and framebuffer             
-/// This is used only for Batched style layers, and relies on previously      
-/// compiled set of pipelines                                                 
+/// Render all instanced renderables in the order with least overhead         
+/// This is used only for Batched style layers                                
 ///   @param config - where to render to                                      
-void ASCIILayer::RenderBatched(const RenderConfig&) const {
-   // Iterate all valid cameras                                         
-   TUnorderedMap<const ASCIIPipeline*, Count> done;
+void ASCIILayer::RenderBatched(const RenderConfig& cfg) const {
+   // Rendering from each custom camera's point of view                 
+   for (const auto camera : mBatchSequence) {
+      // Draw all relevant levels from the camera's POV                 
+      for (auto level : KeepIterator(camera.mValue)) {
+         const auto projectedView = camera.mKey->mProjection
+            * camera.mKey->GetViewTransform(*level.mKey);
 
-   if (not mRelevantCameras) {
-      // Rendering using a fallback camera                              
-      // Iterate all relevant levels                                    
-      for (const auto& level : mRelevantLevels) {
-         // Draw all subscribers to the pipeline for the current level  
-         for (auto pipeline : mRelevantPipelines)
-            done[pipeline] = pipeline->RenderLevel(done[pipeline]);
+         // Involve all relevant pipelines for that level               
+         for (const auto pipeline : *level.mValue) {
+            // Draw all renderables that use that pipeline in their     
+            // current LOD state, from that particular level & POV      
+            for (const auto& instance : pipeline.mValue) {
+               pipeline.mKey->Render(this, projectedView, instance);
+            }
 
-         if (level != *mRelevantLevels.last()) {
-            // Clear depth after rendering this level (if not last)     
-            TODO();
+            //TODO bake the intermediate pipeline buffer to layer's image
          }
-      }
-   }
-   else for (const auto& camera : mRelevantCameras) {
-      // Rendering from each custom camera's point of view              
-      // Iterate all relevant levels                                    
-      for (const auto& level : mRelevantLevels) {
-         // Draw all subscribers to the pipeline for the current level  
-         for (auto pipeline : mRelevantPipelines)
-            done[pipeline] = pipeline->RenderLevel(done[pipeline]);
 
-         if (level != *mRelevantLevels.last()) {
-            // Clear depth after rendering this level (if not last)     
-            TODO();
-         }
+         //TODO light calculations before depth is erased
+
+         // Clear depth after rendering each level                      
+         mDepth.Fill(cfg.mClearDepth);
       }
    }
 }
 
-/// Render the layer to a specific command buffer and framebuffer             
-/// This is used only for Hierarchical style layers, and relies on locally    
-/// compiled subscribers, rendering them in their respective order            
+/// Render all instanced renderables in the order they appear in the scene    
+/// This is used only for Hierarchical style layers                           
 ///   @param config - where to render to                                      
-void ASCIILayer::RenderHierarchical(const RenderConfig&) const {
-   Count subscribersDone = 0;
-   auto subscriberCountPerLevel = &mSubscriberCountPerLevel[0];
+void ASCIILayer::RenderHierarchical(const RenderConfig& cfg) const {
+   // Rendering from each custom camera's point of view                 
+   for (const auto camera : mHierarchicalSequence) {
+      // Draw all relevant levels from the camera's POV                 
+      for (auto level : KeepIterator(camera.mValue)) {
+         const auto projectedView = camera.mKey->mProjection
+            * camera.mKey->GetViewTransform(*level.mKey);
 
-   if (not mRelevantCameras) {
-      // Rendering using a fallback camera                              
-      // Iterate all relevant levels                                    
-      for (const auto& level : mRelevantLevels) {
-         // Draw all subscribers to the pipeline for the current level  
-         for (Count s = 0; s < *subscriberCountPerLevel; ++s) {
-            auto& subscriber = mSubscribers[subscribersDone + s];
-            subscriber.pipeline->Render(*subscriber.sub);
+         // Involve all relevant pipe-renderable pairs for that level   
+         for (const auto& instance : *level.mValue) {
+            instance.mKey->Render(this, projectedView, instance.mValue);
+
+            //TODO bake the intermediate pipeline buffer after each draw
          }
 
-         if (level != *mRelevantLevels.last()) {
-            // Clear depth after rendering this level (if not last)     
-            TODO();
-         }
+         //TODO light calculations before depth is erased
 
-         subscribersDone += *subscriberCountPerLevel;
-         ++subscriberCountPerLevel;
-      }
-   }
-   else for (const auto& camera : mRelevantCameras) {
-      // Iterate all relevant levels                                    
-      for (const auto& level : mRelevantLevels) {
-         // Draw all subscribers to the pipeline for the current level  
-         // and camera                                                  
-         for (Count s = 0; s < *subscriberCountPerLevel; ++s) {
-            auto& subscriber = mSubscribers[subscribersDone + s];
-            subscriber.pipeline->Render(*subscriber.sub);
-         }
-
-         if (level != *mRelevantLevels.last()) {
-            // Clear depth after rendering this level (if not last)     
-            TODO();
-         }
-
-         subscribersDone += *subscriberCountPerLevel;
-         ++subscriberCountPerLevel;
+         // Clear depth after rendering each level                      
+         mDepth.Fill(cfg.mClearDepth);
       }
    }
 }
