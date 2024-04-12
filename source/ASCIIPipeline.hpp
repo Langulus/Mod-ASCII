@@ -17,13 +17,13 @@
 struct PipeSubscriber {
    RGBA color;
    Mat4 transform;
-   Ref<A::Mesh> mesh;
-   Ref<A::Image> texture;
+   A::Mesh* mesh;
+   A::Image* texture;
 
-   PipeSubscriber(const PipeSubscriber&) = default;
+   /*PipeSubscriber(const PipeSubscriber&) = default;
    PipeSubscriber(PipeSubscriber&&) = default;
    PipeSubscriber(const RGBA& rgba, const Mat4& t, A::Mesh* m, A::Image* x)
-      : color {rgba}, transform {t}, mesh {m}, texture {x} {}
+      : color {rgba}, transform {t}, mesh {m}, texture {x} {}*/
 };
 
 /// Defines how pixels are mapped onto symbols                                
