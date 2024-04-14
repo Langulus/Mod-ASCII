@@ -18,9 +18,9 @@ ASCIILayer::ASCIILayer(ASCIIRenderer* producer, const Neat& descriptor)
    : Resolvable {this}
    , ProducedFrom {producer, descriptor}
    , mCameras {this}
+   , mFallbackCamera {this}
    , mRenderables {this}
    , mLights {this}
-   , mFallbackCamera {this}
    , mImage {producer} {
    VERBOSE_ASCII("Initializing...");
    Couple(descriptor);
@@ -29,7 +29,7 @@ ASCIILayer::ASCIILayer(ASCIIRenderer* producer, const Neat& descriptor)
 
 /// Layer destruction                                                         
 ASCIILayer::~ASCIILayer() {
-   Detach();
+   //Detach();
 }
 
 /// Detach layer from hierarchy                                               
