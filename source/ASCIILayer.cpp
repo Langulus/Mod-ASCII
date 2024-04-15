@@ -29,14 +29,13 @@ ASCIILayer::ASCIILayer(ASCIIRenderer* producer, const Neat& descriptor)
 
 /// Layer destruction                                                         
 ASCIILayer::~ASCIILayer() {
-   //Detach();
+   Detach();
 }
 
 /// Detach layer from hierarchy                                               
 void ASCIILayer::Detach() {
-   //mBatchSequence.Reset();
-   //mHierarchicalSequence.Reset();
-
+   mBatchSequence.Reset();
+   mHierarchicalSequence.Reset();
    mCameras.Reset();
    mRenderables.Reset();
    mLights.Reset();

@@ -38,11 +38,11 @@ ASCIIRenderer::ASCIIRenderer(ASCII* producer, const Neat& descriptor)
 
 /// Destroy anything created                                                  
 void ASCIIRenderer::Detach() {
-   /*mBackbuffer.Detach();
-   mLayers.Reset();
+   mBackbuffer.Detach();
    mPipelines.Reset();
+   mLayers.Reset();
    mWindow.Reset();
-   ProducedFrom::Detach();*/
+   ProducedFrom::Detach();
 }
 
 /// Renderer destruction                                                      

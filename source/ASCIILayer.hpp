@@ -26,9 +26,7 @@ struct RenderConfig {
 using BatchSequence = 
    TUnorderedMap<const ASCIICamera*,
       TOrderedMap<Level,
-         TUnorderedMap<const ASCIIPipeline*, TAny<PipeSubscriber>>
-      >
-   >;
+         TUnorderedMap<const ASCIIPipeline*, TAny<PipeSubscriber>>>>;
 
 
 /// For each enabled camera, there exist N levels sorted in a descending      
@@ -38,9 +36,7 @@ using BatchSequence =
 using HierarchicalSequence = 
    TUnorderedMap<const ASCIICamera*,
       TOrderedMap<Level,
-         TAny<TPair<const ASCIIPipeline*, PipeSubscriber>>
-      >
-   >;
+         TAny<TPair<const ASCIIPipeline*, PipeSubscriber>>>>;
 
 
 ///                                                                           

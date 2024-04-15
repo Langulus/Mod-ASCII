@@ -46,10 +46,10 @@ protected:
    // Mouse scroll, can be passed to shaders                            
    Ref<Grad2v2> mMouseScroll;
 
-   // Pipelines                                                         
-   TFactoryUnique<ASCIIPipeline> mPipelines;
    // Layers                                                            
    TFactory<ASCIILayer> mLayers;
+   // Pipelines                                                         
+   TFactoryUnique<ASCIIPipeline> mPipelines;
 
    // Backbuffer                                                        
    ASCIIImage mBackbuffer;
