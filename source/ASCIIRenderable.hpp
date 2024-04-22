@@ -27,7 +27,7 @@ protected:
 
    // Precompiled instances and levels, updated on Refresh()            
    RTTI::Tag<Pin<RGBA>, Traits::Color> mColor = Colors::White;
-   TAny<const A::Instance*> mInstances;
+   TMany<const A::Instance*> mInstances;
    TRange<Level> mLevelRange;
    Ref<A::Mesh> mGeometryContent;
    Ref<A::Image> mTextureContent;

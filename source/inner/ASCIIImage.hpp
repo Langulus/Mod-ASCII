@@ -26,7 +26,7 @@ template<class T>
 struct ASCIIBuffer final : A::Image {
 private:
    // Data for the buffer                                               
-   mutable TAny<T> mData;
+   mutable TMany<T> mData;
 
 public:
    LANGULUS(ABSTRACT) false;
@@ -96,10 +96,10 @@ struct ASCIIImage final : A::Image {
    using Style = Logger::Emphasis;
 
 private:
-   mutable TAny<Text>  mSymbols;   // Array of utf8 encoded symbols     
-   mutable TAny<RGB>   mBgColors;  // Array of foreground colors        
-   mutable TAny<RGB>   mFgColors;  // Array of background colors        
-   mutable TAny<Style> mStyle;     // Array of styles for each pixel    
+   mutable TMany<Text>  mSymbols;   // Array of utf8 encoded symbols     
+   mutable TMany<RGB>   mBgColors;  // Array of foreground colors        
+   mutable TMany<RGB>   mFgColors;  // Array of background colors        
+   mutable TMany<Style> mStyle;     // Array of styles for each pixel    
 
    // Required only in case we're comparing against other images,       
    // provided by a filename                                            

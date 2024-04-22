@@ -115,12 +115,12 @@ auto ASCIIImage::ForEachPixel(auto&& call) const {
 /// color (unless inverted)                                                   
 bool ASCIIImage::Pixel::operator == (const RGBA& color) const noexcept {
    if (mStyle == Style::Default) {
-      return mSymbol == "█" and mFgColor == color
-          or mSymbol == " " and mBgColor == color;
+      return (mSymbol == "█" and mFgColor == color)
+          or (mSymbol == " " and mBgColor == color);
    }
    else if (mStyle == Style::Reverse) {
-      return mSymbol == "█" and mBgColor == color
-          or mSymbol == " " and mFgColor == color;
+      return (mSymbol == "█" and mBgColor == color)
+          or (mSymbol == " " and mFgColor == color);
    }
    else return false;
 }

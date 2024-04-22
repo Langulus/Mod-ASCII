@@ -40,7 +40,7 @@ protected:
    // Eye separation. Stereo if more/less than zero                     
    Real mEyeSeparation {};
 
-   TAny<const A::Instance*> mInstances;
+   TMany<const A::Instance*> mInstances;
    Mat4 mProjectionInverted;
    Scale2u32 mResolution {640, 480};
 
