@@ -61,7 +61,7 @@ private:
    // Toggle depth testing and writing                                  
    bool mDepth = true;
    // Toggle light calculation                                          
-   bool mLit = true;
+   //bool mLit = true;
 
    // Toggle culling                                                    
    enum Cull {

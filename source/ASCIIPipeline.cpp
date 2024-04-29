@@ -182,7 +182,7 @@ void ASCIIPipeline::RasterizeMesh(const CameraState& camera, const A::Mesh& mesh
    if (not posData)
       return; // Nothing to draw...                                     
 
-   const auto norData = mesh.GetData<Traits::Aim>();
+   /*const auto norData = mesh.GetData<Traits::Aim>();
    const auto texData = mesh.GetData<Traits::Sampler>();
    const auto colData = mesh.GetData<Traits::Color>();
    const auto idxData = mesh.GetData<Traits::Index>();
@@ -192,5 +192,5 @@ void ASCIIPipeline::RasterizeMesh(const CameraState& camera, const A::Mesh& mesh
    }
    else {
 
-   }
+   }*/
 }
