@@ -96,9 +96,11 @@ void ASCIIPipeline::RasterizeTriangle(
    case CullBack:
       if (not front)
          return;
+      break;
    case CullFront:
       if (front)
          return;
+      break;
    case NoCulling:
       break;
    }
