@@ -176,8 +176,14 @@ void ASCIILayer::CompileInstance(
       lod.Transform(instance->GetModelTransform(lod));
    }
 
-   // Get relevant pipeline                                             
+   // Get relevant pipeline and geometry                                
    const auto* pipeline = renderable->GetOrCreatePipeline(lod, this);
+   if (not pipeline)
+      return;
+
+   auto* geometry = renderable->GetGeometry(lod);
+   if (not geometry)
+      return;
 
    // Cache the instance in the appropriate sequence                    
    if (mStyle & Style::Hierarchical) {
@@ -196,8 +202,7 @@ void ASCIILayer::CompileInstance(
       auto& cachedPipes = *cachedLvl.mValue;
       cachedPipes << TPair { pipeline, PipeSubscriber {
          renderable->GetColor(),
-         lod.mModel,
-         renderable->GetGeometry(lod),
+         lod.mModel, geometry,
          renderable->GetTexture(lod)
       }};
    }
@@ -223,8 +228,7 @@ void ASCIILayer::CompileInstance(
       auto& cachedRends = *cachedPipe.mValue;
       cachedRends << PipeSubscriber {
          renderable->GetColor(),
-         lod.mModel,
-         renderable->GetGeometry(lod),
+         lod.mModel, geometry,
          renderable->GetTexture(lod)
       };
    }

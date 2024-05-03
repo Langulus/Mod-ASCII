@@ -44,12 +44,13 @@ public:
    ASCIIRenderable(ASCIILayer*, const Neat&);
    ~ASCIIRenderable();
 
-   NOD() ASCIIRenderer* GetRenderer() const noexcept;
-   NOD() A::Mesh*       GetGeometry(const LOD&) const;
-   NOD() A::Image*      GetTexture(const LOD&) const;
-   NOD() RGBA           GetColor() const;
-   NOD() ASCIIPipeline* GetOrCreatePipeline(const LOD&, const ASCIILayer*) const;
+   NOD() auto GetRenderer() const noexcept -> ASCIIRenderer*;
+   NOD() auto GetGeometry(const LOD&) const -> A::Mesh*;
+   NOD() auto GetTexture(const LOD&) const -> A::Image*;
+   NOD() auto GetColor() const -> RGBA;
+   NOD() auto GetOrCreatePipeline(const LOD&, const ASCIILayer*) const -> ASCIIPipeline*;
 
    void Refresh();
    void Detach();
+   void Reset();
 };

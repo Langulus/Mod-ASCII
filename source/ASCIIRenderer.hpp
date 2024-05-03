@@ -65,6 +65,6 @@ public:
    void Create(Verb&);
    void Interpret(Verb&);
 
-   NOD() const A::Window* GetWindow() const noexcept;
-   NOD() Scale2 GetResolution() const noexcept;
+   NOD() auto GetWindow() const noexcept -> const A::Window*;
+   NOD() auto GetResolution() const noexcept -> Scale2;
 };

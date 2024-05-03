@@ -14,7 +14,7 @@
 ///   @param producer - the renderable producer                               
 ///   @param descriptor - the renderable descriptor                           
 ASCIIRenderable::ASCIIRenderable(ASCIILayer* producer, const Neat& descriptor)
-   : Resolvable {this}
+   : Resolvable   {this}
    , ProducedFrom {producer, descriptor} {
    VERBOSE_ASCII("Initializing...");
    Couple(descriptor);
@@ -26,7 +26,7 @@ ASCIIRenderable::~ASCIIRenderable() {
 }
 
 /// Reset the renderable, releasing all used content and pipelines            
-void ASCIIRenderable::Detach() {
+void ASCIIRenderable::Reset() {
    for (auto& lod : mLOD) {
       lod.mGeometry.Reset();
       lod.mTexture.Reset();
@@ -37,6 +37,11 @@ void ASCIIRenderable::Detach() {
    mTextureContent.Reset();
    mInstances.Reset();
    mPredefinedPipeline.Reset();
+}
+
+/// Detach the renderable from the hierarchy                                  
+void ASCIIRenderable::Detach() {
+   Reset();
    ProducedFrom::Detach();
 }
 
@@ -115,11 +120,9 @@ ASCIIPipeline* ASCIIRenderable::GetOrCreatePipeline(
       return mLOD[i].mPipeline;
 }
 
-/// Called when owner changes components/traits                               
+/// Called on environment change                                              
 void ASCIIRenderable::Refresh() {
-   // Just reset - new resources will be regenerated or reused upon     
-   // request if they need be                                           
-   /*Detach();
+   Reset();
 
    // Gather all instances for this renderable, and calculate levels    
    mInstances = GatherUnits<A::Instance, Seek::Here>();
@@ -136,5 +139,8 @@ void ASCIIRenderable::Refresh() {
    if (pipeline) {
       mPredefinedPipeline = pipeline;
       return;
-   }*/
+   }
+
+   mGeometryContent = SeekUnit<A::Mesh, Seek::Here>();
+   mTextureContent = SeekUnit<A::Image, Seek::Here>();
 }
