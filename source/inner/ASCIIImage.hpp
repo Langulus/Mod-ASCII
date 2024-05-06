@@ -96,10 +96,10 @@ struct ASCIIImage final : A::Image {
    using Style = Logger::Emphasis;
 
 private:
-   mutable TMany<Text>  mSymbols;   // Array of utf8 encoded symbols     
-   mutable TMany<RGB>   mBgColors;  // Array of foreground colors        
-   mutable TMany<RGB>   mFgColors;  // Array of background colors        
-   mutable TMany<Style> mStyle;     // Array of styles for each pixel    
+   mutable TMany<Text>  mSymbols;   // Array of utf8 encoded symbols    
+   mutable TMany<RGB>   mBgColors;  // Array of foreground colors       
+   mutable TMany<RGB>   mFgColors;  // Array of background colors       
+   mutable TMany<Style> mStyle;     // Array of styles for each pixel   
 
    // Required only in case we're comparing against other images,       
    // provided by a filename                                            
@@ -129,5 +129,6 @@ public:
    Pixel GetPixel(int x, int y) const;
    void  Fill(const Text&, RGB fg = Colors::White, RGB bg = Colors::Black, Style = {});
    void  Compare(Verb&) const;
+   void  Copy(const ASCIIImage&);
    auto  ForEachPixel(auto&&) const;
 };

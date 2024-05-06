@@ -25,13 +25,13 @@ ASCIICamera::ASCIICamera(ASCIILayer* producer, const Neat& descriptor)
 void ASCIICamera::Compile() {
    mResolution = mProducer->mProducer->mWindow->GetSize();
 
-   if (mResolution[0] <= 1)
-      mResolution[0] = 1;
-   if (mResolution[1] <= 1)
-      mResolution[1] = 1;
+   if (mResolution.x <= 1)
+      mResolution.x = 1;
+   if (mResolution.y <= 1)
+      mResolution.y = 1;
 
-   mAspectRatio = static_cast<Real>(mResolution[0])
-                / static_cast<Real>(mResolution[1]);
+   mAspectRatio = static_cast<Real>(mResolution.x)
+                / static_cast<Real>(mResolution.y);
    mViewport.mMax.xy() = mResolution;
 
    if (mPerspective) {
@@ -52,10 +52,13 @@ void ASCIICamera::Compile() {
       //                  -Aspect*Y                                     
       //                                                                
       mProjection = A::Matrix::PerspectiveFOV(
-         mFOV, mAspectRatio, mViewport.mMin[2], mViewport.mMax[2]
+         mFOV, mAspectRatio, mViewport.mMin.z, mViewport.mMax.z
       );
    }
    else {
+      mViewport.mMin.z = -100;
+      mViewport.mMax.z = +100;
+
       // Orthographic is enabled, so use only viewport                  
       // Origin shall be at the top-left, x/y increasing bottom-right   
       // The final projection coordinates should look like that:        
@@ -67,10 +70,21 @@ void ASCIICamera::Compile() {
       //     v                                                          
       //   +Aspect*Y                                                    
       //                                                                
-      mProjection = A::Matrix::Orthographic(
+
+      mProjection = mProjection.Null();
+      const auto range = mViewport.mMax.z - mViewport.mMin.z;
+      mProjection.mArray[0]  =  2.0f / mResolution.x;
+      mProjection.mArray[5]  = -2.0f / mResolution.y;
+      mProjection.mArray[10] = -2.0f / range;
+      mProjection.mArray[12] = -1.f;
+      mProjection.mArray[13] =  1.f;
+      mProjection.mArray[14] =  1.0f / range;
+      mProjection.mArray[15] =  1.0f;
+
+      /*mProjection = A::Matrix::Orthographic(
          mViewport.mMax[0], mViewport.mMax[1], 
          mViewport.mMin[2], mViewport.mMax[2]
-      );
+      );*/
    }
 
    mProjectionInverted = mProjection.Invert();

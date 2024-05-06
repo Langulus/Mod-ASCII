@@ -17,8 +17,8 @@
 struct PipeSubscriber {
    RGBA color;
    Mat4 transform;
-   A::Mesh* mesh;
-   A::Image* texture;
+   const A::Mesh* mesh;
+   const A::Image* texture;
 };
 
 /// Defines how pixels are mapped onto symbols                                
@@ -87,13 +87,13 @@ public:
    void Render(const ASCIILayer*, const Mat4&, const PipeSubscriber&) const;
 
 private:
-   struct CameraState {
+   struct PipelineState {
       const ASCIILayer* mLayer;
       const Scale2 mResolution;
       const Mat4& mProjectedView;
-      const Mat4& mTransform;
+      const PipeSubscriber& mSubscriber;
    };
 
-   void RasterizeMesh(const CameraState&, const A::Mesh&) const;
-   void RasterizeTriangle(const CameraState&, const Triangle&, const Vec3&, const RGBA&) const;
+   void RasterizeMesh(const PipelineState&) const;
+   void RasterizeTriangle(const PipelineState&, const Mat4&, const Triangle&, const Vec3&, const RGBA&) const;
 };

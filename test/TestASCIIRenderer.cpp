@@ -169,13 +169,13 @@ SCENARIO("Drawing solid polygons", "[renderer]") {
       root.CreateUnit<A::Layer>();
       root.CreateUnit<A::World>();
 
-      auto rect = root.CreateChild({Traits::Size {10}, Traits::Name {"Rectangles"}});
-      auto renderable = rect->CreateUnit<A::Renderable>();
-      auto mesh = rect->CreateUnit<A::Mesh>(Math::Box2 {});
-      auto topLeft  = rect->CreateUnit<A::Instance>(Traits::Place(10, 10), Colors::Black);
-      auto topRight = rect->CreateUnit<A::Instance>(Traits::Place(54, 10), Colors::Green);
-      auto botLeft  = rect->CreateUnit<A::Instance>(Traits::Place(10, 38), Colors::Blue);
-      auto botRight = rect->CreateUnit<A::Instance>(Traits::Place(54, 38), Colors::White);
+      auto rect = root.CreateChild({Traits::Size {10, 5}, Traits::Name {"Rectangles"}});
+      rect->CreateUnit<A::Renderable>();
+      rect->CreateUnit<A::Mesh>(Math::Box2 {});
+      rect->CreateUnit<A::Instance>(Traits::Place(10, 10), Traits::Color(Colors::Black));
+      rect->CreateUnit<A::Instance>(Traits::Place(50, 10), Traits::Color(Colors::Green));
+      rect->CreateUnit<A::Instance>(Traits::Place(10, 30), Traits::Color(Colors::Blue));
+      rect->CreateUnit<A::Instance>(Traits::Place(50, 30), Traits::Color(Colors::White));
       root.DumpHierarchy();
 
       static Allocator::State memoryState2;

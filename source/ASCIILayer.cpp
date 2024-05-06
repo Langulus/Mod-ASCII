@@ -71,6 +71,9 @@ void ASCIILayer::CompileCameras() {
 ///   @return the number of relevant cameras                                  
 void ASCIILayer::CompileLevels() {
    if (not mCameras) {
+      mFallbackCamera.mPerspective = false;
+      mFallbackCamera.Compile();
+
       // No camera, so just render default level on the whole screen    
       if (mStyle & Style::Hierarchical)
          CompileLevelHierarchical(mFallbackCamera, Level::Default);
@@ -170,7 +173,7 @@ void ASCIILayer::CompileInstance(
       lod.Transform();
    }
    else {
-      // Instance available, so cull                                    
+      // Instance available, so do frustum culling                      
       if (instance->Cull(lod))
          return;
       lod.Transform(instance->GetModelTransform(lod));
@@ -201,7 +204,7 @@ void ASCIILayer::CompileInstance(
 
       auto& cachedPipes = *cachedLvl.mValue;
       cachedPipes << TPair { pipeline, PipeSubscriber {
-         renderable->GetColor(),
+         renderable->GetColor() * instance->GetColor(),
          lod.mModel, geometry,
          renderable->GetTexture(lod)
       }};
@@ -227,7 +230,7 @@ void ASCIILayer::CompileInstance(
 
       auto& cachedRends = *cachedPipe.mValue;
       cachedRends << PipeSubscriber {
-         renderable->GetColor(),
+         renderable->GetColor() * instance->GetColor(),
          lod.mModel, geometry,
          renderable->GetTexture(lod)
       };
@@ -237,6 +240,14 @@ void ASCIILayer::CompileInstance(
 /// Render the layer to a specific command buffer and framebuffer             
 ///   @param config - where to render to                                      
 void ASCIILayer::Render(const RenderConfig& config) const {
+   const int sizex = static_cast<int>(GetWindow()->GetSize().x);
+   const int sizey = static_cast<int>(GetWindow()->GetSize().y);
+
+   mImage.Resize(sizex, sizey);
+   mNormals.Resize(sizex, sizey);
+   mDepth.Resize(sizex, sizey);
+   mDepth.Fill(config.mClearDepth);
+
    if (mStyle & Style::Hierarchical)
       RenderHierarchical(config);
    else

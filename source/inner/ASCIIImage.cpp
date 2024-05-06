@@ -186,3 +186,22 @@ bool ASCIIImage::CompareInner(const A::Image& rhs) const {
 
    return false;
 }
+
+/// Copy another image, skip symbols that are space - they are considered     
+/// 'transparent'                                                             
+///   @param other - the image to copy                                        
+void ASCIIImage::Copy(const ASCIIImage& other) {
+   for (uint32_t y = 0; y < GetView().mHeight; ++y) {
+      for (uint32_t x = 0; x < GetView().mWidth; ++x) {
+         auto to = GetPixel(x, y);
+         auto from = other.GetPixel(x, y);
+
+         if (from.mSymbol != " ") {
+            to.mSymbol = from.mSymbol;
+            to.mBgColor = from.mBgColor;
+            to.mFgColor = from.mFgColor;
+            to.mStyle = from.mStyle;
+         }
+      }
+   }
+}

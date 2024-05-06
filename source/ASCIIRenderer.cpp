@@ -99,8 +99,12 @@ void ASCIIRenderer::Draw() {
 
    // Render all layers (if any)                                        
    RenderConfig config {" ", 1_real};
-   for (const auto& layer : mLayers)
+   for (const auto& layer : mLayers) {
       layer.Render(config);
+
+      // Copy the result into the backbuffer                            
+      mBackbuffer.Copy(layer.mImage);
+   }
 
    // Send the rendered backbuffer to the window                        
    (void) mWindow->Draw(&mBackbuffer);

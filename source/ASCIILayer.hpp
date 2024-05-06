@@ -57,6 +57,7 @@ protected:
    friend struct ASCIIRenderable;
    friend struct ASCIILight;
    friend struct ASCIIPipeline;
+   friend struct ASCIIRenderer;
 
    // List of cameras                                                   
    TFactory<ASCIICamera> mCameras;
@@ -81,7 +82,7 @@ protected:
    // The final, combined rendered layer image, after all pipelines,    
    // texturization and illumination. All layer's images are later      
    // blended together into the final ASCIIRenderer's backbuffer        
-   ASCIIImage mImage;
+   mutable ASCIIImage mImage;
 
 
    /// The layer style determines how the scene will be compiled              
