@@ -31,7 +31,7 @@ void ASCIICamera::Compile() {
       mResolution.y = 1;
 
    mAspectRatio = static_cast<Real>(mResolution.x)
-                / static_cast<Real>(mResolution.y);
+                / static_cast<Real>(mResolution.y*2); // Chars are twice as big in the vertical
    mViewport.mMax.xy() = mResolution;
 
    if (mPerspective) {
@@ -56,8 +56,8 @@ void ASCIICamera::Compile() {
       );
    }
    else {
-      mViewport.mMin.z = -100;
-      mViewport.mMax.z = +100;
+      mViewport.mMin.z = -100_real;
+      mViewport.mMax.z = +100_real;
 
       // Orthographic is enabled, so use only viewport                  
       // Origin shall be at the top-left, x/y increasing bottom-right   
@@ -73,13 +73,13 @@ void ASCIICamera::Compile() {
 
       mProjection = mProjection.Null();
       const auto range = mViewport.mMax.z - mViewport.mMin.z;
-      mProjection.mArray[0]  =  2.0f / mResolution.x;
-      mProjection.mArray[5]  = -2.0f / mResolution.y;
-      mProjection.mArray[10] = -2.0f / range;
-      mProjection.mArray[12] = -1.f;
-      mProjection.mArray[13] =  1.f;
-      mProjection.mArray[14] =  1.0f / range;
-      mProjection.mArray[15] =  1.0f;
+      mProjection.mArray[0]  =  2.0_real / mResolution.x;
+      mProjection.mArray[5]  = -2.0_real / mResolution.y;
+      mProjection.mArray[10] = -2.0_real / range;
+      mProjection.mArray[12] = -1._real;
+      mProjection.mArray[13] =  1._real;
+      mProjection.mArray[14] =  1.0_real / range;
+      mProjection.mArray[15] =  1.0_real;
 
       /*mProjection = A::Matrix::Orthographic(
          mViewport.mMax[0], mViewport.mMax[1], 

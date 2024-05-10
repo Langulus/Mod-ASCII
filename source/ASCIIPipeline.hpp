@@ -95,5 +95,7 @@ private:
    };
 
    void RasterizeMesh(const PipelineState&) const;
-   void RasterizeTriangle(const PipelineState&, const Mat4&, const Triangle&, const Vec3&, const RGBA&) const;
+   void RasterizeTriangle(const PipelineState&, const Mat4&,
+      const Triangle&, const Triangle&/*, const TTriangle<RGBA>&*/
+   ) const;
 };

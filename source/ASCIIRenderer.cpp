@@ -98,7 +98,7 @@ void ASCIIRenderer::Draw() {
       pipe.Resize(sizex, sizey);
 
    // Render all layers (if any)                                        
-   RenderConfig config {" ", 1_real};
+   RenderConfig config {" ", 1000_real};
    for (const auto& layer : mLayers) {
       layer.Render(config);
 

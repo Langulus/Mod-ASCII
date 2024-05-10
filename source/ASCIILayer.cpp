@@ -204,7 +204,9 @@ void ASCIILayer::CompileInstance(
 
       auto& cachedPipes = *cachedLvl.mValue;
       cachedPipes << TPair { pipeline, PipeSubscriber {
-         renderable->GetColor() * instance->GetColor(),
+         instance
+            ? renderable->GetColor() * instance->GetColor()
+            : renderable->GetColor(),
          lod.mModel, geometry,
          renderable->GetTexture(lod)
       }};
@@ -230,7 +232,9 @@ void ASCIILayer::CompileInstance(
 
       auto& cachedRends = *cachedPipe.mValue;
       cachedRends << PipeSubscriber {
-         renderable->GetColor() * instance->GetColor(),
+         instance
+            ? renderable->GetColor() * instance->GetColor()
+            : renderable->GetColor(),
          lod.mModel, geometry,
          renderable->GetTexture(lod)
       };
@@ -286,7 +290,7 @@ void ASCIILayer::RenderBatched(const RenderConfig& cfg) const {
 
 /// Render all instanced renderables in the order they appear in the scene    
 /// This is used only for Hierarchical style layers                           
-///   @param config - where to render to                                      
+///   @param cfg - where to render to                                         
 void ASCIILayer::RenderHierarchical(const RenderConfig& cfg) const {
    // Rendering from each custom camera's point of view                 
    for (const auto camera : mHierarchicalSequence) {

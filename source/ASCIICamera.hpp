@@ -15,21 +15,25 @@ using LevelRange = TRange<Level>;
 
 
 ///                                                                           
-///   Camera unit                                                             
+///   ASCII Camera unit                                                       
 ///                                                                           
-struct ASCIICamera final : A::Graphics, ProducedFrom<ASCIILayer> {
+/// Provides fine control over camera properties, like field of view,         
+/// screen viewport, aspect ratio, etc.                                       
+///                                                                           
+struct ASCIICamera final : A::Camera, ProducedFrom<ASCIILayer> {
    LANGULUS(ABSTRACT) false;
-   LANGULUS_BASES(A::Graphics);
+   LANGULUS(PRODUCER) ASCIILayer;
+   LANGULUS_BASES(A::Camera);
 
 protected:
    friend struct ASCIILayer;
 
    // Whether or not a perspective projection is used                   
-   bool mPerspective {true};
+   bool mPerspective = true;
    // The projection matrix                                             
    Mat4 mProjection;
    // Clipping range in all directions, including depth                 
-   Range4 mViewport {{0, 0, 0.1, 0}, {720, 480, 1000, 0}};
+   Range4 mViewport {{0, 0, 0.1, 0}, {640, 480, 1000, 0}};
    // Horizontal field of view, in radians                              
    Radians mFOV {90_deg};
    // Aspect ratio (width / height)                                     
@@ -37,11 +41,11 @@ protected:
    // Human retina is 32 milimeters (10^-3) across, which means that    
    // we can observe stuff slightly smaller than human octave           
    LevelRange mObservableRange {Level::Default, Level::Max};
-   // Eye separation. Stereo if more/less than zero                     
-   Real mEyeSeparation {};
-
+   // Camera instances, for different points of view                    
    TMany<const A::Instance*> mInstances;
+   // Inverse of mProjection                                            
    Mat4 mProjectionInverted;
+   // The screen resolution (can be bigger than the viewport)           
    Scale2u32 mResolution {640, 480};
 
 public:

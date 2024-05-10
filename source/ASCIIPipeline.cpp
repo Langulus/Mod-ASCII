@@ -13,7 +13,7 @@
 ///   @param producer - the pipeline producer                                 
 ///   @param descriptor - the pipeline descriptor                             
 ASCIIPipeline::ASCIIPipeline(ASCIIRenderer* producer, const Neat& descriptor)
-   : Resolvable {this}
+   : Resolvable   {this}
    , ProducedFrom {producer, descriptor} {
    VERBOSE_ASCII("Initializing graphics pipeline from: ", descriptor);
    descriptor.ForEach(
@@ -41,12 +41,15 @@ ASCIIPipeline::ASCIIPipeline(ASCIIRenderer* producer, const Neat& descriptor)
 }
 
 /// Resize the pipeline's internal buffer                                     
+///   @param x - buffer width                                                 
+///   @param y - buffer height                                                
 void ASCIIPipeline::Resize(int x, int y) {
    mBuffer.Resize(x * mBufferXScale, y * mBufferYScale);
    mBuffer.Fill({0, 0, 0, 0});
 }
 
 /// Draw a single renderable (used in hierarchical drawing)                   
+///   @param layer - the layer that we're rendering to                        
 ///   @param pv - the projection-view matrix                                  
 ///   @param sub - prepared renderable instance LOD to draw                   
 void ASCIIPipeline::Render(
@@ -69,7 +72,7 @@ void ASCIIPipeline::Render(
          if (mBufferXScale == 1 and mBufferYScale == 1) {
             // Pixels map 1:1                                           
             auto d = layer->mDepth.Get(x, y);
-            if (d > 0 and d < 1) {
+            if (d > 0.0f and d < 1000.0f) {
                // Write pixel only if in valid depth range              
                auto& from = mBuffer.Get(x, y);
                to.mSymbol = "█";
@@ -91,85 +94,54 @@ void ASCIIPipeline::RasterizeMesh(const PipelineState& ps) const {
    // Create a buffer for each relevant data trait                      
    // Each data request will generate that data, if it hasn't yet       
    auto& mesh = *ps.mSubscriber.mesh;
-   const auto posData = mesh.GetData<Traits::Place>();
-   if (not posData)
-      return; // Nothing to draw...                                     
+   if (mesh.MadeOfTriangles()) {
+      Triangle pos;
+      Triangle nor;
+      //TTriangle<RGBA> col;
+      Offset counter = 0;
 
-   const Vec2* rawpos = {};
-   if (posData and posData->Is<Vec2>())
-      rawpos = posData->GetRaw<Vec2>();
+      mesh.ForEachVertex(
+         [&](const Traits::Place& p, const Traits::Aim& n/*, const Traits::Color& c*/) {
+            if (p.IsSimilar<Vec3>())
+               pos[counter] = p.GetRaw<Vec3>()[0];
+            else if (p.IsSimilar<Vec2>())
+               pos[counter] = Vec3(p.GetRaw<Vec2>()[0], 0);
+            else
+               LANGULUS_OOPS(Access, "Unsupported place type");
 
-   const auto norData = mesh.GetData<Traits::Aim>();
-   const Normal* rawnor = {};
-   if (norData and norData->Is<Normal>())
-      rawnor = norData->GetRaw<Normal>();
+            if (n.IsSimilar<Vec3>())
+               nor[counter] = n.GetRaw<Vec3>()[0];
+            else
+               LANGULUS_OOPS(Access, "Unsupported normal type");
 
-   //const auto texData = mesh.GetData<Traits::Sampler>();
-   const auto colData = mesh.GetData<Traits::Color>();
-   const RGBA* rawcol = {};
-   if (colData and colData->Is<RGBA>())
-      rawcol = colData->GetRaw<RGBA>();
-
-   const auto idxData = mesh.GetData<Traits::Index>();
-
-   if (mesh.GetView().mTopology->Is<A::Triangle>()) {
-      // Rasterize triangle lists                                       
-      if (idxData) {
-         if (idxData->Is<uint32_t>()) {
-            const auto rawidx = idxData->GetRaw<uint32_t>();
-            for (Count i = 0; i < idxData->GetCount(); i += 3) {
-               RasterizeTriangle(ps, MVP,
-                  {rawpos[rawidx[i]], rawpos[rawidx[i + 1]], rawpos[rawidx[i + 2]]},
-                  rawnor ? rawnor[rawidx[i / 3]] : Normal {Axes::Backward<>},
-                  rawcol ? rawcol[rawidx[i / 3]] : Colors::White
-               );
+            //col[counter] = c.AsCast<RGBA, false>();
+            if (++counter == 3) {
+               // A triangle is ready                                   
+               RasterizeTriangle(ps, MVP, pos, nor/*, col*/);
+               counter = 0;
             }
          }
-         else TODO();
-      }
+      );
    }
-   else if (mesh.GetView().mTopology->Is<A::Line>()) {
-      // Rasterize line lists                                           
-   }
-   else if (mesh.GetView().mTopology->Is<A::TriangleStrip>()) {
-      // Rasterize triangle strips                                      
-      TODO();
-   }
-   else if (mesh.GetView().mTopology->Is<A::LineStrip>()) {
-      // Rasterize triangle strips                                      
-      TODO();
-   }
-   else if (mesh.GetView().mTopology->Is<A::TriangleFan>()) {
-      // Rasterize triangle fans                                        
-      TODO();
-   }
-   else if (mesh.GetView().mTopology->Is<A::LineLoop>()) {
-      // Rasterize triangle fans                                        
-      TODO();
-   }
-
-   if (idxData) {
-   }
-   else {
-
-   }
+   else TODO();
 }
 
 /// Rasterize a single triangle                                               
-///   @param camera - [in/out] reusable camera state                          
+///   @param ps - the pipeline state                                          
+///   @param MVP - precomputed model*view*projection matrix                   
 ///   @param triangle - triangle to rasterize                                 
-///   @param normal - the normal for the triangle (not smooth)                
+///   @param normals - the normals for each triangle corner                   
 void ASCIIPipeline::RasterizeTriangle(
    const PipelineState& ps,
    const Mat4& MVP,
    const Triangle& triangle,
-   const Vec3& normal,
-   const RGBA& color
+   const Triangle& normals/*,
+   const TTriangle<RGBA>& colors*/
 ) const {
-   if (color.a == 0) {
+   /*if (colors[0].a * colors[1].a * colors[2].a == 0) {
       // Whole triangle discarded by alpha test                         
       return;
-   }
+   }*/
 
    // Transform to eye space                                            
    const Vec4f pt0 = MVP * Vec4f(triangle[0], 1);
@@ -228,6 +200,8 @@ void ASCIIPipeline::RasterizeTriangle(
                x < static_cast<int>(maxp.x); ++x) {
          const Vec2f screenuv = (Vec2f(x, y) - minp) / cam.mResolution.x;*/
    for (int y = 0; y < static_cast<int>(ps.mResolution.y) * mBufferYScale; ++y) {
+      bool row_started = false;
+
       for (int x = 0; x < static_cast<int>(ps.mResolution.x) * mBufferXScale; ++x) {
          const Vec2f screenuv = (Vec2f(x, y) * 2.0f - ps.mResolution + Vec2f(0.5)) / ps.mResolution;
 
@@ -240,10 +214,18 @@ void ASCIIPipeline::RasterizeTriangle(
 
          if (s <= 0 or t <= 0 or 1 - s - t <= 0) {
             // Pixel discarded (not inside the triangle)                
-            continue;
+            // Was a row started? If so, then there's not any chance to 
+            // find a point in the triangle again on this row.          
+            if (row_started) {
+               row_started = false;
+               break;
+            }
+            else continue;
          }
 
+         // If reached, then pixel is inside triangle                   
          // Depth test                                                  
+         row_started = true;
          Vec4f test {1, s, t, 1 - s - t};
          float denominator = 1.0f / (test.y / pt1.w + test.z / pt2.w + test.w / pt0.w);
          float z = (
@@ -259,14 +241,16 @@ void ASCIIPipeline::RasterizeTriangle(
          }
 
          // If reached, pixel is overwritten                            
-         mBuffer.Get(x, y) = color * ps.mSubscriber.color;
+         const Normal interpolatedNormal = normals[1] * s + normals[2] * t + normals[0] * (1 - s - t);
+
+         mBuffer.Get(x, y) = /*colors[0] **/ ps.mSubscriber.color * interpolatedNormal.Dot(Normal(1,1,0).Normalize()); //TODO color interpolation
 
          // Only last pixel of a group is allowed to write depth and    
          // normal, otherwise subtle bugs might occur                   
          if ((x % mBufferXScale) == mBufferXScale - 1
          and (y % mBufferYScale) == mBufferYScale - 1) {
             depth = z;
-            ps.mLayer->mNormals.Get(x / mBufferXScale, y / mBufferYScale) = normal;
+            ps.mLayer->mNormals.Get(x / mBufferXScale, y / mBufferYScale) = normals[0]; //TODO normal interpolation
          }
       }
    }
