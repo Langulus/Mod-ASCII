@@ -73,8 +73,8 @@ void ASCIICamera::Compile() {
 
       mProjection = mProjection.Null();
       const auto range = mViewport.mMax.z - mViewport.mMin.z;
-      mProjection.mArray[0]  =  2.0_real / mResolution.x;
-      mProjection.mArray[5]  = -2.0_real / mResolution.y;
+      mProjection.mArray[0]  =  2.0_real / static_cast<Real>(mResolution.x);
+      mProjection.mArray[5]  = -2.0_real / static_cast<Real>(mResolution.y);
       mProjection.mArray[10] = -2.0_real / range;
       mProjection.mArray[12] = -1._real;
       mProjection.mArray[13] =  1._real;

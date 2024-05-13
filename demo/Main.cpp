@@ -49,6 +49,7 @@ int main(int, char**) {
    maxwell->CreateUnit<A::Renderable>();
    maxwell->CreateUnit<A::Mesh>("maxwell/maxwell.obj");
    maxwell->CreateUnit<A::Instance>(Traits::Place {0, -9, -25.0});
+   maxwell->Run("Move^1 Yaw(5)");
 
    while (true) {
       // Update until quit                                              
@@ -56,7 +57,6 @@ int main(int, char**) {
          break;
 
       // This part is just measuring if we're keeping the frame rate    
-      // It is not necessary to keep the frame rate                     
       const auto time_in_seconds = time_point_cast<seconds>(system_clock::now());
       if (time_in_seconds > prev_time_in_seconds)
          prev_time_in_seconds = time_in_seconds;
