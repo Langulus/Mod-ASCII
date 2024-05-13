@@ -49,7 +49,7 @@ int main(int, char**) {
    maxwell->CreateUnit<A::Renderable>();
    maxwell->CreateUnit<A::Mesh>("maxwell/maxwell.obj");
    maxwell->CreateUnit<A::Instance>(Traits::Place {0, -9, -25.0});
-   maxwell->Run("Move^1 Yaw(5)");
+   maxwell->Run("Move^1 Yaw(-20)");
 
    while (true) {
       // Update until quit                                              
