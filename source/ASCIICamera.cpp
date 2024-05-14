@@ -1,4 +1,3 @@
-
 ///                                                                           
 /// Langulus::Module::ASCII                                                   
 /// Copyright (c) 2024 Dimo Markov <team@langulus.com>                        
@@ -25,10 +24,10 @@ ASCIICamera::ASCIICamera(ASCIILayer* producer, const Neat& descriptor)
 void ASCIICamera::Compile() {
    mResolution = mProducer->mProducer->mWindow->GetSize();
 
-   if (mResolution.x <= 1)
-      mResolution.x = 1;
-   if (mResolution.y <= 1)
-      mResolution.y = 1;
+   if (mResolution.x <= 1u)
+      mResolution.x = 1u;
+   if (mResolution.y <= 1u)
+      mResolution.y = 1u;
 
    mAspectRatio = static_cast<Real>(mResolution.x)
                 / static_cast<Real>(mResolution.y*2); // Chars are twice as big in the vertical
