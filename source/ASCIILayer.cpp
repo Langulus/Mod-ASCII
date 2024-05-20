@@ -248,7 +248,11 @@ void ASCIILayer::Render(const RenderConfig& config) const {
    const int sizey = static_cast<int>(GetWindow()->GetSize().y);
 
    mImage.Resize(sizex, sizey);
+   mImage.Fill(' ', Colors::White, Colors::Red);
+
    mNormals.Resize(sizex, sizey);
+   mNormals.Fill(Vec3 {});
+
    mDepth.Resize(sizex, sizey);
    mDepth.Fill(config.mClearDepth);
 

@@ -183,26 +183,21 @@ void ASCIIPipeline::RasterizeTriangle(
    const auto term_t2 = p0.y - p1.y;
    const auto term_t3 = p1.x - p0.x;
 
-   //const auto minp = Math::Floor(Math::Min(p0, p1, p2) * cam.mResolution * 0.5f);
-   //const auto maxp = Math::Ceil (Math::Max(p0, p1, p2) * cam.mResolution * 0.5f);
+   const auto minp = Math::Floor(Math::Min(p0, p1, p2) * 0.5_real + 0.5_real) * ps.mResolution;
+   const auto maxp = Math::Ceil (Math::Max(p0, p1, p2) * 0.5_real + 0.5_real) * ps.mResolution;
 
    // Clip                                                              
-   /*if (maxp.x < 0.0 or maxp.y < 0.0
-   or minp.x >= cam.mResolution.x or minp.y >= cam.mResolution.y) {
+   if (maxp.x < 0.0 or maxp.y < 0.0
+   or minp.x >= ps.mResolution.x or minp.y >= ps.mResolution.y) {
       // Triangle is fully outside view                                 
       return;
-   }*/
+   }
 
    // Iterate all pixels in the area of interest                        
-   /*for (int y = static_cast<int>(minp.y);
-            y < static_cast<int>(maxp.y); ++y) {
-      for (int x = static_cast<int>(minp.x);
-               x < static_cast<int>(maxp.x); ++x) {
-         const Vec2f screenuv = (Vec2f(x, y) - minp) / cam.mResolution.x;*/
-   for (int y = 0; y < static_cast<int>(ps.mResolution.y) * mBufferYScale; ++y) {
+   for (int y = static_cast<int>(minp.y); y < static_cast<int>(maxp.y) * mBufferYScale; ++y) {
       bool row_started = false;
 
-      for (int x = 0; x < static_cast<int>(ps.mResolution.x) * mBufferXScale; ++x) {
+      for (int x = static_cast<int>(minp.x); x < static_cast<int>(maxp.x) * mBufferXScale; ++x) {
          const Vec2f screenuv = (Vec2f(x, y) * 2.0f - ps.mResolution + Vec2f(0.5)) / ps.mResolution;
 
          const float s = term_a * (term_s1
