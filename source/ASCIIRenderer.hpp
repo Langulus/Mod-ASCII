@@ -9,7 +9,8 @@
 #pragma once
 #include "ASCIIPipeline.hpp"
 #include "ASCIILayer.hpp"
-#include "inner/ASCIIImage.hpp"
+#include "inner/ASCIITexture.hpp"
+#include "inner/ASCIIGeometry.hpp"
 #include <Flow/Verbs/Create.hpp>
 #include <Flow/Verbs/Interpret.hpp>
 #include <Math/Gradient.hpp>
@@ -50,6 +51,11 @@ protected:
    TFactory<ASCIILayer> mLayers;
    // Pipelines                                                         
    TFactoryUnique<ASCIIPipeline> mPipelines;
+
+   // Geometry content mirror                                           
+   TFactoryUnique<ASCIIGeometry> mGeometries;
+   // Texture content mirror                                            
+   TFactoryUnique<ASCIITexture> mTextures;
 
    // Backbuffer                                                        
    ASCIIImage mBackbuffer;

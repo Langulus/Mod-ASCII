@@ -8,7 +8,8 @@
 ///                                                                           
 #pragma once
 #include "Common.hpp"
-#include "inner/ASCIIImage.hpp"
+#include "inner/ASCIITexture.hpp"
+#include "inner/ASCIIGeometry.hpp"
 #include <Math/Normal.hpp>
 #include <Langulus/Mesh.hpp>
 #include <Langulus/IO.hpp>
@@ -17,8 +18,8 @@
 struct PipeSubscriber {
    RGBA color;
    Mat4 transform;
-   const A::Mesh* mesh;
-   const A::Image* texture;
+   const ASCIIGeometry* mesh;
+   const ASCIITexture*  texture;
 };
 
 /// Defines how pixels are mapped onto symbols                                
@@ -59,9 +60,9 @@ struct ASCIIPipeline : A::Graphics, ProducedFrom<ASCIIRenderer> {
 
 private:
    // Toggle depth testing and writing                                  
-   bool mDepth = true;
+   bool mDepthTest = true;
    // Toggle light calculation                                          
-   //bool mLit = true;
+   bool mLit = true;
 
    // Toggle culling                                                    
    enum Cull {
@@ -73,18 +74,23 @@ private:
 
    // Some styles involve more pixels per character                     
    // Halfblocks are 2x2 pixels per symbol, while Braille is 2x4        
-   int mBufferXScale = 1, mBufferYScale = 1;
+   Scale2i mBufferScale;
 
    // An intermediate render buffer, used only by the pipeline          
    // This buffer is then compiled into an image inside ASCIILayer      
-   // Note: alpha channel acts as a stencil, to mark painted pixels     
-   mutable ASCIIBuffer<RGBA> mBuffer;
+   mutable ASCIIBuffer<RGBA>  mBuffer;
+
+   // Intermediate (may be sub-pixel) depth buffer, that also acts as   
+   // a stencil buffer (pixel is valid if depth is not at max)          
+   mutable ASCIIBuffer<float> mDepth;
 
 public:
    ASCIIPipeline(ASCIIRenderer*, const Neat&);
 
+   void Clear(RGBA, float);
    void Resize(int x, int y);
    void Render(const ASCIILayer*, const Mat4&, const PipeSubscriber&) const;
+   void Assemble(const ASCIILayer*) const;
 
 private:
    struct PipelineState {
@@ -95,7 +101,10 @@ private:
    };
 
    void RasterizeMesh(const PipelineState&) const;
-   void RasterizeTriangle(const PipelineState&, const Mat4&,
-      const Triangle&, const Triangle&/*, const TTriangle<RGBA>&*/
+
+   template<bool LIT, bool DEPTH>
+   void RasterizeTriangle(
+      const PipelineState&, const Mat4&,
+      const ASCIIGeometry::Vertex*
    ) const;
 };

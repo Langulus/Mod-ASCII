@@ -207,7 +207,8 @@ void ASCIILayer::CompileInstance(
          instance
             ? renderable->GetColor() * instance->GetColor()
             : renderable->GetColor(),
-         lod.mModel, geometry,
+         lod.mModel, 
+         renderable->GetGeometry(lod),
          renderable->GetTexture(lod)
       }};
    }
@@ -235,7 +236,8 @@ void ASCIILayer::CompileInstance(
          instance
             ? renderable->GetColor() * instance->GetColor()
             : renderable->GetColor(),
-         lod.mModel, geometry,
+         lod.mModel,
+         renderable->GetGeometry(lod),
          renderable->GetTexture(lod)
       };
    }
@@ -248,12 +250,9 @@ void ASCIILayer::Render(const RenderConfig& config) const {
    const int sizey = static_cast<int>(GetWindow()->GetSize().y);
 
    mImage.Resize(sizex, sizey);
-   mImage.Fill(' ', Colors::White, Colors::Red);
-
-   mNormals.Resize(sizex, sizey);
-   mNormals.Fill(Vec3 {});
-
    mDepth.Resize(sizex, sizey);
+
+   mImage.Fill(' ', Colors::White, Colors::Red);
    mDepth.Fill(config.mClearDepth);
 
    if (mStyle & Style::Hierarchical)
@@ -277,16 +276,14 @@ void ASCIILayer::RenderBatched(const RenderConfig& cfg) const {
          for (const auto pipeline : *level.mValue) {
             // Draw all renderables that use that pipeline in their     
             // current LOD state, from that particular level & POV      
-            for (const auto& instance : pipeline.mValue) {
+            for (const auto& instance : pipeline.mValue)
                pipeline.mKey->Render(this, projectedView, instance);
-            }
 
-            //TODO bake the intermediate pipeline buffer to layer's image
+            // Assemble after everything has been drawn                 
+            pipeline.mKey->Assemble(this);
          }
 
-         //TODO light calculations before depth is erased
-
-         // Clear depth after rendering each level                      
+         // Clear global depth after rendering each level               
          mDepth.Fill(cfg.mClearDepth);
       }
    }
@@ -303,14 +300,13 @@ void ASCIILayer::RenderHierarchical(const RenderConfig& cfg) const {
          const auto projectedView = camera.mKey->mProjection
             * camera.mKey->GetViewTransform(*level.mKey);
 
-         // Involve all relevant pipe-renderable pairs for that level   
+         // Render all relevant pipe-renderable pairs for that level    
          for (const auto& instance : *level.mValue) {
             instance.mKey->Render(this, projectedView, instance.mValue);
 
-            //TODO bake the intermediate pipeline buffer after each draw
+            // Assemble after each draw in order to keep hierarchy      
+            instance.mKey->Assemble(this);
          }
-
-         //TODO light calculations before depth is erased
 
          // Clear depth after rendering each level                      
          mDepth.Fill(cfg.mClearDepth);

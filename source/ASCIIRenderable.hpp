@@ -29,14 +29,14 @@ protected:
    RTTI::Tag<Pin<RGBA>, Traits::Color> mColor = Colors::White;
    TMany<const A::Instance*> mInstances;
    TRange<Level> mLevelRange;
-   Ref<A::Mesh> mGeometryContent;
+   Ref<A::Mesh>  mGeometryContent;
    Ref<A::Image> mTextureContent;
    mutable Ref<ASCIIPipeline> mPredefinedPipeline;
 
    // Precompiled content, updated on Refresh()                         
    mutable struct {
-      Ref<A::Mesh> mGeometry;
-      Ref<A::Image> mTexture;
+      Ref<ASCIIGeometry> mGeometry;
+      Ref<ASCIITexture>  mTexture;
       Ref<ASCIIPipeline> mPipeline;
    } mLOD[LOD::IndexCount];
 
@@ -45,8 +45,8 @@ public:
    ~ASCIIRenderable();
 
    NOD() auto GetRenderer() const noexcept -> ASCIIRenderer*;
-   NOD() auto GetGeometry(const LOD&) const -> A::Mesh*;
-   NOD() auto GetTexture(const LOD&) const -> A::Image*;
+   NOD() auto GetGeometry(const LOD&) const -> const ASCIIGeometry*;
+   NOD() auto GetTexture(const LOD&) const -> const ASCIITexture*;
    NOD() auto GetColor() const -> RGBA;
    NOD() auto GetOrCreatePipeline(const LOD&, const ASCIILayer*) const -> ASCIIPipeline*;
 

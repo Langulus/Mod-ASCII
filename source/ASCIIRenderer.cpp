@@ -15,11 +15,13 @@
 ///   @param producer - the renderer producer                                 
 ///   @param descriptor - the renderer descriptor                             
 ASCIIRenderer::ASCIIRenderer(ASCII* producer, const Neat& descriptor)
-   : Resolvable {this}
+   : Resolvable   {this}
    , ProducedFrom {producer, descriptor}
-   , mLayers {this}
-   , mPipelines {this}
-   , mBackbuffer {this} {
+   , mLayers      {this}
+   , mPipelines   {this}
+   , mGeometries  {this}
+   , mTextures    {this}
+   , mBackbuffer  {this} {
    VERBOSE_ASCII("Initializing...");
 
    // Retrieve relevant traits from the environment                     
@@ -64,6 +66,8 @@ void ASCIIRenderer::Refresh() {
 void ASCIIRenderer::Create(Verb& verb) {
    mLayers.Create(verb);
    mPipelines.Create(verb);
+   mGeometries.Create(verb);
+   mTextures.Create(verb);
 }
 
 /// Interpret the renderer as an image, i.e. take an ascii "screenshot"       
@@ -81,8 +85,9 @@ void ASCIIRenderer::Draw() {
    if (mWindow->IsMinimized())
       return;
 
+   RenderConfig config {Colors::Red, 1000_real};
+
    // Generate the draw lists for all layers                            
-   // This will populate uniform buffers for all relevant pipelines     
    for (auto& layer : mLayers)
       layer.Generate();
 
@@ -91,19 +96,22 @@ void ASCIIRenderer::Draw() {
    const int sizey = static_cast<int>(mWindow->GetSize().y);
 
    mBackbuffer.Resize(sizex, sizey);
-   mBackbuffer.Fill(' ', Colors::White, Colors::Red);
+   mBackbuffer.Fill(' ', Colors::White, config.mClearColor);
 
-   // Resize and clear the pipelines                                    
-   for (auto& pipe : mPipelines)
-      pipe.Resize(sizex, sizey);
+   if (mLayers) {
+      // Resize and clear all pipelines                                 
+      for (auto& pipe : mPipelines) {
+         pipe.Resize(sizex, sizey);
+         pipe.Clear(config.mClearColor, config.mClearDepth);
+      }
 
-   // Render all layers (if any)                                        
-   RenderConfig config {" ", 1000_real};
-   for (const auto& layer : mLayers) {
-      layer.Render(config);
+      // Render all layers                                              
+      for (const auto& layer : mLayers) {
+         layer.Render(config);
 
-      // Copy the result into the backbuffer                            
-      mBackbuffer.Copy(layer.mImage);
+         // Copy the result into the backbuffer                         
+         mBackbuffer.Copy(layer.mImage); //TODO assemble using stencil instead
+      }
    }
 
    // Send the rendered backbuffer to the window                        

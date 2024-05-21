@@ -47,7 +47,7 @@ void ASCIIRenderable::Detach() {
 
 /// Get the renderer                                                          
 ///   @return a pointer to the renderer                                       
-ASCIIRenderer* ASCIIRenderable::GetRenderer() const noexcept {
+auto ASCIIRenderable::GetRenderer() const noexcept -> ASCIIRenderer* {
    return GetProducer()->GetProducer();
 }
 
@@ -55,10 +55,17 @@ ASCIIRenderer* ASCIIRenderable::GetRenderer() const noexcept {
 /// This is the point where content might be generated upon request           
 ///   @param lod - information used to extract the best LOD                   
 ///   @return the VRAM geometry or nullptr if content is not available        
-A::Mesh* ASCIIRenderable::GetGeometry(const LOD& lod) const {
+auto ASCIIRenderable::GetGeometry(const LOD& lod) const -> const ASCIIGeometry* {
    const auto i = lod.GetAbsoluteIndex();
-   if (not mLOD[i].mGeometry and mGeometryContent)
-      mLOD[i].mGeometry = mGeometryContent->GetLOD(lod);
+   if (not mLOD[i].mGeometry and mGeometryContent) {
+      // Cache geometry to a more cache-friendly format                 
+      Verbs::Create creator {
+         Construct::From<ASCIIGeometry>(mGeometryContent->GetLOD(lod))
+      };
+      mProducer->Create(creator);
+      mLOD[i].mGeometry = creator->template As<ASCIIGeometry*>();
+   }
+
    return mLOD[i].mGeometry;
 }
 
@@ -66,16 +73,23 @@ A::Mesh* ASCIIRenderable::GetGeometry(const LOD& lod) const {
 /// This is the point where content might be generated upon request           
 ///   @param lod - information used to extract the best LOD                   
 ///   @return the VRAM texture or nullptr if content is not available         
-A::Image* ASCIIRenderable::GetTexture(const LOD& lod) const {
+auto ASCIIRenderable::GetTexture(const LOD& lod) const -> const ASCIITexture* {
    const auto i = lod.GetAbsoluteIndex();
-   if (not mLOD[i].mTexture and mTextureContent)
-      mLOD[i].mTexture = mTextureContent->GetLOD(lod);
+   if (not mLOD[i].mTexture and mTextureContent) {
+      // Cache texture to a more cache-friendly format                  
+      Verbs::Create creator {
+         Construct::From<ASCIITexture>(mTextureContent->GetLOD(lod))
+      };
+      mProducer->Create(creator);
+      mLOD[i].mTexture = creator->template As<ASCIITexture*>();
+   }
+
    return mLOD[i].mTexture;
 }
 
 /// Get uniform color                                                         
 ///   @return the color                                                       
-RGBA ASCIIRenderable::GetColor() const {
+auto ASCIIRenderable::GetColor() const -> RGBA {
    return *mColor;
 }
 
@@ -83,9 +97,9 @@ RGBA ASCIIRenderable::GetColor() const {
 ///   @param lod - information used to extract the best LOD                   
 ///   @param layer - additional settings might be provided by the used layer  
 ///   @return the pipeline                                                    
-ASCIIPipeline* ASCIIRenderable::GetOrCreatePipeline(
+auto ASCIIRenderable::GetOrCreatePipeline(
    const LOD& lod, const ASCIILayer* layer
-) const {
+) const -> ASCIIPipeline* {
    // Always return the predefined pipeline if available                
    if (mPredefinedPipeline)
       return mPredefinedPipeline;
@@ -107,6 +121,7 @@ ASCIIPipeline* ASCIIRenderable::GetOrCreatePipeline(
    // Get, or create the pipeline                                       
    Verbs::Create creator {&construct};
    GetRenderer()->Create(creator);
+
    creator->ForEachDeep([&](ASCIIPipeline& p) {
       if (usingGlobalPipeline)
          mPredefinedPipeline = &p;
@@ -141,6 +156,6 @@ void ASCIIRenderable::Refresh() {
       return;
    }
 
-   mGeometryContent = SeekUnit<A::Mesh, Seek::Here>();
-   mTextureContent = SeekUnit<A::Image, Seek::Here>();
+   mGeometryContent = SeekUnit<A::Mesh,  Seek::Here>();
+   mTextureContent  = SeekUnit<A::Image, Seek::Here>();
 }

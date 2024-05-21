@@ -76,8 +76,6 @@ protected:
 
    // Depth buffer                                                      
    mutable ASCIIBuffer<float> mDepth;
-   // Normals buffer                                                    
-   mutable ASCIIBuffer<Vec3> mNormals;
 
    // The final, combined rendered layer image, after all pipelines,    
    // texturization and illumination. All layer's images are later      

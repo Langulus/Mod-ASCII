@@ -21,8 +21,26 @@ constexpr int FPS = 60;
 
 LANGULUS_RTTI_BOUNDARY(RTTI::MainBoundary)
 
+namespace Langulus::Logger
+{
+   /// Consumes all logging messages, so that they don't interfere with       
+   /// rendering inside the console                                           
+   struct MessageSink final : Logger::A::Interface {
+      void Write(const TextView&) const noexcept {}
+      void Write(const Command&) noexcept {}
+      void Write(const Color&) noexcept {}
+      void Write(const Emphasis&) noexcept {}
+      void Write(const Style&) noexcept {}
+      void NewLine() const noexcept {}
+      void Tabulate() const noexcept {}
+   } MessageSinkInstance;
+}
 
 int main(int, char**) {
+   // Suppress any logging messages, so that we don't interfere with    
+   // the ASCII renderer in the console                                 
+   Logger::Instance.AttachRedirector(&Logger::MessageSinkInstance);
+
    auto invFpsLimit = round<system_clock::duration>(dsec {1. / FPS});
    auto m_BeginFrame = system_clock::now();
    auto m_EndFrame = m_BeginFrame + invFpsLimit;
@@ -67,5 +85,6 @@ int main(int, char**) {
       m_EndFrame = m_BeginFrame + invFpsLimit;
    }
 
+   Logger::Instance.DettachRedirector(&Logger::MessageSinkInstance);
    return 0;
 }
