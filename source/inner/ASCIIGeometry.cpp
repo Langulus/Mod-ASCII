@@ -28,6 +28,7 @@ ASCIIGeometry::ASCIIGeometry(ASCIIRenderer* producer, const Neat& descriptor)
                 const Traits::Color&   c
             ) {
                Vertex output;
+               LANGULUS_ASSERT(p, Access, "No vertex position");
 
                if (p.IsSimilar<Vec3>())
                   output.mPos = Vec4(*p.GetRaw<Vec3>(), 1);
@@ -38,17 +39,22 @@ ASCIIGeometry::ASCIIGeometry(ASCIIRenderer* producer, const Neat& descriptor)
                else
                   LANGULUS_OOPS(Access, "Unsupported place type");
 
-               if (n.IsSimilar<Vec3>())
-                  output.mNor = *n.GetRaw<Vec3>();
-               else
-                  LANGULUS_OOPS(Access, "Unsupported normal type");
+               if (n) {
+                  if (n.IsSimilar<Vec3>())
+                     output.mNor = *n.GetRaw<Vec3>();
+                  else
+                     LANGULUS_OOPS(Access, "Unsupported normal type");
+               }
 
-               if (t.IsSimilar<Vec2>())
-                  output.mTex = *t.GetRaw<Vec2>();
-               else
-                  LANGULUS_OOPS(Access, "Unsupported sampler type");
+               if (t) {
+                  if (t and t.IsSimilar<Vec2>())
+                     output.mTex = *t.GetRaw<Vec2>();
+                  else
+                     LANGULUS_OOPS(Access, "Unsupported sampler type");
+               }
 
-               output.mCol = c.AsCast<RGBA, false>();
+               if (c)
+                  output.mCol = c.AsCast<RGBA, false>();
 
                // Cache the vertex                                      
                mVertices << output;

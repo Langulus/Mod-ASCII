@@ -62,7 +62,7 @@ auto ASCIIRenderable::GetGeometry(const LOD& lod) const -> const ASCIIGeometry* 
       Verbs::Create creator {
          Construct::From<ASCIIGeometry>(mGeometryContent->GetLOD(lod))
       };
-      mProducer->Create(creator);
+      GetRenderer()->Create(creator);
       mLOD[i].mGeometry = creator->template As<ASCIIGeometry*>();
    }
 
@@ -80,7 +80,7 @@ auto ASCIIRenderable::GetTexture(const LOD& lod) const -> const ASCIITexture* {
       Verbs::Create creator {
          Construct::From<ASCIITexture>(mTextureContent->GetLOD(lod))
       };
-      mProducer->Create(creator);
+      GetRenderer()->Create(creator);
       mLOD[i].mTexture = creator->template As<ASCIITexture*>();
    }
 
