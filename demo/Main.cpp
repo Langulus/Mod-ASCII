@@ -11,6 +11,7 @@
 #include <Langulus/Graphics.hpp>
 #include <Langulus/Physical.hpp>
 #include <Langulus/Mesh.hpp>
+#include <Langulus/Input.hpp>
 #include <Flow/Time.hpp>
 #include <thread>
 
@@ -21,25 +22,12 @@ constexpr int FPS = 60;
 
 LANGULUS_RTTI_BOUNDARY(RTTI::MainBoundary)
 
-namespace Langulus::Logger
-{
-   /// Consumes all logging messages, so that they don't interfere with       
-   /// rendering inside the console                                           
-   struct MessageSink final : Logger::A::Interface {
-      void Write(const TextView&) const noexcept {}
-      void Write(const Command&) noexcept {}
-      void Write(const Color&) noexcept {}
-      void Write(const Emphasis&) noexcept {}
-      void Write(const Style&) noexcept {}
-      void NewLine() const noexcept {}
-      void Tabulate() const noexcept {}
-   } MessageSinkInstance;
-}
 
 int main(int, char**) {
    // Suppress any logging messages, so that we don't interfere with    
    // the ASCII renderer in the console                                 
-   Logger::Instance.AttachRedirector(&Logger::MessageSinkInstance);
+   Logger::ToHTML logFile {"logfile.htm"};
+   Logger::Instance.AttachRedirector(&logFile);
 
    auto invFpsLimit = round<system_clock::duration>(dsec {1. / FPS});
    auto m_BeginFrame = system_clock::now();
@@ -56,17 +44,26 @@ int main(int, char**) {
    root.LoadMod("FileSystem");
    root.LoadMod("AssetsGeometry");
    root.LoadMod("Physics");
+   root.LoadMod("InputSDL");
 
    root.CreateUnit<A::Window>();
    root.CreateUnit<A::Renderer>();
    root.CreateUnit<A::Layer>();
-   root.CreateUnit<A::Camera>();
    root.CreateUnit<A::World>();
+   root.CreateUnit<A::InputGatherer>();
 
+   // Create a player entity with controllable camera                   
+   auto player = root.CreateChild({Traits::Name {"Player"}});
+   player->CreateUnit<A::Camera>();
+   player->CreateUnit<A::Instance>(Traits::Place {0, 9, 25.0});
+   player->CreateUnit<A::InputListener>();
+   player->Run("create Anticipator(MouseMoveHorizontal, Yaw)");
+
+   // Create a rotating dingus                                          
    auto maxwell = root.CreateChild({Traits::Name {"Maxwell"}});
    maxwell->CreateUnit<A::Renderable>();
    maxwell->CreateUnit<A::Mesh>("maxwell/maxwell.obj");
-   maxwell->CreateUnit<A::Instance>(Traits::Place {0, -9, -25.0});
+   maxwell->CreateUnit<A::Instance>();
    maxwell->Run("Move^0.016 Yaw(-1)");
 
    while (true) {
@@ -85,6 +82,6 @@ int main(int, char**) {
       m_EndFrame = m_BeginFrame + invFpsLimit;
    }
 
-   Logger::Instance.DettachRedirector(&Logger::MessageSinkInstance);
+   Logger::Instance.DettachRedirector(&logFile);
    return 0;
 }

@@ -17,6 +17,7 @@ add_dependencies(LangulusModASCIIDemo
     LangulusModFileSystem
     LangulusModAssetsGeometry
     LangulusModPhysics
+    LangulusModInputSDL
 )
 
 # Make the data dir                                                     
