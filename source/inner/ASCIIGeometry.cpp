@@ -3,8 +3,7 @@
 /// Copyright (c) 2024 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
-/// Distributed under GNU General Public License v3+                          
-/// See LICENSE file, or https://www.gnu.org/licenses                         
+/// SPDX-License-Identifier: GPL-3.0-or-later                                 
 ///                                                                           
 #include "../ASCII.hpp"
 #include <Math/Normal.hpp>
@@ -62,7 +61,7 @@ ASCIIGeometry::ASCIIGeometry(ASCIIRenderer* producer, const Neat& descriptor)
          );
 
          mView.mTopology = MetaDataOf<A::Triangle>();
-         mView.mPrimitiveCount = mVertices.GetCount() / 3;
+         mView.mPrimitiveCount = static_cast<uint32_t>(mVertices.GetCount() / 3);
          mView.mTextureMapping = Math::MapMode::Custom;
       }
       else TODO();

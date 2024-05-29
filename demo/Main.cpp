@@ -3,8 +3,7 @@
 /// Copyright (c) 2024 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
-/// Distributed under GNU General Public License v3+                          
-/// See LICENSE file, or https://www.gnu.org/licenses                         
+/// SPDX-License-Identifier: GPL-3.0-or-later                                 
 ///                                                                           
 #include <Langulus.hpp>
 #include <Langulus/Platform.hpp>
@@ -27,7 +26,7 @@ int main(int, char**) {
    // Suppress any logging messages, so that we don't interfere with    
    // the ASCII renderer in the console                                 
    Logger::ToHTML logFile {"logfile.htm"};
-   Logger::Instance.AttachRedirector(&logFile);
+   Logger::AttachRedirector(&logFile);
 
    auto invFpsLimit = round<system_clock::duration>(dsec {1. / FPS});
    auto m_BeginFrame = system_clock::now();
@@ -57,7 +56,9 @@ int main(int, char**) {
    player->CreateUnit<A::Camera>();
    player->CreateUnit<A::Instance>(Traits::Place {0, 9, 25.0});
    player->CreateUnit<A::InputListener>();
-   player->Run("create Anticipator(MouseMoveHorizontal, Yaw)");
+   player->Run("Create "
+      "Anticipator(MouseMoveHorizontal, [Move Yaw(1)]), "
+      "Anticipator(MouseMoveVertical,   [Move Pitch(1)])");
 
    // Create a rotating dingus                                          
    auto maxwell = root.CreateChild({Traits::Name {"Maxwell"}});
@@ -82,6 +83,6 @@ int main(int, char**) {
       m_EndFrame = m_BeginFrame + invFpsLimit;
    }
 
-   Logger::Instance.DettachRedirector(&logFile);
+   Logger::DettachRedirector(&logFile);
    return 0;
 }

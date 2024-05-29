@@ -3,8 +3,7 @@
 /// Copyright (c) 2024 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
-/// Distributed under GNU General Public License v3+                          
-/// See LICENSE file, or https://www.gnu.org/licenses                         
+/// SPDX-License-Identifier: GPL-3.0-or-later                                 
 ///                                                                           
 #include "../ASCII.hpp"
 
@@ -23,7 +22,7 @@ ASCIITexture::ASCIITexture(ASCIIRenderer* producer, const Neat& descriptor)
 
 /// Initialize from the provided content                                      
 ///   @param content - the abstract texture content interface                 
-void ASCIITexture::Upload(const A::Image& content) {
+void ASCIITexture::Upload(const A::Image&) {
    TODO(); //compile into intermediate format
 }
 
