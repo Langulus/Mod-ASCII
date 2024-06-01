@@ -38,7 +38,7 @@ protected:
    // Aspect ratio (width / height)                                     
    Real mAspectRatio {Real {720} / Real {480}};
    // Human retina is 32 milimeters (10^-3) across, which means that    
-   // we can observe stuff slightly smaller than human octave           
+   // we can observe stuff slightly smaller than human level            
    LevelRange mObservableRange {Level::Default, Level::Max};
    // Camera instances, for different points of view                    
    TMany<const A::Instance*> mInstances;

@@ -99,10 +99,14 @@ void ASCIIPipeline::Assemble(const ASCIILayer* layer) const {
 }
 
 /// Rasterize a single triangle                                               
+///   @tparam LIT - whether or not to calculate lights and speculars          
+///   @tparam DEPTH - whether or not to perform depth test and write depth    
+///   @tparam SMOOTH - interpolate normals/colors inside trianlges            
 ///   @param ps - the pipeline state                                          
-///   @param MVP - precomputed model*view*projection matrix                   
+///   @param M - precomputed model matrix for rotating normals                
+///   @param MVP - precomputed model*invertedView*projection matrix           
 ///   @param triangle - pointer to the first vertex of three consecutive ones 
-template<bool LIT, bool DEPTH>
+template<bool LIT, bool DEPTH, bool SMOOTH>
 void ASCIIPipeline::RasterizeTriangle(
    const PipelineState& ps, const Mat4& M, const Mat4& MVP,
    const ASCIIGeometry::Vertex* triangle
@@ -160,6 +164,15 @@ void ASCIIPipeline::RasterizeTriangle(
       // Triangle is fully outside view                                 
       return;
    }
+
+   Normal n;
+
+   if constexpr (not SMOOTH) {
+      // Get an average normal for the triangle for flat rendering      
+      n = M * Vec4(triangle[0].mNor + triangle[1].mNor + triangle[2].mNor, 0)
+              .Normalize();
+   }
+
 
    // Iterate all pixels in the area of interest                        
    for (auto y = minp.y; y < maxp.y; ++y) {
@@ -220,14 +233,21 @@ void ASCIIPipeline::RasterizeTriangle(
                + triangle[0].mCol * d;*/
 
          if constexpr (LIT) {
-            // Interpolate and transform the normal                     
-            const Normal n = M * Vec4( triangle[0].mNor * d
-                                     + triangle[1].mNor * s
-                                     + triangle[2].mNor * t, 0);
+            if constexpr (SMOOTH) {
+               // Interpolate and transform the normal                  
+               n = M * Vec4( triangle[0].mNor * d
+                           + triangle[1].mNor * s
+                           + triangle[2].mNor * t, 0);
 
-            //TODO apply light sources
-            pixel = ps.mSubscriber.color
-                  * n.Dot(Normal(1, 1, 0).Normalize());
+               //TODO apply light sources
+               pixel = ps.mSubscriber.color
+                     * n.Dot(Normal(1, 1, 0).Normalize());
+            }
+            else {
+               // Flat triangles                                        
+               pixel = ps.mSubscriber.color
+                     * n.Dot(Normal(1, 1, 0).Normalize());
+            }
          }
          else {
             // Just blend vertex color with the one provided from the   
@@ -254,12 +274,12 @@ void ASCIIPipeline::RasterizeMesh(const PipelineState& ps) const {
          if (mDepthTest) {
             // Do a depth test and write                                
             for (Offset i = 0; i < mesh->GetVertices().GetCount(); i += 3)
-               RasterizeTriangle<true, true>(ps, M, MVP, vertices + i);
+               RasterizeTriangle<true, true, false>(ps, M, MVP, vertices + i);
          }
          else {
             // No depth testing/writing                                 
             for (Offset i = 0; i < mesh->GetVertices().GetCount(); i += 3)
-               RasterizeTriangle<true, false>(ps, M, MVP, vertices + i);
+               RasterizeTriangle<true, false, false>(ps, M, MVP, vertices + i);
          }
       }
       else {
@@ -267,12 +287,12 @@ void ASCIIPipeline::RasterizeMesh(const PipelineState& ps) const {
          if (mDepthTest) {
             // Do a depth test and write                                
             for (Offset i = 0; i < mesh->GetVertices().GetCount(); i += 3)
-               RasterizeTriangle<false, true>(ps, M, MVP, vertices + i);
+               RasterizeTriangle<false, true, false>(ps, M, MVP, vertices + i);
          }
          else {
             // No depth testing/writing                                 
             for (Offset i = 0; i < mesh->GetVertices().GetCount(); i += 3)
-               RasterizeTriangle<false, false>(ps, M, MVP, vertices + i);
+               RasterizeTriangle<false, false, false>(ps, M, MVP, vertices + i);
          }
       }
    }

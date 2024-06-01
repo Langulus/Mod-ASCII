@@ -269,7 +269,7 @@ void ASCIILayer::RenderBatched(const RenderConfig& cfg) const {
       // Draw all relevant levels from the camera's POV                 
       for (auto level : KeepIterator(camera.mValue)) {
          const auto projectedView = camera.mKey->mProjection
-            * camera.mKey->GetViewTransform(*level.mKey);
+            * camera.mKey->GetViewTransform(*level.mKey).Invert();
 
          // Involve all relevant pipelines for that level               
          for (const auto pipeline : *level.mValue) {

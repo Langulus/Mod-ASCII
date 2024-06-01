@@ -101,7 +101,7 @@ private:
 
    void RasterizeMesh(const PipelineState&) const;
 
-   template<bool LIT, bool DEPTH>
+   template<bool LIT, bool DEPTH, bool SMOOTH>
    void RasterizeTriangle(
       const PipelineState&,
       const Mat4&, const Mat4&,
