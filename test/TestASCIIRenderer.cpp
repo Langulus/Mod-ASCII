@@ -46,12 +46,7 @@ SCENARIO("Renderer creation inside a window", "[renderer]") {
    for (int repeat = 0; repeat != 10; ++repeat) {
       GIVEN(std::string("Init and shutdown cycle #") + std::to_string(repeat)) {
          // Create root entity                                          
-         Thing root;
-         root.SetName("ROOT");
-
-         root.CreateRuntime();
-         root.LoadMod("FTXUI");
-         root.LoadMod("ASCII");
+         auto root = Thing::Root<false>("FTXUI", "ASCII");
          
          WHEN("A renderer is created via abstractions") {
             auto window = root.CreateUnit<A::Window>();
@@ -99,15 +94,8 @@ SCENARIO("Drawing an empty window", "[renderer]") {
    GIVEN("A window with a renderer") {
 
       // Create the scene                                               
-      Thing root;
-      root.SetName("ROOT");
-
-      root.CreateRuntime();
-      root.LoadMod("FTXUI");
-      root.LoadMod("ASCII");
-
-      root.CreateUnit<A::Window>();
-      root.CreateUnit<A::Renderer>();
+      auto root = Thing::Root<false>("FTXUI", "ASCII");
+      root.CreateUnits<A::Window, A::Renderer>();
 
       static Allocator::State memoryState2;
 
@@ -153,28 +141,22 @@ SCENARIO("Drawing solid polygons", "[renderer]") {
 
    GIVEN("A window with a renderer") {
       // Create the scene                                               
-      Thing root;
-      root.SetName("ROOT");
+      auto root = Thing::Root<false>(
+         "FTXUI",
+         "ASCII",
+         "FileSystem",
+         "AssetsGeometry",
+         "Physics"
+      );
+      root.CreateUnits<A::Window, A::Renderer, A::Layer, A::World>();
 
-      root.CreateRuntime();
-      root.LoadMod("FTXUI");
-      root.LoadMod("ASCII");
-      root.LoadMod("FileSystem");
-      root.LoadMod("AssetsGeometry");
-      root.LoadMod("Physics");
-
-      root.CreateUnit<A::Window>();
-      root.CreateUnit<A::Renderer>();
-      root.CreateUnit<A::Layer>();
-      root.CreateUnit<A::World>();
-
-      auto rect = root.CreateChild({Traits::Size {10, 5}, Traits::Name {"Rectangles"}});
+      auto rect = root.CreateChild(Traits::Size {10, 5}, "Rectangles");
       rect->CreateUnit<A::Renderable>();
       rect->CreateUnit<A::Mesh>(Math::Box2 {});
-      rect->CreateUnit<A::Instance>(Traits::Place(10, 10), Traits::Color(Colors::Black));
-      rect->CreateUnit<A::Instance>(Traits::Place(50, 10), Traits::Color(Colors::Green));
-      rect->CreateUnit<A::Instance>(Traits::Place(10, 30), Traits::Color(Colors::Blue));
-      rect->CreateUnit<A::Instance>(Traits::Place(50, 30), Traits::Color(Colors::White));
+      rect->CreateUnit<A::Instance>(Traits::Place(10, 10), Colors::Black);
+      rect->CreateUnit<A::Instance>(Traits::Place(50, 10), Colors::Green);
+      rect->CreateUnit<A::Instance>(Traits::Place(10, 30), Colors::Blue);
+      rect->CreateUnit<A::Instance>(Traits::Place(50, 30), Colors::White);
       root.DumpHierarchy();
 
       static Allocator::State memoryState2;
