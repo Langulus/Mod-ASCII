@@ -56,9 +56,9 @@ int main(int, char**) {
    player->CreateUnit<A::Camera>();
    player->CreateUnit<A::Instance>(Traits::Place {0, 9, 25.0});
    player->CreateUnit<A::InputListener>();
-   player->Run("Create "
-      "Anticipator(MouseMoveHorizontal, [Move Yaw(1)]), "
-      "Anticipator(MouseMoveVertical,   [Move Pitch(1)])");
+   player->Run("Create("
+      "Anticipator(MouseMoveHorizontal, [Move Yaw  (1)]), "
+      "Anticipator(MouseMoveVertical,   [Move Pitch(1)]))");
 
    // Create a rotating dingus                                          
    auto maxwell = root.CreateChild({Traits::Name {"Maxwell"}});
