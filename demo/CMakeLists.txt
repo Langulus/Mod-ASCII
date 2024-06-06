@@ -37,4 +37,7 @@ add_custom_command(
     COMMAND ${CMAKE_COMMAND} -E copy
 		"$<TARGET_PROPERTY:LangulusModAssetsGeometry,SOURCE_DIR>/test/data/dingus_whiskers.png"
 		"$<TARGET_FILE_DIR:LangulusModASCIIDemo>/data/assets/meshes/maxwell/dingus_whiskers.png"
+    COMMAND ${CMAKE_COMMAND} -E copy
+		"$<TARGET_PROPERTY:LangulusModASCIIDemo,SOURCE_DIR>/data/castle.obj"
+		"$<TARGET_FILE_DIR:LangulusModASCIIDemo>/data/assets/meshes/castle.obj"
 )

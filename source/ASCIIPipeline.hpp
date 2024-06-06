@@ -104,7 +104,7 @@ private:
    template<bool LIT, bool DEPTH, bool SMOOTH>
    void RasterizeTriangle(
       const PipelineState&,
-      const Mat4&, const Mat4&,
+      const Mat3&, const Mat4&,
       const ASCIIGeometry::Vertex*
    ) const;
 };

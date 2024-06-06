@@ -103,12 +103,12 @@ void ASCIIPipeline::Assemble(const ASCIILayer* layer) const {
 ///   @tparam DEPTH - whether or not to perform depth test and write depth    
 ///   @tparam SMOOTH - interpolate normals/colors inside trianlges            
 ///   @param ps - the pipeline state                                          
-///   @param M - precomputed model matrix for rotating normals                
+///   @param M - precomputed model orientation matrix for rotating normals    
 ///   @param MVP - precomputed model*invertedView*projection matrix           
 ///   @param triangle - pointer to the first vertex of three consecutive ones 
 template<bool LIT, bool DEPTH, bool SMOOTH>
 void ASCIIPipeline::RasterizeTriangle(
-   const PipelineState& ps, const Mat4& M, const Mat4& MVP,
+   const PipelineState& ps, const Mat3& M, const Mat4& MVP,
    const ASCIIGeometry::Vertex* triangle
 ) const {
    // Transform to eye space                                            
@@ -152,11 +152,11 @@ void ASCIIPipeline::RasterizeTriangle(
    const auto term_t3 = p1.x - p0.x;
 
    const Vec2i minp
-      = Math::Floor(Math::Min(p0, p1, p2) * 0.5 + 0.5)
-      * ps.mResolution;
+      = Math::Max(Math::Floor(Math::Min(p0, p1, p2) * 0.5 + 0.5)
+      * ps.mResolution, 0);
    const Vec2i maxp
-      = Math::Ceil (Math::Max(p0, p1, p2) * 0.5 + 0.5)
-      * ps.mResolution;
+      = Math::Min(Math::Ceil (Math::Max(p0, p1, p2) * 0.5 + 0.5)
+      * ps.mResolution, ps.mResolution);
 
    // Clip                                                              
    if (maxp.x < 0 or maxp.y < 0
@@ -169,16 +169,16 @@ void ASCIIPipeline::RasterizeTriangle(
 
    if constexpr (not SMOOTH) {
       // Get an average normal for the triangle for flat rendering      
-      n = M * Vec4(triangle[0].mNor + triangle[1].mNor + triangle[2].mNor, 0)
+      n = M * Vec3(triangle[0].mNor + triangle[1].mNor + triangle[2].mNor)
               .Normalize();
    }
 
 
    // Iterate all pixels in the area of interest                        
-   for (auto y = minp.y; y < maxp.y; ++y) {
+   for (int y = minp.y; y < maxp.y; ++y) {
       bool row_started = false;
 
-      for (auto x = minp.x; x < maxp.x; ++x) {
+      for (int x = minp.x; x < maxp.x; ++x) {
          const Vec2 screenuv = (Vec2(x, y) * 2 - ps.mResolution + 0.5)
             / ps.mResolution;
          const auto s = term_a * (term_s1
@@ -235,9 +235,9 @@ void ASCIIPipeline::RasterizeTriangle(
          if constexpr (LIT) {
             if constexpr (SMOOTH) {
                // Interpolate and transform the normal                  
-               n = M * Vec4( triangle[0].mNor * d
+               n = M * Vec3( triangle[0].mNor * d
                            + triangle[1].mNor * s
-                           + triangle[2].mNor * t, 0);
+                           + triangle[2].mNor * t);
 
                //TODO apply light sources
                pixel = ps.mSubscriber.color
