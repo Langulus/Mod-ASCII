@@ -48,25 +48,14 @@ int main(int, char**) {
    auto player = root.CreateChild("Player");
    player->CreateUnits<A::Camera, A::InputListener>();
    player->CreateUnit<A::Instance>(Traits::Place {0, 20, 20});
-   player->Run("Create("
-      "Anticipator(MouseMoveHorizontal, [Move Yaw  (1)]), "
-      "Anticipator(MouseMoveVertical,   [Move Pitch(1)]))"
-   );
+   player->Run("Create(Anticipator(MouseMove, [thing? Move (Yaw(?.x), Pitch(?.y))]))");
    player->Run("Move Pitch(-45)");
-
-   // Create a rotating dingus                                          
-   /*auto maxwell = root.CreateChild("Maxwell");
-   maxwell->CreateUnits<A::Renderable>();
-   maxwell->CreateUnit<A::Instance>(Traits::Place {0, 0, 0});
-   maxwell->CreateUnit<A::Mesh>("maxwell/maxwell.obj");
-   maxwell->Run("Move^1 Yaw(-1)");*/
 
    // Create a castle                                                   
    auto castle = root.CreateChild("Castle");
    castle->CreateUnits<A::Renderable>();
    castle->CreateUnit<A::Instance>(Traits::Size {450}, Traits::Place {0, -5, 0});
    castle->CreateUnit<A::Mesh>("castle.obj");
-   castle->Run("Move^1 Yaw(-1)");
 
    // Loop until quit                                                   
    while (root.Update(fps.GetDeltaTime()))
