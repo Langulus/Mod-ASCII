@@ -84,7 +84,7 @@ void ASCIIRenderer::Draw() {
    if (mWindow->IsMinimized())
       return;
 
-   RenderConfig config {Colors::Red, 1000_real};
+   RenderConfig config {Colors::Red, 1_real};
 
    // Generate the draw lists for all layers                            
    for (auto& layer : mLayers)

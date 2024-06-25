@@ -98,48 +98,151 @@ void ASCIIPipeline::Assemble(const ASCIILayer* layer) const {
    }
 }
 
-/// Rasterize a single triangle                                               
-///   @tparam LIT - whether or not to calculate lights and speculars          
-///   @tparam DEPTH - whether or not to perform depth test and write depth    
-///   @tparam SMOOTH - interpolate normals/colors inside trianlges            
-///   @param ps - the pipeline state                                          
-///   @param M - precomputed model orientation matrix for rotating normals    
-///   @param MVP - precomputed model*invertedView*projection matrix           
-///   @param triangle - pointer to the first vertex of three consecutive ones 
-template<bool LIT, bool DEPTH, bool SMOOTH>
-void ASCIIPipeline::RasterizeTriangle(
-   const PipelineState& ps, const Mat3& M, const Mat4& MVP,
-   const ASCIIGeometry::Vertex* triangle
+/// Clip a triangle, if one of its points is inside the clip space            
+///   @param in - the vertex which is inside the clip space                   
+///   @param out1 - first vertex, that will be clipped                        
+///   @param out2 - second vertex, that will be clipped                       
+///   @param rasterizer - the rasterizer function to invoke with clipped      
+///      vertex positions                                                     
+LANGULUS(INLINED)
+void ASCIIPipeline::Clip1(
+   const Vec4& in, Vec4 out1, Vec4 out2, auto&& rasterizer
+) const {
+   const auto t1 = (in.z + in.w) / ((in.z + in.w) - (out1.z + out1.w));
+   out1 = t1 * out1 + in;
+
+   const auto t2 = (in.z + in.w) / ((in.z + in.w) - (out2.z + out2.w));
+   out2 = t2 * out2 + in;
+
+   rasterizer(Triangle4 {in, out1, out2});
+}
+ 
+/// Clip a triangle, if two of its points are inside clip space               
+///   @param in1 - the first vertex which is inside the clip space            
+///   @param in2 - the second vertex which is inside the clip space           
+///   @param out - vertex, that will be clipped                               
+///   @param rasterizer - the rasterizer function to invoke with clipped      
+///      vertex positions - will be invoked twice for each new triangle       
+LANGULUS(INLINED)
+void ASCIIPipeline::Clip2(
+   const Vec4& in1, const Vec4& in2, Vec4 out, auto&& rasterizer
+) const {
+   // First new vertex:                                                 
+   const auto t1 = (in1.z + in1.w) / ((in1.z + in1.w) - (out.z + out.w));
+   const auto out1 = t1 * out + in1;
+
+   // Second new vertex:                                                
+   const auto t2 = (in2.z + in2.w) / ((in2.z + in2.w) - (out.z + out.w));
+   const auto out2 = t2 * out + in2;
+
+   // Split into 2 triangles:                                           
+   rasterizer(Triangle4 {in1, out1, in2});
+   rasterizer(Triangle4 {in1, in2, out2});
+}
+
+/// Clip a triangle, depending on how many vertices are in clips-pace         
+///   @param MVP - model*view*projection matrix                               
+///   @param triangle - the triangle to clip                                  
+///   @param rasterizer - rasterizer to use                                   
+void ASCIIPipeline::ClipTriangle(
+   const Mat4& MVP, const ASCIIGeometry::Vertex* triangle, auto&& rasterizer
 ) const {
    // Transform to eye space                                            
    const Vec4 pt0 = MVP * triangle[0].mPos;
    const Vec4 pt1 = MVP * triangle[1].mPos;
    const Vec4 pt2 = MVP * triangle[2].mPos;
 
-   const Vec2 p0 = pt0.xy() / pt0.w;
-   const Vec2 p1 = pt1.xy() / pt1.w;
-   const Vec2 p2 = pt2.xy() / pt2.w;
+   if (pt0.x < -pt0.w or pt0.x > pt0.w
+   or  pt0.y < -pt0.w or pt0.y > pt0.w
+   /*or  pt0.z < -pt0.w or pt0.z > pt0.w*/) {
+      // First point is outside clip space                              
+      if (pt1.x < -pt1.w or pt1.x > pt1.w
+      or  pt1.y < -pt1.w or pt1.y > pt1.w
+      /*or  pt1.z < -pt1.w or pt1.z > pt1.w*/) {
+         // First & second point is outside clip space                  
+         if (pt2.x < -pt2.w or pt2.x > pt2.w
+         or  pt2.y < -pt2.w or pt2.y > pt2.w
+         /*or  pt2.z < -pt2.w or pt2.z > pt2.w*/) {
+            // All points are outside clip space, don't rasterize at all
+            return;
+         }
+         else {
+            // Only the third point is inside                           
+            Clip1(pt2, pt0, pt1, rasterizer);
+         }
+      }
+      else
+      if (pt2.x < -pt2.w or pt2.x > pt2.w
+      or  pt2.y < -pt2.w or pt2.y > pt2.w
+      /*or  pt2.z < -pt2.w or pt2.z > pt2.w*/) {
+         // First & third point is outside clip space, second is in     
+         Clip1(pt1, pt0, pt2, rasterizer);
+      }
+      else {
+         // Only the first point is outside                             
+         Clip2(pt1, pt2, pt0, rasterizer);
+      }
+   }
+   else
+   if (pt1.x < -pt1.w or pt1.x > pt1.w
+   or  pt1.y < -pt1.w or pt1.y > pt1.w
+   /*or  pt1.z < -pt1.w or pt1.z > pt1.w*/) {
+      // First point is inside clip space                               
+      // Second point is outside clip space                             
+      if (pt2.x < -pt2.w or pt2.x > pt2.w
+      or  pt2.y < -pt2.w or pt2.y > pt2.w
+      /*or  pt2.z < -pt2.w or pt2.z > pt2.w*/) {
+         // First is in, second is out, third is out                    
+         Clip1(pt0, pt1, pt2, rasterizer);
+      }
+      else {
+         // First and third points are in, second is out                
+         Clip2(pt0, pt2, pt1, rasterizer);
+      }
+   }
+   else
+   if (pt2.x < -pt2.w or pt2.x > pt2.w
+   or  pt2.y < -pt2.w or pt2.y > pt2.w
+   /*or  pt2.z < -pt2.w or pt2.z > pt2.w*/) {
+      // First and second points are inside clip space                  
+      // Only the third point is outside clip space                     
+      Clip2(pt0, pt1, pt2, rasterizer);
+   }
+   else {
+      // All points are inside clip space                               
+      rasterizer(Triangle4 {pt0, pt1, pt2});
+   }
+}
+
+/// Rasterize a single triangle                                               
+///   @tparam LIT - whether or not to calculate lights and speculars          
+///   @tparam DEPTH - whether or not to perform depth test and write depth    
+///   @tparam SMOOTH - interpolate normals/colors inside trianlges            
+///   @param ps - the pipeline state                                          
+///   @param M - precomputed model orientation matrix for rotating normals    
+///   @param triangle - pointer to the first vertex of three consecutive ones 
+template<bool LIT, bool DEPTH, bool SMOOTH>
+void ASCIIPipeline::RasterizeTriangle(
+   const PipelineState& ps, const Mat3& M,
+   const ASCIIGeometry::Vertex* triangle,
+   const Triangle4& clipped
+) const {
+   const Vec3 p0 = clipped[0].xyz() / clipped[0].w;
+   const Vec3 p1 = clipped[1].xyz() / clipped[1].w;
+   const Vec3 p2 = clipped[2].xyz() / clipped[2].w;
 
    const auto a = 0.5_real * (
-      -p1.y * p2.x + 
+      -p1.y *   p2.x + 
        p0.y * (-p1.x + p2.x) + 
        p0.x * ( p1.y - p2.y) + 
-       p1.x * p2.y
+       p1.x *   p2.y
    );
-   const bool front = a <= 0;
 
-   // Cull if we have to                                                
+   // Cull based on winding if enabled                                  
    switch (mCull) {
-   case CullBack:
-      if (not front)
-         return;
-      break;
-   case CullFront:
-      if (front)
-         return;
-      break;
-   case NoCulling:
-      break;
+   case CullBack:  if (a  > 0) return; break;
+   case CullFront: if (a <= 0) return; break;
+   case NoCulling: break;
    }
 
    // If reached, then triangle is visible                              
@@ -160,7 +263,8 @@ void ASCIIPipeline::RasterizeTriangle(
 
    // Clip                                                              
    if (maxp.x < 0 or maxp.y < 0
-   or minp.x >= ps.mResolution.x or minp.y >= ps.mResolution.y) {
+   or  minp.x >= ps.mResolution.x
+   or  minp.y >= ps.mResolution.y) {
       // Triangle is fully outside view                                 
       return;
    }
@@ -172,7 +276,6 @@ void ASCIIPipeline::RasterizeTriangle(
       n = M * Vec3(triangle[0].mNor + triangle[1].mNor + triangle[2].mNor)
               .Normalize();
    }
-
 
    // Iterate all pixels in the area of interest                        
    for (int y = minp.y; y < maxp.y; ++y) {
@@ -189,7 +292,7 @@ void ASCIIPipeline::RasterizeTriangle(
             + term_t3 * -screenuv.y);
          const auto d = 1 - s - t;
 
-         if (s <= 0 or t <= 0 or d <= 0) {
+         if (s < 0 or t < 0 or d < 0) {
             // Pixel discarded (not inside the triangle)                
             // Was a row started? If so, then there's not any chance to 
             // find a point in the triangle again on this row.          
@@ -201,22 +304,15 @@ void ASCIIPipeline::RasterizeTriangle(
          }
 
          // If reached, then pixel is inside triangle                   
-         // Depth test                                                  
          row_started = true;
 
          if constexpr (DEPTH) {
-            Vec4 test {1, s, t, d};
-            const auto denominator = 1.0_real
-               / (test.y / pt1.w + test.z / pt2.w + test.w / pt0.w);
-            const auto z = (
-               (pt1.z * test.y) / pt1.w +
-               (pt2.z * test.z) / pt2.w +
-               (pt0.z * test.w) / pt0.w
-               ) * denominator;
+            // Interpolate depth at the current pixel                   
+            const auto z = p1.z * s + p2.z * t + p0.z * d;
+            auto& global_depth = ps.mLayer->mDepth.Get(x / mBufferScale.x, y / mBufferScale.y);
 
             // Do depth test                                            
-            auto& global_depth = ps.mLayer->mDepth.Get(x / mBufferScale.x, y / mBufferScale.y);
-            if (z > global_depth or z <= 0)
+            if (z >= global_depth or z <= 0 or z >= 1)
                continue;
 
             global_depth = mDepth.Get(x, y) = z;
@@ -273,26 +369,38 @@ void ASCIIPipeline::RasterizeMesh(const PipelineState& ps) const {
          // Do a lighting pass, too                                     
          if (mDepthTest) {
             // Do a depth test and write                                
-            for (Offset i = 0; i < mesh->GetVertices().GetCount(); i += 3)
-               RasterizeTriangle<true, true, false>(ps, M, MVP, vertices + i);
+            for (Offset i = 0; i < mesh->GetVertices().GetCount(); i += 3) {
+               ClipTriangle(MVP, vertices + i, [&](const Triangle4& t) {
+                  RasterizeTriangle<true, true, false>(ps, M, vertices + i, t);
+               });
+            }
          }
          else {
             // No depth testing/writing                                 
-            for (Offset i = 0; i < mesh->GetVertices().GetCount(); i += 3)
-               RasterizeTriangle<true, false, false>(ps, M, MVP, vertices + i);
+            for (Offset i = 0; i < mesh->GetVertices().GetCount(); i += 3) {
+               ClipTriangle(MVP, vertices + i, [&](const Triangle4& t) {
+                  RasterizeTriangle<true, false, false>(ps, M, vertices + i, t);
+               });
+            }
          }
       }
       else {
          // No lighting                                                 
          if (mDepthTest) {
             // Do a depth test and write                                
-            for (Offset i = 0; i < mesh->GetVertices().GetCount(); i += 3)
-               RasterizeTriangle<false, true, false>(ps, M, MVP, vertices + i);
+            for (Offset i = 0; i < mesh->GetVertices().GetCount(); i += 3) {
+               ClipTriangle(MVP, vertices + i, [&](const Triangle4& t) {
+                  RasterizeTriangle<false, true, false>(ps, M, vertices + i, t);
+               });
+            }
          }
          else {
             // No depth testing/writing                                 
-            for (Offset i = 0; i < mesh->GetVertices().GetCount(); i += 3)
-               RasterizeTriangle<false, false, false>(ps, M, MVP, vertices + i);
+            for (Offset i = 0; i < mesh->GetVertices().GetCount(); i += 3) {
+               ClipTriangle(MVP, vertices + i, [&](const Triangle4& t) {
+                  RasterizeTriangle<false, false, false>(ps, M, vertices + i, t);
+               });
+            }
          }
       }
    }

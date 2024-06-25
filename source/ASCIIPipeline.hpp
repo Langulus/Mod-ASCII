@@ -104,7 +104,12 @@ private:
    template<bool LIT, bool DEPTH, bool SMOOTH>
    void RasterizeTriangle(
       const PipelineState&,
-      const Mat3&, const Mat4&,
-      const ASCIIGeometry::Vertex*
+      const Mat3&,
+      const ASCIIGeometry::Vertex*,
+      const Triangle4&
    ) const;
+
+   void ClipTriangle(const Mat4&, const ASCIIGeometry::Vertex*, auto&&) const;
+   void Clip1(const Vec4&, Vec4, Vec4, auto&&) const;
+   void Clip2(const Vec4&, const Vec4&, Vec4, auto&&) const;
 };

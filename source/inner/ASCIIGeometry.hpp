@@ -27,7 +27,7 @@ struct ASCIIGeometry : A::Graphics, ProducedFrom<ASCIIRenderer> {
    struct Vertex {
       Vec4    mPos {0, 0, 0, 1};    // Vertex position                  
       Normal3 mNor {0, 0, 1};       // Vertex normal                    
-      Point2  mTex;                 // Vertex texture coordinates       
+      Vec2    mTex;                 // Vertex texture coordinates       
       RGBA    mCol = Colors::White; // Vertex color                     
    };
 
