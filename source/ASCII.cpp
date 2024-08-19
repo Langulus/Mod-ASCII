@@ -20,7 +20,7 @@ LANGULUS_DEFINE_MODULE(
 ASCII::ASCII(Runtime* runtime, const Neat&)
    : Resolvable {this}
    , Module {runtime}
-   , mRenderers {this} {
+   /*, mRenderers {this}*/ {
    VERBOSE_ASCII("Initializing...");
    VERBOSE_ASCII("Initialized");
 }
@@ -36,5 +36,5 @@ bool ASCII::Update(Time) {
 /// Create/destroy renderers                                                  
 ///   @param verb - the creation/destruction verb                             
 void ASCII::Create(Verb& verb) {
-   mRenderers.Create(verb);
+   mRenderers.Create(this, verb);
 }

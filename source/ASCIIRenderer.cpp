@@ -16,10 +16,10 @@
 ASCIIRenderer::ASCIIRenderer(ASCII* producer, const Neat& descriptor)
    : Resolvable   {this}
    , ProducedFrom {producer, descriptor}
-   , mLayers      {this}
+   /*, mLayers      {this}
    , mPipelines   {this}
    , mGeometries  {this}
-   , mTextures    {this}
+   , mTextures    {this}*/
    , mBackbuffer  {this} {
    VERBOSE_ASCII("Initializing...");
 
@@ -63,10 +63,10 @@ void ASCIIRenderer::Refresh() {
 /// Also initialized the renderer if a window is provided                     
 ///   @param verb - creation verb                                             
 void ASCIIRenderer::Create(Verb& verb) {
-   mLayers.Create(verb);
-   mPipelines.Create(verb);
-   mGeometries.Create(verb);
-   mTextures.Create(verb);
+   mLayers.Create(this, verb);
+   mPipelines.Create(this, verb);
+   mGeometries.Create(this, verb);
+   mTextures.Create(this, verb);
 }
 
 /// Interpret the renderer as an image, i.e. take an ascii "screenshot"       

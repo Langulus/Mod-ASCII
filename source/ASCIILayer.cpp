@@ -16,10 +16,10 @@
 ASCIILayer::ASCIILayer(ASCIIRenderer* producer, const Neat& descriptor)
    : Resolvable {this}
    , ProducedFrom {producer, descriptor}
-   , mCameras {this}
    , mFallbackCamera {this}
+   /*, mCameras {this}
    , mRenderables {this}
-   , mLights {this}
+   , mLights {this}*/
    , mImage {producer} {
    VERBOSE_ASCII("Initializing...");
    Couple(descriptor);
@@ -44,9 +44,9 @@ void ASCIILayer::Detach() {
 /// Create/destroy renderables, cameras, lights                               
 ///   @param verb - creation verb                                             
 void ASCIILayer::Create(Verb& verb) {
-   mCameras.Create(verb);
-   mRenderables.Create(verb);
-   mLights.Create(verb);
+   mCameras.Create(this, verb);
+   mRenderables.Create(this, verb);
+   mLights.Create(this, verb);
 }
 
 /// Generate the draw list for the layer                                      
