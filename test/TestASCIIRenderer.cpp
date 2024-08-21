@@ -37,8 +37,8 @@ namespace Catch
    struct is_range<T> {
       static const bool value = false;
    };
-
 }
+
 
 SCENARIO("Renderer creation inside a window", "[renderer]") {
    static Allocator::State memoryState;

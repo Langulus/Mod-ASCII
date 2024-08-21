@@ -16,10 +16,6 @@
 ASCIIRenderer::ASCIIRenderer(ASCII* producer, const Neat& descriptor)
    : Resolvable   {this}
    , ProducedFrom {producer, descriptor}
-   /*, mLayers      {this}
-   , mPipelines   {this}
-   , mGeometries  {this}
-   , mTextures    {this}*/
    , mBackbuffer  {this} {
    VERBOSE_ASCII("Initializing...");
 

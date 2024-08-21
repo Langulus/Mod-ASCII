@@ -17,9 +17,6 @@ ASCIILayer::ASCIILayer(ASCIIRenderer* producer, const Neat& descriptor)
    : Resolvable {this}
    , ProducedFrom {producer, descriptor}
    , mFallbackCamera {this}
-   /*, mCameras {this}
-   , mRenderables {this}
-   , mLights {this}*/
    , mImage {producer} {
    VERBOSE_ASCII("Initializing...");
    Couple(descriptor);

@@ -49,8 +49,8 @@ int main(int, char**) {
    player->CreateUnits<A::Camera, A::InputListener>();
    player->CreateUnit<A::Instance>(Traits::Place {0, 20, 20});
    player->Run("Create Anticipator(MouseMove, [thing? Move*-1 (Yaw(?.x * 0.05), Pitch(?.y * 0.05))])");
-   player->Run("Create Anticipator(Keys::W,   [thing? Move    (Axes::Forward * Derive(?.Time))])");
-   player->Run("Move Pitch(-45)");
+   //player->Run("Create Anticipator(Keys::W,   [thing? Move    (Axes::Forward * Derive(?.Time))])");
+   //player->Run("Move Pitch(-45)");
 
    // Create a castle                                                   
    auto castle = root.CreateChild("Castle");

@@ -19,8 +19,7 @@ LANGULUS_DEFINE_MODULE(
 ///   @param handle - the library handle                                      
 ASCII::ASCII(Runtime* runtime, const Neat&)
    : Resolvable {this}
-   , Module {runtime}
-   /*, mRenderers {this}*/ {
+   , Module {runtime} {
    VERBOSE_ASCII("Initializing...");
    VERBOSE_ASCII("Initialized");
 }
