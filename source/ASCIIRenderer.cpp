@@ -13,7 +13,7 @@
 /// Descriptor constructor                                                    
 ///   @param producer - the renderer producer                                 
 ///   @param descriptor - the renderer descriptor                             
-ASCIIRenderer::ASCIIRenderer(ASCII* producer, const Neat& descriptor)
+ASCIIRenderer::ASCIIRenderer(ASCII* producer, Describe descriptor)
    : Resolvable   {this}
    , ProducedFrom {producer, descriptor}
    , mBackbuffer  {this} {

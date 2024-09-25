@@ -60,7 +60,7 @@ protected:
    ASCIIImage mBackbuffer;
 
 public:
-   ASCIIRenderer(ASCII*, const Neat&);
+   ASCIIRenderer(ASCII*, Describe);
    ~ASCIIRenderer();
 
    void Detach();

@@ -120,7 +120,7 @@ protected:
    Style mStyle = Style::Default;
 
 public:
-   ASCIILayer(ASCIIRenderer*, const Neat&);
+   ASCIILayer(ASCIIRenderer*, Describe);
    ~ASCIILayer();
 
    void Create(Verb&);

@@ -40,7 +40,7 @@ protected:
    } mLOD[LOD::IndexCount];
 
 public:
-   ASCIIRenderable(ASCIILayer*, const Neat&);
+   ASCIIRenderable(ASCIILayer*, Describe);
    ~ASCIIRenderable();
 
    NOD() auto GetRenderer() const noexcept -> ASCIIRenderer*;

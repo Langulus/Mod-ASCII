@@ -16,5 +16,5 @@ struct ASCIILight : A::Graphics, ProducedFrom<ASCIILayer> {
    LANGULUS(ABSTRACT) false;
    LANGULUS_BASES(A::Graphics);
 
-   ASCIILight(ASCIILayer*, const Neat&);
+   ASCIILight(ASCIILayer*, Describe);
 };

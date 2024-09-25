@@ -11,7 +11,7 @@
 /// Descriptor constructor                                                    
 ///   @param producer - the camera producer                                   
 ///   @param descriptor - the camera descriptor                               
-ASCIICamera::ASCIICamera(ASCIILayer* producer, const Neat& descriptor)
+ASCIICamera::ASCIICamera(ASCIILayer* producer, Describe descriptor)
    : Resolvable {this}
    , ProducedFrom {producer, descriptor} {
    VERBOSE_ASCII("Initializing...");

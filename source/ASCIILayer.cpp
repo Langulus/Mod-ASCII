@@ -13,7 +13,7 @@
 /// Descriptor constructor                                                    
 ///   @param producer - the camera producer                                   
 ///   @param descriptor - the camera descriptor                               
-ASCIILayer::ASCIILayer(ASCIIRenderer* producer, const Neat& descriptor)
+ASCIILayer::ASCIILayer(ASCIIRenderer* producer, Describe descriptor)
    : Resolvable {this}
    , ProducedFrom {producer, descriptor}
    , mFallbackCamera {this}

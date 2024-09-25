@@ -11,8 +11,8 @@
 /// Descriptor constructor                                                    
 ///   @param producer - the light producer                                    
 ///   @param descriptor - the light descriptor                                
-ASCIILight::ASCIILight(ASCIILayer* producer, const Neat& descriptor)
-   : Resolvable {this}
+ASCIILight::ASCIILight(ASCIILayer* producer, Describe descriptor)
+   : Resolvable   {this}
    , ProducedFrom {producer, descriptor} {
    VERBOSE_ASCII("Initializing...");
    Couple(descriptor);
