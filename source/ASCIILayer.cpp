@@ -13,11 +13,11 @@
 /// Descriptor constructor                                                    
 ///   @param producer - the camera producer                                   
 ///   @param descriptor - the camera descriptor                               
-ASCIILayer::ASCIILayer(ASCIIRenderer* producer, Describe descriptor)
-   : Resolvable {this}
-   , ProducedFrom {producer, descriptor}
+ASCIILayer::ASCIILayer(ASCIIRenderer* producer, const Many& descriptor)
+   : Resolvable      {this}
+   , ProducedFrom    {producer, descriptor}
    , mFallbackCamera {this}
-   , mImage {producer} {
+   , mImage          {producer} {
    VERBOSE_ASCII("Initializing...");
    Couple(descriptor);
    VERBOSE_ASCII("Initialized");
@@ -312,12 +312,12 @@ void ASCIILayer::RenderHierarchical(const RenderConfig& cfg) const {
 
 /// Get the style of a layer                                                  
 ///   @return the layer style                                                 
-ASCIILayer::Style ASCIILayer::GetStyle() const noexcept {
+auto ASCIILayer::GetStyle() const noexcept -> Style {
    return mStyle;
 }
 
 /// Get the window of a layer                                                 
 ///   @return the window interface                                            
-const A::Window* ASCIILayer::GetWindow() const noexcept {
+auto ASCIILayer::GetWindow() const noexcept -> const A::Window* {
    return mProducer->GetWindow();
 }

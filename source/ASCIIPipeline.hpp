@@ -84,7 +84,7 @@ private:
    mutable ASCIIBuffer<float> mDepth;
 
 public:
-   ASCIIPipeline(ASCIIRenderer*, Describe);
+   ASCIIPipeline(ASCIIRenderer*, const Many&);
 
    void Clear(RGBA, float);
    void Resize(int x, int y);

@@ -120,7 +120,7 @@ protected:
    Style mStyle = Style::Default;
 
 public:
-   ASCIILayer(ASCIIRenderer*, Describe);
+   ASCIILayer(ASCIIRenderer*, const Many&);
    ~ASCIILayer();
 
    void Create(Verb&);
@@ -128,8 +128,8 @@ public:
    void Render(const RenderConfig&) const;
    void Detach();
 
-   NOD() Style GetStyle() const noexcept;
-   NOD() const A::Window* GetWindow() const noexcept;
+   NOD() auto GetStyle() const noexcept -> Style;
+   NOD() auto GetWindow() const noexcept -> const A::Window*;
 
 private:
    void CompileCameras();

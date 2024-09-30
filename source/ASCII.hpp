@@ -26,7 +26,7 @@ protected:
    TFactory<ASCIIRenderer> mRenderers;
 
 public:
-   ASCII(Runtime*, Describe);
+   ASCII(Runtime*, const Many&);
 
    bool Update(Time);
    void Create(Verb&);

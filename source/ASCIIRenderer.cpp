@@ -13,7 +13,7 @@
 /// Descriptor constructor                                                    
 ///   @param producer - the renderer producer                                 
 ///   @param descriptor - the renderer descriptor                             
-ASCIIRenderer::ASCIIRenderer(ASCII* producer, Describe descriptor)
+ASCIIRenderer::ASCIIRenderer(ASCII* producer, const Many& descriptor)
    : Resolvable   {this}
    , ProducedFrom {producer, descriptor}
    , mBackbuffer  {this} {
@@ -25,9 +25,9 @@ ASCIIRenderer::ASCIIRenderer(ASCII* producer, Describe descriptor)
       "No window available for renderer - did you create a window component "
       "_before_ creating the renderer?");
 
-   SeekValueAux<Traits::Time>(descriptor, mTime);
+   SeekValueAux<Traits::Time         >(descriptor, mTime);
    SeekValueAux<Traits::MousePosition>(descriptor, mMousePosition);
-   SeekValueAux<Traits::MouseScroll>(descriptor, mMouseScroll);
+   SeekValueAux<Traits::MouseScroll  >(descriptor, mMouseScroll);
 
    Couple(descriptor);
    VERBOSE_ASCII("Initialized");
@@ -115,13 +115,13 @@ void ASCIIRenderer::Draw() {
 
 /// Get the window interface                                                  
 ///   @return the window interface                                            
-const A::Window* ASCIIRenderer::GetWindow() const noexcept {
+auto ASCIIRenderer::GetWindow() const noexcept -> const A::Window* {
    return mWindow;
 }
 
 /// Get the current resolution                                                
 ///   @return the resolution                                                  
-Scale2 ASCIIRenderer::GetResolution() const noexcept {
+auto ASCIIRenderer::GetResolution() const noexcept -> Scale2 {
    return {
       mBackbuffer.GetView().mWidth,
       mBackbuffer.GetView().mHeight

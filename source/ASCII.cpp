@@ -17,7 +17,7 @@ LANGULUS_DEFINE_MODULE(
 /// ASCII module construction                                                 
 ///   @param system - the system that owns the module instance                
 ///   @param handle - the library handle                                      
-ASCII::ASCII(Runtime* runtime, Describe)
+ASCII::ASCII(Runtime* runtime, const Many&)
    : Resolvable {this}
    , Module     {runtime} {
    VERBOSE_ASCII("Initializing...");

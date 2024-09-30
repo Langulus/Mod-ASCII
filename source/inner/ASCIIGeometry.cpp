@@ -13,7 +13,7 @@
 /// Descriptor constructor                                                    
 ///   @param producer - the producer of the unit                              
 ///   @param descriptor - the unit descriptor                                 
-ASCIIGeometry::ASCIIGeometry(ASCIIRenderer* producer, Describe descriptor)
+ASCIIGeometry::ASCIIGeometry(ASCIIRenderer* producer, const Many& descriptor)
    : Resolvable   {this}
    , ProducedFrom {producer, descriptor} {
    // Scan the descriptor                                               

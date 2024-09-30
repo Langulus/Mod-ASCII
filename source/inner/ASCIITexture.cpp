@@ -11,7 +11,7 @@
 /// Texture constructor                                                       
 ///   @param producer - the texture producer                                  
 ///   @param descriptor - the texture descriptor                              
-ASCIITexture::ASCIITexture(ASCIIRenderer* producer, Describe descriptor)
+ASCIITexture::ASCIITexture(ASCIIRenderer* producer, const Many& descriptor)
    : Resolvable   {this}
    , ProducedFrom {producer, descriptor}
    , mImage       {producer} {

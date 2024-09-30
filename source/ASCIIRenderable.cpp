@@ -12,7 +12,7 @@
 /// Descriptor constructor                                                    
 ///   @param producer - the renderable producer                               
 ///   @param descriptor - the renderable descriptor                           
-ASCIIRenderable::ASCIIRenderable(ASCIILayer* producer, Describe descriptor)
+ASCIIRenderable::ASCIIRenderable(ASCIILayer* producer, const Many& descriptor)
    : Resolvable   {this}
    , ProducedFrom {producer, descriptor} {
    VERBOSE_ASCII("Initializing...");

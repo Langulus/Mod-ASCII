@@ -24,7 +24,7 @@ private:
    void Upload(const A::Image&);
 
 public:
-   ASCIITexture(ASCIIRenderer*, Describe);
+   ASCIITexture(ASCIIRenderer*, const Many&);
 
    NOD() auto GetImage() const noexcept -> const ASCIIImage&;
 };
