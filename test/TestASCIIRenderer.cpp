@@ -137,9 +137,6 @@ SCENARIO("Drawing an empty window", "[renderer]") {
 }
 
 SCENARIO("Drawing solid polygons", "[renderer]") {
-   Logger::ToHTML logFile {"logfile.htm"};
-   Logger::AttachRedirector(&logFile);
-
    static Allocator::State memoryState;
 
    GIVEN("A window with a renderer") {
@@ -201,6 +198,5 @@ SCENARIO("Drawing solid polygons", "[renderer]") {
 
    // Check for memory leaks after each initialization cycle            
    REQUIRE(memoryState.Assert());
-   Logger::DettachRedirector(&logFile);
 }
 

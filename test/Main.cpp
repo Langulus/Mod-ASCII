@@ -13,6 +13,12 @@
 LANGULUS_RTTI_BOUNDARY(RTTI::MainBoundary)
 
 int main(int argc, char* argv[]) {
+   Logger::ToHTML logFile {"logfile.htm"};
+   Logger::AttachRedirector(&logFile);
+
    Catch::Session session;
-   return session.run(argc, argv);
+   auto result = session.run(argc, argv);
+
+   Logger::DettachRedirector(&logFile);
+   return result;
 }
