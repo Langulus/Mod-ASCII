@@ -26,8 +26,7 @@ ASCII::ASCII(Runtime* runtime, const Many&)
 
 /// Shutdown ASCII module                                                     
 ASCII::~ASCII() {
-   for (auto& renderer : mRenderers)
-      renderer.Detach();
+   mRenderers.Reset();
 }
 
 /// Module update routine                                                     

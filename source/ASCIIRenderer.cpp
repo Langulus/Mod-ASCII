@@ -36,14 +36,10 @@ ASCIIRenderer::ASCIIRenderer(ASCII* producer, const Many& descriptor)
 /// Destroy anything created                                                  
 void ASCIIRenderer::Detach() {
    mBackbuffer.Detach();
-   for (auto& item : mTextures)
-      item.Detach();
-   for (auto& item : mGeometries)
-      item.Detach();
-   for (auto& item : mPipelines)
-      item.Detach();
-   for (auto& item : mLayers)
-      item.Detach();
+   mTextures.Reset();
+   mGeometries.Reset();
+   mPipelines.Reset();
+   mLayers.Reset();
    mWindow.Reset();
    ProducedFrom::Detach();
 }

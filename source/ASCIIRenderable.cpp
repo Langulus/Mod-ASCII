@@ -31,11 +31,10 @@ void ASCIIRenderable::Reset() {
       lod.mTexture.Reset();
       lod.mPipeline.Reset();
    }
-
-   mGeometryContent.Reset();
-   mTextureContent.Reset();
-   mInstances.Reset();
    mPredefinedPipeline.Reset();
+   mTextureContent.Reset();
+   mGeometryContent.Reset();
+   mInstances.Reset();
 }
 
 /// Detach the renderable from the hierarchy                                  

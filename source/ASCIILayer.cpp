@@ -32,12 +32,9 @@ ASCIILayer::~ASCIILayer() {
 void ASCIILayer::Detach() {
    mHierarchicalSequence.Reset();
    mBatchSequence.Reset();
-   for (auto& item : mLights)
-      item.Detach();
-   for (auto& item : mRenderables)
-      item.Detach();
-   for (auto& item : mCameras)
-      item.Detach();
+   mLights.Reset();
+   mRenderables.Reset();
+   mCameras.Reset();
    ProducedFrom::Detach();
 }
 
