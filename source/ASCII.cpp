@@ -24,11 +24,6 @@ ASCII::ASCII(Runtime* runtime, const Many&)
    VERBOSE_ASCII("Initialized");
 }
 
-/// Shutdown ASCII module                                                     
-ASCII::~ASCII() {
-   mRenderers.Reset();
-}
-
 /// Module update routine                                                     
 ///   @param dt - time from last update                                       
 bool ASCII::Update(Time) {
