@@ -116,13 +116,13 @@ SCENARIO("Drawing an empty window", "[renderer]") {
             REQUIRE(interpret->IsSparse());
             REQUIRE(interpret->template CastsTo<A::Image>());
 
-            /*Verbs::Compare compare {Colors::Red};
+            Verbs::Compare compare {Colors::Red};
             interpret.Then(compare);
 
             REQUIRE(compare.IsDone());
             REQUIRE(compare->GetCount() == 1);
             REQUIRE(compare->IsDense());
-            REQUIRE(compare.GetOutput() == Compared::Equal);*/
+            REQUIRE(compare.GetOutput() == Compared::Equal);
 
             root.DumpHierarchy();
 
