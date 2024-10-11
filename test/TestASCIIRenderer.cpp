@@ -164,7 +164,7 @@ SCENARIO("Drawing solid polygons", "[renderer]") {
       for (int repeat = 0; repeat != 10; ++repeat) {
          WHEN(std::string("Update cycle #") + std::to_string(repeat)) {
             // Update the scene                                         
-            REQUIRE_NOTHROW(root.Update(16ms));
+            root.Update(16ms);
 
             // And interpret the scene as an image, i.e. taking a       
             // screenshot                                               
