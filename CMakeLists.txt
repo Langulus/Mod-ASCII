@@ -23,4 +23,4 @@ if(LANGULUS_TESTING)
 	add_subdirectory(test)
 endif()
 
-add_subdirectory(demo)
+#add_subdirectory(demo)
