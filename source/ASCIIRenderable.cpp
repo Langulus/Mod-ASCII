@@ -117,7 +117,7 @@ auto ASCIIRenderable::GetOrCreatePipeline(
       construct << layer;
 
    // Get, or create the pipeline                                       
-   Verbs::Create creator {&construct};
+   Verbs::Create creator {Abandon(construct)};
    GetRenderer()->Create(creator);
 
    creator->ForEachDeep([&](ASCIIPipeline& p) {
