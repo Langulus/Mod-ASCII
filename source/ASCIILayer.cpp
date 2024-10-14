@@ -30,6 +30,7 @@ ASCIILayer::~ASCIILayer() {
 
 /// Detach layer from hierarchy                                               
 void ASCIILayer::Detach() {
+   mImage.Detach();
    mHierarchicalSequence.Reset();
    mBatchSequence.Reset();
    mLights.Reset();

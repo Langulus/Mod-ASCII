@@ -11,7 +11,7 @@
 /// Default constructor                                                       
 ASCIIImage::ASCIIImage(ASCIIRenderer* renderer)
    : Resolvable {this}
-   , mRenderer {renderer} {
+   , mRenderer  {renderer} {
    VERBOSE_ASCII("Initializing...");
    // Member arrays are commited as references to reduce boilerplate    
    // but beware of descriptor-content disparity if this Image class    
