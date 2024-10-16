@@ -23,20 +23,19 @@ ASCIILayer::ASCIILayer(ASCIIRenderer* producer, const Many& descriptor)
    VERBOSE_ASCII("Initialized");
 }
 
-/// Layer destruction                                                         
-ASCIILayer::~ASCIILayer() {
-   Detach();
-}
+/// Reference the layer, triggering teardown if no longer used                
+auto ASCIILayer::Reference(int x) -> Count {
+   if (A::Layer::Reference(x) == 1) {
+      mImage.Reference(-1);
+      mHierarchicalSequence.Reset();
+      mBatchSequence.Reset();
+      mLights.Teardown();
+      mRenderables.Teardown();
+      mCameras.Teardown();
+      ProducedFrom::Teardown();
+   }
 
-/// Detach layer from hierarchy                                               
-void ASCIILayer::Detach() {
-   mImage.Detach();
-   mHierarchicalSequence.Reset();
-   mBatchSequence.Reset();
-   mLights.Reset();
-   mRenderables.Reset();
-   mCameras.Reset();
-   ProducedFrom::Detach();
+   return GetReferences();
 }
 
 /// Create/destroy renderables, cameras, lights                               

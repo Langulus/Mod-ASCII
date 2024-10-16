@@ -61,9 +61,8 @@ protected:
 
 public:
    ASCIIRenderer(ASCII*, const Many&);
-   ~ASCIIRenderer();
 
-   void Detach();
+   auto Reference(int) -> Count;
    void Refresh() override;
    void Draw();
 

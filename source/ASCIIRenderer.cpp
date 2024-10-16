@@ -33,20 +33,19 @@ ASCIIRenderer::ASCIIRenderer(ASCII* producer, const Many& descriptor)
    VERBOSE_ASCII("Initialized");
 }
 
-/// Destroy anything created                                                  
-void ASCIIRenderer::Detach() {
-   mBackbuffer.Detach();
-   mTextures.Reset();
-   mGeometries.Reset();
-   mPipelines.Reset();
-   mLayers.Reset();
-   mWindow.Reset();
-   ProducedFrom::Detach();
-}
+/// Reference the renderer, triggering teardown if no longer used             
+auto ASCIIRenderer::Reference(int x) -> Count {
+   if (A::Renderer::Reference(x) == 1) {
+      mBackbuffer.Reference(-1);
+      mTextures.Teardown();
+      mGeometries.Teardown();
+      mPipelines.Teardown();
+      mLayers.Teardown();
+      mWindow.Reset();
+      ProducedFrom::Teardown();
+   }
 
-/// Renderer destruction                                                      
-ASCIIRenderer::~ASCIIRenderer() {
-   Detach();
+   return GetReferences();
 }
 
 /// React to changes in environment                                           

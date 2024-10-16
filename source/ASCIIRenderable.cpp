@@ -20,10 +20,6 @@ ASCIIRenderable::ASCIIRenderable(ASCIILayer* producer, const Many& descriptor)
    VERBOSE_ASCII("Initialized");
 }
 
-ASCIIRenderable::~ASCIIRenderable() {
-   Detach();
-}
-
 /// Reset the renderable, releasing all used content and pipelines            
 void ASCIIRenderable::Reset() {
    for (auto& lod : mLOD) {
@@ -37,10 +33,14 @@ void ASCIIRenderable::Reset() {
    mInstances.Reset();
 }
 
-/// Detach the renderable from the hierarchy                                  
-void ASCIIRenderable::Detach() {
-   Reset();
-   ProducedFrom::Detach();
+/// Reference the renderable, triggering teardown if no longer used           
+auto ASCIIRenderable::Reference(int x) -> Count {
+   if (A::Renderable::Reference(x) == 1) {
+      Reset();
+      ProducedFrom::Teardown();
+   }
+
+   return GetReferences();
 }
 
 /// Get the renderer                                                          

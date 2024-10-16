@@ -41,7 +41,6 @@ protected:
 
 public:
    ASCIIRenderable(ASCIILayer*, const Many&);
-   ~ASCIIRenderable();
 
    NOD() auto GetRenderer() const noexcept -> ASCIIRenderer*;
    NOD() auto GetGeometry(const LOD&) const -> const ASCIIGeometry*;
@@ -50,6 +49,6 @@ public:
    NOD() auto GetOrCreatePipeline(const LOD&, const ASCIILayer*) const -> ASCIIPipeline*;
 
    void Refresh();
-   void Detach();
+   auto Reference(int) -> Count;
    void Reset();
 };

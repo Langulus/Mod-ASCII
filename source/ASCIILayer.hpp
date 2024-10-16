@@ -121,12 +121,11 @@ protected:
 
 public:
    ASCIILayer(ASCIIRenderer*, const Many&);
-   ~ASCIILayer();
 
    void Create(Verb&);
    void Generate();
    void Render(const RenderConfig&) const;
-   void Detach();
+   auto Reference(int) -> Count;
 
    NOD() auto GetStyle() const noexcept -> Style;
    NOD() auto GetWindow() const noexcept -> const A::Window*;
