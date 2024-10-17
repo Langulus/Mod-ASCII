@@ -33,16 +33,6 @@ void ASCIIRenderable::Reset() {
    mInstances.Reset();
 }
 
-/// Reference the renderable, triggering teardown if no longer used           
-auto ASCIIRenderable::Reference(int x) -> Count {
-   if (A::Renderable::Reference(x) == 1) {
-      Reset();
-      ProducedFrom::Teardown();
-   }
-
-   return GetReferences();
-}
-
 /// Get the renderer                                                          
 ///   @return a pointer to the renderer                                       
 auto ASCIIRenderable::GetRenderer() const noexcept -> ASCIIRenderer* {

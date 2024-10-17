@@ -24,6 +24,11 @@ ASCII::ASCII(Runtime* runtime, const Many&)
    VERBOSE_ASCII("Initialized");
 }
 
+/// First stage destruction                                                   
+void ASCII::Teardown() {
+   mRenderers.Teardown();
+}
+
 /// Module update routine                                                     
 ///   @param dt - time from last update                                       
 bool ASCII::Update(Time) {

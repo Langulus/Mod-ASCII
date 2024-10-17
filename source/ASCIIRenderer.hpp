@@ -62,7 +62,7 @@ protected:
 public:
    ASCIIRenderer(ASCII*, const Many&);
 
-   auto Reference(int) -> Count;
+   void Teardown();
    void Refresh() override;
    void Draw();
 

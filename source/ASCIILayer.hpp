@@ -125,7 +125,7 @@ public:
    void Create(Verb&);
    void Generate();
    void Render(const RenderConfig&) const;
-   auto Reference(int) -> Count;
+   void Teardown();
 
    NOD() auto GetStyle() const noexcept -> Style;
    NOD() auto GetWindow() const noexcept -> const A::Window*;

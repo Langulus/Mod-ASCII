@@ -23,19 +23,11 @@ ASCIILayer::ASCIILayer(ASCIIRenderer* producer, const Many& descriptor)
    VERBOSE_ASCII("Initialized");
 }
 
-/// Reference the layer, triggering teardown if no longer used                
-auto ASCIILayer::Reference(int x) -> Count {
-   if (A::Layer::Reference(x) == 1) {
-      mImage.Reference(-1);
-      mHierarchicalSequence.Reset();
-      mBatchSequence.Reset();
-      mLights.Teardown();
-      mRenderables.Teardown();
-      mCameras.Teardown();
-      ProducedFrom::Teardown();
-   }
-
-   return GetReferences();
+/// First stage destruction                                                   
+void ASCIILayer::Teardown() {
+   mLights.Teardown();
+   mRenderables.Teardown();
+   mCameras.Teardown();
 }
 
 /// Create/destroy renderables, cameras, lights                               

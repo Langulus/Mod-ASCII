@@ -49,6 +49,5 @@ public:
    NOD() auto GetOrCreatePipeline(const LOD&, const ASCIILayer*) const -> ASCIIPipeline*;
 
    void Refresh();
-   auto Reference(int) -> Count;
    void Reset();
 };
