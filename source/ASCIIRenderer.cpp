@@ -23,7 +23,7 @@ ASCIIRenderer::ASCIIRenderer(ASCII* producer, const Many& descriptor)
    mWindow = SeekUnitAux<A::Window>(descriptor);
    LANGULUS_ASSERT(mWindow, Construct,
       "No window available for renderer - did you create a window component "
-      "_before_ creating the renderer?");
+      "_before_ creating the renderer?"); //TODO just find one on Refresh()?
 
    SeekValueAux<Traits::Time         >(descriptor, mTime);
    SeekValueAux<Traits::MousePosition>(descriptor, mMousePosition);
@@ -35,10 +35,17 @@ ASCIIRenderer::ASCIIRenderer(ASCII* producer, const Many& descriptor)
 
 /// First stage destruction                                                   
 void ASCIIRenderer::Teardown()  {
+   mBackbuffer.Reset();
+
    mTextures.Teardown();
    mGeometries.Teardown();
    mPipelines.Teardown();
    mLayers.Teardown();
+
+   mMouseScroll.Reset();
+   mMousePosition.Reset();
+   mTime.Reset();
+   mWindow.Reset();
 }
 
 /// React to changes in environment                                           

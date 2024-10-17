@@ -62,12 +62,12 @@ protected:
 public:
    ASCIIRenderer(ASCII*, const Many&);
 
+   void Create(Verb&);
+   void Interpret(Verb&);
+
    void Teardown();
    void Refresh() override;
    void Draw();
-
-   void Create(Verb&);
-   void Interpret(Verb&);
 
    NOD() auto GetWindow() const noexcept -> const A::Window*;
    NOD() auto GetResolution() const noexcept -> Scale2;

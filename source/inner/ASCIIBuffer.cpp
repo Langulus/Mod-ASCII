@@ -23,6 +23,16 @@ ASCIIImage::ASCIIImage(ASCIIRenderer* renderer)
    VERBOSE_ASCII("Initialized");
 }
 
+/// Reset the image                                                           
+void ASCIIImage::Reset() {
+   mView = {};
+   mDataListMap.Reset();
+   mSymbols.Reset();
+   mBgColors.Reset();
+   mFgColors.Reset();
+   mStyle.Reset();
+}
+
 /// Resize the image                                                          
 ///   @param x - new width                                                    
 ///   @param y - new height                                                   

@@ -92,7 +92,6 @@ SCENARIO("Drawing an empty window", "[renderer]") {
    static Allocator::State memoryState;
 
    GIVEN("A window with a renderer") {
-
       // Create the scene                                               
       auto root = Thing::Root<false>("FTXUI", "ASCII");
       root.CreateUnits<A::Window, A::Renderer>();
@@ -168,7 +167,7 @@ SCENARIO("Drawing solid polygons", "[renderer]") {
 
             // And interpret the scene as an image, i.e. taking a       
             // screenshot                                               
-            /*Verbs::InterpretAs<A::Image*> interpret;
+            Verbs::InterpretAs<A::Image*> interpret;
             root.Run(interpret);
 
             REQUIRE(root.GetUnits().GetCount() == 4);
@@ -178,7 +177,7 @@ SCENARIO("Drawing solid polygons", "[renderer]") {
             REQUIRE(interpret.IsDone());
             REQUIRE(interpret->GetCount() == 1);
             REQUIRE(interpret->IsSparse());
-            REQUIRE(interpret->template CastsTo<A::Image>());*/
+            REQUIRE(interpret->template CastsTo<A::Image>());
 
             /*Verbs::Compare compare {"polygons.png"};
             interpret.Then(compare);

@@ -25,6 +25,10 @@ ASCIILayer::ASCIILayer(ASCIIRenderer* producer, const Many& descriptor)
 
 /// First stage destruction                                                   
 void ASCIILayer::Teardown() {
+   mImage.Reset();
+   mDepth.Reset();
+   mHierarchicalSequence.Reset();
+   mBatchSequence.Reset();
    mLights.Teardown();
    mRenderables.Teardown();
    mCameras.Teardown();

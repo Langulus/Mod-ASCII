@@ -82,6 +82,12 @@ public:
       if constexpr (CT::Bool<R>)
          return counter;
    }
+
+   void Reset() {
+      mData.Reset();
+      mView = {};
+      mDataListMap.Reset();
+   }
 };
 
 
@@ -130,4 +136,5 @@ public:
    void  Compare(Verb&) const;
    void  Copy(const ASCIIImage&);
    auto  ForEachPixel(auto&&) const;
+   void  Reset();
 };

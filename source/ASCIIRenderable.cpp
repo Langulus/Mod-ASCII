@@ -20,8 +20,8 @@ ASCIIRenderable::ASCIIRenderable(ASCIILayer* producer, const Many& descriptor)
    VERBOSE_ASCII("Initialized");
 }
 
-/// Reset the renderable, releasing all used content and pipelines            
-void ASCIIRenderable::Reset() {
+/// First stage of destruction                                                
+void ASCIIRenderable::Teardown() {
    for (auto& lod : mLOD) {
       lod.mGeometry.Reset();
       lod.mTexture.Reset();
@@ -125,7 +125,7 @@ auto ASCIIRenderable::GetOrCreatePipeline(
 
 /// Called on environment change                                              
 void ASCIIRenderable::Refresh() {
-   Reset();
+   Teardown();
 
    // Gather all instances for this renderable, and calculate levels    
    mInstances = GatherUnits<A::Instance, Seek::Here>();

@@ -49,5 +49,5 @@ public:
    NOD() auto GetOrCreatePipeline(const LOD&, const ASCIILayer*) const -> ASCIIPipeline*;
 
    void Refresh();
-   void Reset();
+   void Teardown();
 };
