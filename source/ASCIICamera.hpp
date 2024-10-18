@@ -52,6 +52,8 @@ public:
 
    void Refresh();
    void Compile();
+   void Teardown();
+
    NOD() Mat4 GetViewTransform(const LOD&) const;
    NOD() Mat4 GetViewTransform(const Level& = {}) const;
 };

@@ -27,6 +27,7 @@ void ASCIIRenderable::Teardown() {
       lod.mTexture.Reset();
       lod.mPipeline.Reset();
    }
+
    mPredefinedPipeline.Reset();
    mTextureContent.Reset();
    mGeometryContent.Reset();

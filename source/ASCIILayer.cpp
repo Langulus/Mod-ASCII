@@ -31,6 +31,7 @@ void ASCIILayer::Teardown() {
    mBatchSequence.Reset();
    mLights.Teardown();
    mRenderables.Teardown();
+   mFallbackCamera.TeardownInner();
    mCameras.Teardown();
 }
 

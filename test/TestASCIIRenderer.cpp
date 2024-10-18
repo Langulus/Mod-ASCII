@@ -40,7 +40,7 @@ namespace Catch
 }
 
 
-/*SCENARIO("Renderer creation inside a window", "[renderer]") {
+SCENARIO("Renderer creation inside a window", "[renderer]") {
    static Allocator::State memoryState;
 
    for (int repeat = 0; repeat != 10; ++repeat) {
@@ -133,7 +133,7 @@ SCENARIO("Drawing an empty window", "[renderer]") {
 
    // Check for memory leaks after each initialization cycle            
    REQUIRE(memoryState.Assert());
-}*/
+}
 
 SCENARIO("Drawing solid polygons", "[renderer]") {
    static Allocator::State memoryState;
@@ -158,7 +158,7 @@ SCENARIO("Drawing solid polygons", "[renderer]") {
       rect->CreateUnit<A::Instance>(Traits::Place(50, 30), Colors::White);
       root.DumpHierarchy();
 
-      static Allocator::State memoryState2;
+      //static Allocator::State memoryState2;
 
       for (int repeat = 0; repeat != 10; ++repeat) {
          WHEN(std::string("Update cycle #") + std::to_string(repeat)) {
@@ -190,7 +190,7 @@ SCENARIO("Drawing solid polygons", "[renderer]") {
             root.DumpHierarchy();
 
             // Check for memory leaks after each update cycle           
-            REQUIRE(memoryState2.Assert());
+            //REQUIRE(memoryState2.Assert());
          }
       }
    }

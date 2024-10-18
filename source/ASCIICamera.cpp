@@ -91,6 +91,11 @@ void ASCIICamera::Compile() {
    //const auto offset   = mViewport.mMin;
 }
 
+/// First stage destruction                                                   
+void ASCIICamera::Teardown() {
+   mInstances.Reset();
+}
+
 /// Recompile the camera                                                      
 void ASCIICamera::Refresh() {
    mInstances = GatherUnits<A::Instance, Seek::Here>();
