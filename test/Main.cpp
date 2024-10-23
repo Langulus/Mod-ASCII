@@ -13,7 +13,7 @@
 LANGULUS_RTTI_BOUNDARY(RTTI::MainBoundary)
 
 int main(int argc, char* argv[]) {
-   Logger::ToTXT logFile {"logfile.txt"};
+   Logger::ToTXT logFile {"ascii-test.txt"};
    Logger::AttachRedirector(&logFile);
 
    Catch::Session session;
