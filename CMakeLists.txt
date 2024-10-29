@@ -12,11 +12,7 @@ file(GLOB_RECURSE
 )
 
 # Build the module                                                              
-add_library(LangulusModASCII SHARED ${LANGULUS_MOD_ASCII_SOURCES})
-
-target_link_libraries(LangulusModASCII
-    PRIVATE     Langulus
-)
+add_langulus_mod(LangulusModASCII ${LANGULUS_MOD_ASCII_SOURCES})
 
 if(LANGULUS_TESTING)
     enable_testing()
