@@ -4,20 +4,16 @@ file(GLOB_RECURSE
     *.cpp
 )
 
-add_executable(LangulusModASCIIDemo ${LANGULUS_MOD_ASCII_DEMO_SOURCES})
-
-target_link_libraries(LangulusModASCIIDemo
-    PRIVATE		Langulus
-                $<$<NOT:$<BOOL:${WIN32}>>:pthread>
-)
-
-add_dependencies(LangulusModASCIIDemo
-    LangulusModASCII
-    LangulusModFTXUI
-    LangulusModFileSystem
-    LangulusModAssetsGeometry
-    LangulusModPhysics
-    LangulusModInputSDL
+add_langulus_app(LangulusModASCIIDemo
+	SOURCES			${LANGULUS_MOD_ASCII_DEMO_SOURCES}
+	LIBRARIES		Langulus
+					$<$<NOT:$<BOOL:${WIN32}>>:pthread>
+	DEPENDENCIES    LangulusModASCII
+					LangulusModFTXUI
+					LangulusModFileSystem
+					LangulusModAssetsGeometry
+					LangulusModPhysics
+					LangulusModInputSDL
 )
 
 # Make the data dir                                                     
