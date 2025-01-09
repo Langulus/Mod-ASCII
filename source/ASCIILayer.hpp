@@ -127,8 +127,8 @@ public:
    void Render(const RenderConfig&) const;
    void Teardown();
 
-   NOD() auto GetStyle() const noexcept -> Style;
-   NOD() auto GetWindow() const noexcept -> const A::Window*;
+   auto GetStyle()  const noexcept -> Style;
+   auto GetWindow() const noexcept -> const A::Window*;
 
 private:
    void CompileCameras();

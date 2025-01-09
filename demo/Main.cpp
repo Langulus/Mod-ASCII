@@ -48,9 +48,13 @@ int main(int, char**) {
    auto player = root.CreateChild("Player");
    player->CreateUnits<A::Camera, A::InputListener>();
    player->CreateUnit<A::Instance>(Traits::Place {0, 20, 20});
-   player->Run("? create Anticipator(MouseMove, {thing? Move*-1 (Yaw(?.x * 0.05), Pitch(?.y * 0.05))})");
-   //player->Run("Create Anticipator(Keys::W,   [thing? Move    (Axes::Forward * Derive(?.Time))])");
-   //player->Run("Move Pitch(-45)");
+   player->Run("? create Anticipator(MouseMove,          {thing? move (Yaw(?.x * 0.05), Pitch(?.y * 0.05))})");
+   player->Run("? create Anticipator(Keys::W,            {thing? move (Normal3(Axes::Forward),  relative)})");
+   player->Run("? create Anticipator(Keys::S,            {thing? move (Normal3(Axes::Backward), relative)})");
+   player->Run("? create Anticipator(Keys::A,            {thing? move (Normal3(Axes::Left),     relative)})");
+   player->Run("? create Anticipator(Keys::D,            {thing? move (Normal3(Axes::Right),    relative)})");
+   player->Run("? create Anticipator(Keys::Space,        {thing? move (Normal3(Axes::Up),       relative)})");
+   player->Run("? create Anticipator(Keys::LeftControl,  {thing? move (Normal3(Axes::Down),     relative)})");
 
    // Create a castle                                                   
    auto castle = root.CreateChild("Castle");

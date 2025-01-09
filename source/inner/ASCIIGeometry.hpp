@@ -41,6 +41,6 @@ private:
 public:
    ASCIIGeometry(ASCIIRenderer*, const Many&);
 
-   NOD() auto MadeOfTriangles() const noexcept -> bool;
-   NOD() auto GetVertices() const noexcept -> const TMany<Vertex>&;
+   auto MadeOfTriangles() const noexcept -> bool;
+   auto GetVertices() const noexcept -> const TMany<Vertex>&;
 };

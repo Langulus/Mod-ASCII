@@ -69,6 +69,6 @@ public:
    void Refresh() override;
    void Draw();
 
-   NOD() auto GetWindow() const noexcept -> const A::Window*;
-   NOD() auto GetResolution() const noexcept -> Scale2;
+   auto GetWindow() const noexcept -> const A::Window*;
+   auto GetResolution() const noexcept -> Scale2;
 };

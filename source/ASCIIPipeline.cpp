@@ -269,7 +269,7 @@ void ASCIIPipeline::RasterizeTriangle(
       return;
    }
 
-   Normal n;
+   Normal n {0, 0, 1};
 
    if constexpr (not SMOOTH) {
       // Get an average normal for the triangle for flat rendering      

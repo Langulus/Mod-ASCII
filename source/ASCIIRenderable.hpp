@@ -42,11 +42,11 @@ protected:
 public:
    ASCIIRenderable(ASCIILayer*, const Many&);
 
-   NOD() auto GetRenderer() const noexcept -> ASCIIRenderer*;
-   NOD() auto GetGeometry(const LOD&) const -> const ASCIIGeometry*;
-   NOD() auto GetTexture(const LOD&) const -> const ASCIITexture*;
-   NOD() auto GetColor() const -> RGBA;
-   NOD() auto GetOrCreatePipeline(const LOD&, const ASCIILayer*) const -> ASCIIPipeline*;
+   auto GetRenderer() const noexcept -> ASCIIRenderer*;
+   auto GetGeometry(const LOD&) const -> const ASCIIGeometry*;
+   auto GetTexture(const LOD&) const -> const ASCIITexture*;
+   auto GetColor() const -> RGBA;
+   auto GetOrCreatePipeline(const LOD&, const ASCIILayer*) const -> ASCIIPipeline*;
 
    void Refresh();
    void Teardown();

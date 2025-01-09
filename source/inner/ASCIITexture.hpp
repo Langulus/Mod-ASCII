@@ -26,5 +26,5 @@ private:
 public:
    ASCIITexture(ASCIIRenderer*, const Many&);
 
-   NOD() auto GetImage() const noexcept -> const ASCIIImage&;
+   auto GetImage() const noexcept -> const ASCIIImage&;
 };

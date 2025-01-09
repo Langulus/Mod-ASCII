@@ -67,7 +67,7 @@ public:
       static_assert(CT::Similar<A, T>,
          "Pixel iterator must be CT::Similar to T");
 
-      UNUSED() Count counter = 0;
+      [[maybe_unused]] Count counter = 0;
       for (uint32_t y = 0; y < mView.mHeight; ++y) {
          for (uint32_t x = 0; x < mView.mWidth; ++x) {
             if constexpr (CT::Bool<R>) {
@@ -130,11 +130,11 @@ public:
       bool operator == (const RGBA&) const noexcept;
    };
 
-   void  Resize(int x, int y);
-   Pixel GetPixel(int x, int y) const;
-   void  Fill(const Text&, RGB fg = Colors::White, RGB bg = Colors::Black, Style = {});
-   void  Compare(Verb&) const;
-   void  Copy(const ASCIIImage&);
-   auto  ForEachPixel(auto&&) const;
-   void  Reset();
+   void Resize(int x, int y);
+   auto GetPixel(int x, int y) const -> Pixel;
+   void Fill(const Text&, RGB fg = Colors::White, RGB bg = Colors::Black, Style = {});
+   void Compare(Verb&) const;
+   void Copy(const ASCIIImage&);
+   auto ForEachPixel(auto&&) const;
+   void Reset();
 };

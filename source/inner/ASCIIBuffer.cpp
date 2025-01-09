@@ -102,7 +102,7 @@ auto ASCIIImage::ForEachPixel(auto&& call) const {
    static_assert(CT::Exact<A, const Pixel&>,
       "Pixel iterator must be constant ASCIIImage::Pixel reference");
 
-   UNUSED() Count counter = 0;
+   [[maybe_unused]] Count counter = 0;
    for (uint32_t y = 0; y < mView.mHeight; ++y) {
       for (uint32_t x = 0; x < mView.mWidth; ++x) {
          if constexpr (CT::Bool<R>) {
