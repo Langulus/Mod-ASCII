@@ -66,7 +66,7 @@ private:
    // Toggle culling                                                    
    enum Cull {
       NoCulling, CullBack, CullFront
-   } mCull = NoCulling;
+   } mCull = CullFront;
    
    // Rendering style                                                   
    ASCIIStyle mStyle = ASCIIStyle::Fullblocks;

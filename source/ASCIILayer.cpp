@@ -291,7 +291,7 @@ void ASCIILayer::RenderHierarchical(const RenderConfig& cfg) const {
       // Draw all relevant levels from the camera's POV                 
       for (auto level : KeepIterator(camera.mValue)) {
          const auto projectedView = camera.mKey->mProjection
-            * camera.mKey->GetViewTransform(level.GetKey());
+            * camera.mKey->GetViewTransform(level.GetKey()).Invert();
 
          // Render all relevant pipe-renderable pairs for that level    
          for (const auto& instance : level.GetValue()) {

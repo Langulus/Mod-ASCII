@@ -98,120 +98,86 @@ void ASCIIPipeline::Assemble(const ASCIILayer* layer) const {
    }
 }
 
-/// Clip a triangle, if one of its points is inside the clip space            
-///   @param in - the vertex which is inside the clip space                   
-///   @param out1 - first vertex, that will be clipped                        
-///   @param out2 - second vertex, that will be clipped                       
-///   @param rasterizer - the rasterizer function to invoke with clipped      
-///      vertex positions                                                     
-LANGULUS(INLINED)
-void ASCIIPipeline::Clip1(
-   const Vec4& in, Vec4 out1, Vec4 out2, auto&& rasterizer
-) const {
-   const auto t1 = (in.z + in.w) / ((in.z + in.w) - (out1.z + out1.w));
-   out1 = t1 * out1 + in;
+/// Credit: https://github.com/Gaukler/Software-Rasterizer                    
+/// However the mentioned code clips in NDC space, which presumably works     
+/// only if there's no chance at anything getting behind the camera.          
+/// I modified the code, so that it works in clipspace.                       
+template<int AXIS>
+std::vector<Vec4> ClipLine(const std::vector<Vec4>& vertices) {
+   auto isInside = [](const Vec4& p) {
+      return p[AXIS] > -p.w and p[AXIS] < p.w;
+   };
 
-   const auto t2 = (in.z + in.w) / ((in.z + in.w) - (out2.z + out2.w));
-   out2 = t2 * out2 + in;
+   std::vector<Vec4> clipped;
+   for (size_t i = 0; i < vertices.size(); i++) {
+      Vec4 v1 = vertices[i];
+      Vec4 v2 = vertices[(i + 1) % vertices.size()];
 
-   rasterizer(Triangle4 {in, out1, out2});
+      if (isInside(v1) and isInside(v2)) {
+         // Both points in                                              
+         clipped.emplace_back(v2);
+      }
+      else if (not isInside(v1) and not isInside(v2)) {
+         // Both points out, nothing to draw                            
+      }
+      else if (v1[AXIS] > v1.w) {
+         // Mixed                                                       
+         auto t = (v1[AXIS] - v1.w) / ((v1[AXIS] - v1.w) - (v2[AXIS] - v2.w));
+         clipped.emplace_back(t * v2 + (1 - t) * v1);
+         clipped.emplace_back(v2);
+      }
+      else if (v1[AXIS] < -v1.w) {
+         // Mixed                                                       
+         auto t = (v1[AXIS] + v1.w) / ((v1[AXIS] + v1.w) - (v2[AXIS] + v2.w));
+         clipped.emplace_back(t * v2 + (1 - t) * v1);
+         clipped.emplace_back(v2);
+      }
+      else if (v2[AXIS] >  v2.w) {
+         // Mixed (notice this branch depends on the other branches     
+         // being executed first on a prior iteration)                  
+         auto t = (v2[AXIS] - v2.w) / ((v2[AXIS] - v2.w) - (v1[AXIS] - v1.w));
+         clipped.emplace_back(t * v1 + (1 - t) * v2);
+      }
+      else if (v2[AXIS] < -v2.w) {
+         // Mixed (notice this branch depends on the other branches     
+         // being executed first on a prior iteration)                  
+         auto t = (v2[AXIS] + v2.w) / ((v2[AXIS] + v2.w) - (v1[AXIS] + v1.w));
+         clipped.emplace_back(t * v1 + (1 - t) * v2);
+      }
+   }
+
+   return clipped;
 }
- 
-/// Clip a triangle, if two of its points are inside clip space               
-///   @param in1 - the first vertex which is inside the clip space            
-///   @param in2 - the second vertex which is inside the clip space           
-///   @param out - vertex, that will be clipped                               
-///   @param rasterizer - the rasterizer function to invoke with clipped      
-///      vertex positions - will be invoked twice for each new triangle       
-LANGULUS(INLINED)
-void ASCIIPipeline::Clip2(
-   const Vec4& in1, const Vec4& in2, Vec4 out, auto&& rasterizer
-) const {
-   // First new vertex:                                                 
-   const auto t1 = (in1.z + in1.w) / ((in1.z + in1.w) - (out.z + out.w));
-   const auto out1 = t1 * out + in1;
 
-   // Second new vertex:                                                
-   const auto t2 = (in2.z + in2.w) / ((in2.z + in2.w) - (out.z + out.w));
-   const auto out2 = t2 * out + in2;
-
-   // Split into 2 triangles:                                           
-   rasterizer(Triangle4 {in1, out1, in2});
-   rasterizer(Triangle4 {in1, in2, out2});
-}
-
-/// Clip a triangle, depending on how many vertices are in clips-pace         
+/// Clip a triangle depending on how many vertices are in viewport            
 ///   @param MVP - model*view*projection matrix                               
 ///   @param triangle - the triangle to clip                                  
 ///   @param rasterizer - rasterizer to use                                   
 void ASCIIPipeline::ClipTriangle(
    const Mat4& MVP, const ASCIIGeometry::Vertex* triangle, auto&& rasterizer
 ) const {
-   // Transform to eye space                                            
-   const Vec4 pt0 = MVP * triangle[0].mPos;
-   const Vec4 pt1 = MVP * triangle[1].mPos;
-   const Vec4 pt2 = MVP * triangle[2].mPos;
+   // Transform to viewspace                                            
+   std::vector<Vec4> points;
+   points.emplace_back(MVP * triangle[0].mPos);
+   points.emplace_back(MVP * triangle[1].mPos);
+   points.emplace_back(MVP * triangle[2].mPos);
 
-   if (pt0.x < -pt0.w or pt0.x > pt0.w
-   or  pt0.y < -pt0.w or pt0.y > pt0.w
-   /*or  pt0.z < -pt0.w or pt0.z > pt0.w*/) {
-      // First point is outside clip space                              
-      if (pt1.x < -pt1.w or pt1.x > pt1.w
-      or  pt1.y < -pt1.w or pt1.y > pt1.w
-      /*or  pt1.z < -pt1.w or pt1.z > pt1.w*/) {
-         // First & second point is outside clip space                  
-         if (pt2.x < -pt2.w or pt2.x > pt2.w
-         or  pt2.y < -pt2.w or pt2.y > pt2.w
-         /*or  pt2.z < -pt2.w or pt2.z > pt2.w*/) {
-            // All points are outside clip space, don't rasterize at all
-            return;
-         }
-         else {
-            // Only the third point is inside                           
-            Clip1(pt2, pt0, pt1, rasterizer);
-         }
-      }
-      else
-      if (pt2.x < -pt2.w or pt2.x > pt2.w
-      or  pt2.y < -pt2.w or pt2.y > pt2.w
-      /*or  pt2.z < -pt2.w or pt2.z > pt2.w*/) {
-         // First & third point is outside clip space, second is in     
-         Clip1(pt1, pt0, pt2, rasterizer);
-      }
-      else {
-         // Only the first point is outside                             
-         Clip2(pt1, pt2, pt0, rasterizer);
-      }
-   }
-   else
-   if (pt1.x < -pt1.w or pt1.x > pt1.w
-   or  pt1.y < -pt1.w or pt1.y > pt1.w
-   /*or  pt1.z < -pt1.w or pt1.z > pt1.w*/) {
-      // First point is inside clip space                               
-      // Second point is outside clip space                             
-      if (pt2.x < -pt2.w or pt2.x > pt2.w
-      or  pt2.y < -pt2.w or pt2.y > pt2.w
-      /*or  pt2.z < -pt2.w or pt2.z > pt2.w*/) {
-         // First is in, second is out, third is out                    
-         Clip1(pt0, pt1, pt2, rasterizer);
-      }
-      else {
-         // First and third points are in, second is out                
-         Clip2(pt0, pt2, pt1, rasterizer);
-      }
-   }
-   else
-   if (pt2.x < -pt2.w or pt2.x > pt2.w
-   or  pt2.y < -pt2.w or pt2.y > pt2.w
-   /*or  pt2.z < -pt2.w or pt2.z > pt2.w*/) {
-      // First and second points are inside clip space                  
-      // Only the third point is outside clip space                     
-      Clip2(pt0, pt1, pt2, rasterizer);
-   }
-   else {
-      // All points are inside clip space                               
-      rasterizer(Triangle4 {pt0, pt1, pt2});
-   }
+   // Clip                                                              
+   //points = ClipLine<0>(points);
+   //points = ClipLine<1>(points);
+   points = ClipLine<2>(points);  // Clipping only z is enough for me,  
+                                  // but also clipping along x and y    
+                                  // produces undesired artifacts       
+   if (points.size() < 3)
+      return;
+
+   // Do perspective division (collapses Z data)                        
+   for (auto& p : points)
+      p /= p.w;
+
+   // Create a triangle fan                                             
+   for (size_t i = 1; i < points.size() - 1; ++i)
+      rasterizer(Triangle4 {points[0], points[i], points[i + 1]});
 }
 
 /// Rasterize a single triangle                                               
@@ -227,9 +193,15 @@ void ASCIIPipeline::RasterizeTriangle(
    const ASCIIGeometry::Vertex* triangle,
    const Triangle4& clipped
 ) const {
-   const Vec3 p0 = clipped[0].xyz() / clipped[0].w;
-   const Vec3 p1 = clipped[1].xyz() / clipped[1].w;
-   const Vec3 p2 = clipped[2].xyz() / clipped[2].w;
+   const Vec3 p0 = clipped[0].xyz();
+   const Vec3 p1 = clipped[1].xyz();
+   const Vec3 p2 = clipped[2].xyz();
+   const RGBA   fogColor {80, 0, 0, 255};
+   const Range1 fogRange {5, 25};
+
+   // Ignore degenerate triangles                                       
+   //if (p0 == p1 or p0 == p2 or p1 == p2)
+   //   return;
 
    const auto a = 0.5_real * (
       -p1.y *   p2.x + 
@@ -306,9 +278,10 @@ void ASCIIPipeline::RasterizeTriangle(
          // If reached, then pixel is inside triangle                   
          row_started = true;
 
+         // Interpolate depth at the current pixel                      
+         const Real z = p1.z * s + p2.z * t + p0.z * d;
+
          if constexpr (DEPTH) {
-            // Interpolate depth at the current pixel                   
-            const auto z = p1.z * s + p2.z * t + p0.z * d;
             auto& global_depth = ps.mLayer->mDepth.Get(x / mBufferScale.x, y / mBufferScale.y);
 
             // Do depth test                                            
@@ -350,6 +323,15 @@ void ASCIIPipeline::RasterizeTriangle(
             // instance                                                 
             pixel *= ps.mSubscriber.color;
          }
+
+         /*const auto fog = Clamp(
+            (fogRange.GetMax() - z) / fogRange.Length(),
+            0_real, 1_real
+         );*/ //TODO clamp not working in this context, check TODO.md
+         auto fog = (fogRange.GetMax() - (1 - z) * 1000) / fogRange.Length();
+         if (fog < 0) fog = 0;
+         if (fog > 1) fog = 1;
+         pixel = fogColor*fog + pixel*(1 - fog);
       }
    }
 }
@@ -364,6 +346,33 @@ void ASCIIPipeline::RasterizeMesh(const PipelineState& ps) const {
    if (mesh->MadeOfTriangles()) {
       // Rasterize triangles...                                         
       auto vertices = mesh->GetVertices().GetRaw();
+
+      bool firstVertex = true;
+      Range4 dataRangeBeforeW;
+      Range4 dataRangeAfterW;
+      for (Offset i = 0; i < mesh->GetVertices().GetCount(); ++i) {
+         auto p = MVP * vertices[i].mPos;
+         if (firstVertex)
+            dataRangeBeforeW.mMin = dataRangeBeforeW.mMax = p;
+         else
+            dataRangeBeforeW.Embrace(p);
+
+         if (p.w != 0)
+            p /= p.w;
+         else {
+            Logger::Info(Self(), "Bad point: ", p);
+            continue;
+         }
+
+         if (firstVertex)
+            dataRangeAfterW.mMin = dataRangeAfterW.mMax = p;
+         else
+            dataRangeAfterW.Embrace(p);
+
+         firstVertex = false;
+      }
+      Logger::Info(Self(), "Range before w: ", dataRangeBeforeW);
+      Logger::Info(Self(), "Range after w:  ", dataRangeAfterW);
 
       if (mLit) {
          // Do a lighting pass, too                                     

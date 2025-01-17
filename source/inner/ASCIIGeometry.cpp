@@ -16,6 +16,9 @@
 ASCIIGeometry::ASCIIGeometry(ASCIIRenderer* producer, const Many& descriptor)
    : Resolvable   {this}
    , ProducedFrom {producer, descriptor} {
+   bool firstVertex = true;
+   Range4 dataRange;
+
    // Scan the descriptor                                               
    descriptor.ForEachDeep([&](const A::Mesh& mesh) {
       if (mesh.MadeOfTriangles()) {
@@ -37,6 +40,12 @@ ASCIIGeometry::ASCIIGeometry(ASCIIRenderer* producer, const Many& descriptor)
                   output.mPos = *p.GetRaw<Vec4>();
                else
                   LANGULUS_OOPS(Access, "Unsupported place type");
+
+               if (firstVertex) {
+                  dataRange.mMin = dataRange.mMax = output.mPos;
+                  firstVertex = false;
+               }
+               else dataRange.Embrace(output.mPos);
 
                if (n) {
                   if (n.IsSimilar<Vec3>())
@@ -66,6 +75,8 @@ ASCIIGeometry::ASCIIGeometry(ASCIIRenderer* producer, const Many& descriptor)
       }
       else TODO();
    });
+
+   Logger::Verbose(Self(), "Range is: ", dataRange);
 }
 
 /// Check if the cached geometry is made of triangles                         
