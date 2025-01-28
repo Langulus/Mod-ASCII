@@ -8,7 +8,7 @@
 #pragma once
 #include "Common.hpp"
 #include <Langulus/Physical.hpp>
-#include <Math/Range.hpp>
+#include <Langulus/Math/Range.hpp>
  
 using LevelRange = TRange<Level>;
 

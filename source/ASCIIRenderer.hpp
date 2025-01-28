@@ -10,10 +10,10 @@
 #include "ASCIILayer.hpp"
 #include "inner/ASCIITexture.hpp"
 #include "inner/ASCIIGeometry.hpp"
-#include <Flow/Verbs/Create.hpp>
-#include <Flow/Verbs/Interpret.hpp>
-#include <Math/Gradient.hpp>
-#include <Entity/Pin.hpp>
+#include <Langulus/Verbs/Create.hpp>
+#include <Langulus/Verbs/Interpret.hpp>
+#include <Langulus/Math/Gradient.hpp>
+#include <Langulus/Entity/Pin.hpp>
 
 
 ///                                                                           

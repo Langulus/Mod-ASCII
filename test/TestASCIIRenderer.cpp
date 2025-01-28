@@ -6,14 +6,14 @@
 /// SPDX-License-Identifier: GPL-3.0-or-later                                 
 ///                                                                           
 #include "Main.hpp"
-#include <Flow/Time.hpp>
-#include <Flow/Verbs/Interpret.hpp>
-#include <Flow/Verbs/Compare.hpp>
+#include <Langulus/Flow/Time.hpp>
 #include <Langulus/Platform.hpp>
 #include <Langulus/Graphics.hpp>
 #include <Langulus/Physical.hpp>
 #include <Langulus/Mesh.hpp>
 #include <Langulus/Image.hpp>
+#include <Langulus/Verbs/Interpret.hpp>
+#include <Langulus/Verbs/Compare.hpp>
 #include <catch2/catch.hpp>
 
 

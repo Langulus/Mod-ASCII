@@ -7,7 +7,7 @@
 ///                                                                           
 #pragma once
 #include "../Common.hpp"
-#include <Math/Normal.hpp>
+#include <Langulus/Math/Normal.hpp>
 #include <Langulus/Mesh.hpp>
 
 

@@ -6,8 +6,8 @@
 /// SPDX-License-Identifier: GPL-3.0-or-later                                 
 ///                                                                           
 #include "../ASCII.hpp"
-#include <Math/Normal.hpp>
-#include <Math/Sampler.hpp>
+#include <Langulus/Math/Normal.hpp>
+#include <Langulus/Math/Sampler.hpp>
 
 
 /// Descriptor constructor                                                    

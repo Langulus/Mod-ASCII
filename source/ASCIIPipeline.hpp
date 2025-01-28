@@ -9,7 +9,7 @@
 #include "Common.hpp"
 #include "inner/ASCIITexture.hpp"
 #include "inner/ASCIIGeometry.hpp"
-#include <Math/Normal.hpp>
+#include <Langulus/Math/Normal.hpp>
 #include <Langulus/Mesh.hpp>
 #include <Langulus/IO.hpp>
 

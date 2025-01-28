@@ -9,7 +9,7 @@
 #include "ASCIICamera.hpp"
 #include "ASCIIRenderable.hpp"
 #include "ASCIILight.hpp"
-#include <Anyness/TSet.hpp>
+#include <Langulus/Anyness/TSet.hpp>
 
 
 struct RenderConfig {
