@@ -5,7 +5,6 @@
 ///                                                                           
 /// SPDX-License-Identifier: GPL-3.0-or-later                                 
 ///                                                                           
-#include "Main.hpp"
 #include <Langulus/Flow/Time.hpp>
 #include <Langulus/Platform.hpp>
 #include <Langulus/Graphics.hpp>
@@ -14,30 +13,7 @@
 #include <Langulus/Image.hpp>
 #include <Langulus/Verbs/Interpret.hpp>
 #include <Langulus/Verbs/Compare.hpp>
-#include <catch2/catch.hpp>
-
-
-/// See https://github.com/catchorg/Catch2/blob/devel/docs/tostring.md        
-CATCH_TRANSLATE_EXCEPTION(::Langulus::Exception const& ex) {
-   const Text serialized {ex};
-   return ::std::string {Token {serialized}};
-}
-
-namespace Catch
-{
-   template<CT::Stringifiable T>
-   struct StringMaker<T> {
-      static std::string convert(T const& value) {
-         return ::std::string {Token {static_cast<Text>(value)}};
-      }
-   };
-
-   /// Save catch2 from doing infinite recursions with Block types            
-   template<CT::Block T>
-   struct is_range<T> {
-      static const bool value = false;
-   };
-}
+#include <Langulus/Testing.hpp>
 
 
 SCENARIO("Renderer creation inside a window", "[renderer]") {
