@@ -22,7 +22,7 @@ int main(int, char**) {
    // Suppress any logging messages, so that we don't interfere with    
    // the ASCII renderer in the console. Instead, redirect all logging  
    // to an external HTML file.                                         
-   Logger::ToHTML logFile {"logfile.htm"};
+   Logger::ToHTML logFile {"ascii-demo.htm"};
    Logger::AttachRedirector(&logFile);
 
    // Create root entity                                                

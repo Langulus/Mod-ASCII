@@ -84,7 +84,7 @@ void ASCIILayer::CompileLevels() {
                CompileLevelBatched(cam, level);
          }
       }
-      else if (cam.mObservableRange.Inside(Level::Default)) {
+      else if (cam.mObservableRange.Contains(Level::Default)) {
          // Default level style - checks only if camera sees default    
          if (mStyle & Style::Hierarchical)
             CompileLevelHierarchical(cam, Level::Default);
@@ -261,19 +261,19 @@ void ASCIILayer::RenderBatched(const RenderConfig& cfg) const {
    // Rendering from each custom camera's point of view                 
    for (const auto camera : mBatchSequence) {
       // Draw all relevant levels from the camera's POV                 
-      for (auto level : KeepIterator(camera.mValue)) {
-         const auto projectedView = camera.mKey->mProjection
-            * camera.mKey->GetViewTransform(level.GetKey()).Invert();
+      for (auto level : KeepIterator(camera.GetValue())) {
+         const auto projectedView = camera.GetKey()->mProjection
+            * camera.GetKey()->GetViewTransform(level.GetKey()).Invert();
 
          // Involve all relevant pipelines for that level               
          for (const auto pipeline : level.GetValue()) {
             // Draw all renderables that use that pipeline in their     
             // current LOD state, from that particular level & POV      
-            for (const auto& instance : pipeline.mValue)
-               pipeline.mKey->Render(this, projectedView, instance);
+            for (const auto& instance : pipeline.GetValue())
+               pipeline.GetKey()->Render(this, projectedView, instance);
 
             // Assemble after everything has been drawn                 
-            pipeline.mKey->Assemble(this);
+            pipeline.GetKey()->Assemble(this);
          }
 
          // Clear global depth after rendering each level               
@@ -289,16 +289,16 @@ void ASCIILayer::RenderHierarchical(const RenderConfig& cfg) const {
    // Rendering from each custom camera's point of view                 
    for (const auto camera : mHierarchicalSequence) {
       // Draw all relevant levels from the camera's POV                 
-      for (auto level : KeepIterator(camera.mValue)) {
-         const auto projectedView = camera.mKey->mProjection
-            * camera.mKey->GetViewTransform(level.GetKey()).Invert();
+      for (auto level : KeepIterator(camera.GetValue())) {
+         const auto projectedView = camera.GetKey()->mProjection
+            * camera.GetKey()->GetViewTransform(level.GetKey()).Invert();
 
          // Render all relevant pipe-renderable pairs for that level    
          for (const auto& instance : level.GetValue()) {
-            instance.mKey->Render(this, projectedView, instance.mValue);
+            instance.GetKey()->Render(this, projectedView, instance.GetValue());
 
             // Assemble after each draw in order to keep hierarchy      
-            instance.mKey->Assemble(this);
+            instance.GetKey()->Assemble(this);
          }
 
          // Clear depth after rendering each level                      
