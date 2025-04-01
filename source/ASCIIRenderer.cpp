@@ -7,7 +7,6 @@
 ///                                                                           
 #include "ASCII.hpp"
 #include <Langulus/Platform.hpp>
-#include <Langulus/Profiler.hpp>
 #include <set>
 
 

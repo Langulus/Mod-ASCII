@@ -6,7 +6,6 @@
 /// SPDX-License-Identifier: GPL-3.0-or-later                                 
 ///                                                                           
 #include "ASCII.hpp"
-#include <Langulus/Profiler.hpp>
 
 
 /// Descriptor constructor                                                    

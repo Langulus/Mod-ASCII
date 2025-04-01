@@ -11,7 +11,6 @@
 #include <Langulus/Mesh.hpp>
 #include <Langulus/Input.hpp>
 #include <Langulus/Flow/Time.hpp>
-#include <Langulus/Profiler.hpp>
 #include <thread>
 
 using namespace Langulus;

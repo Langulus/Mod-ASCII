@@ -8,7 +8,6 @@
 #include "ASCII.hpp"
 #include <Langulus/Platform.hpp>
 #include <Langulus/Physical.hpp>
-#include <Langulus/Profiler.hpp>
 
 
 /// Descriptor constructor                                                    
