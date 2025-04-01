@@ -8,6 +8,7 @@
 #include "ASCII.hpp"
 #include <Langulus/Platform.hpp>
 #include <Langulus/Physical.hpp>
+#include <Langulus/Profiler.hpp>
 
 
 /// Descriptor constructor                                                    
@@ -239,6 +240,7 @@ void ASCIILayer::CompileInstance(
 /// Render the layer to a specific command buffer and framebuffer             
 ///   @param config - where to render to                                      
 void ASCIILayer::Render(const RenderConfig& config) const {
+   LANGULUS(PROFILE);
    const int sizex = static_cast<int>(GetWindow()->GetSize().x);
    const int sizey = static_cast<int>(GetWindow()->GetSize().y);
 

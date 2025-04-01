@@ -47,10 +47,10 @@ void ASCIIImage::Resize(int x, int y) {
    mSymbols.New(count, ' ');
 
    mFgColors.Clear();
-   mFgColors.New(count, Colors::White);
+   mFgColors.New(count, RGBAf {Colors::White});
 
    mBgColors.Clear();
-   mBgColors.New(count, Colors::Black);
+   mBgColors.New(count, RGBAf {Colors::Black});
 
    mStyle.Clear();
    mStyle.New(count);
@@ -83,7 +83,7 @@ ASCIIImage::Pixel ASCIIImage::GetPixel(int x, int y) const {
 ///   @param fg - the color that will be used for the background              
 ///   @param bg - the color that will be used for the foreground              
 ///   @param f - the emphasis that will be used                               
-void ASCIIImage::Fill(const Text& s, RGB fg, RGB bg, Style f) {
+void ASCIIImage::Fill(const Text& s, RGBAf fg, RGBAf bg, Style f) {
    mSymbols.Fill(s);
    mFgColors.Fill(fg);
    mBgColors.Fill(bg);
@@ -122,7 +122,7 @@ auto ASCIIImage::ForEachPixel(auto&& call) const {
 /// - we must either compare against fullblock “█” (U+2588) symbol with the   
 /// same foreground color, or a space " " symbol with the same background     
 /// color (unless inverted)                                                   
-bool ASCIIImage::Pixel::operator == (const RGBA& color) const noexcept {
+bool ASCIIImage::Pixel::operator == (const RGBAf& color) const noexcept {
    if (mStyle == Style::Default) {
       return (mSymbol == "█" and mFgColor == color)
           or (mSymbol == " " and mBgColor == color);
@@ -206,10 +206,10 @@ void ASCIIImage::Copy(const ASCIIImage& other) {
          auto from = other.GetPixel(x, y);
 
          if (from.mSymbol != " ") {
-            to.mSymbol = from.mSymbol;
+            to.mSymbol  = from.mSymbol;
             to.mBgColor = from.mBgColor;
             to.mFgColor = from.mFgColor;
-            to.mStyle = from.mStyle;
+            to.mStyle   = from.mStyle;
          }
       }
    }

@@ -14,7 +14,7 @@
 
 
 struct RenderConfig {
-   RGB   mClearColor;
+   RGBAf mClearColor;
    float mClearDepth;
 };
 

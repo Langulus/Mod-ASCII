@@ -6,6 +6,7 @@
 /// SPDX-License-Identifier: GPL-3.0-or-later                                 
 ///                                                                           
 #include "ASCII.hpp"
+#include <Langulus/Profiler.hpp>
 
 LANGULUS_DEFINE_MODULE(
    ASCII, 11, "ASCII",
@@ -32,6 +33,7 @@ void ASCII::Teardown() {
 /// Module update routine                                                     
 ///   @param dt - time from last update                                       
 bool ASCII::Update(Time) {
+   LANGULUS(PROFILE);
    for (auto& renderer : mRenderers)
       renderer.Draw();
    return true;

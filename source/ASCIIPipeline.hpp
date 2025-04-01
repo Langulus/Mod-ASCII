@@ -15,7 +15,7 @@
 
 
 struct PipeSubscriber {
-   RGBA color;
+   RGBAf color;
    Mat4 transform;
    const ASCIIGeometry* mesh;
    const ASCIITexture*  texture;
@@ -77,7 +77,7 @@ private:
 
    // An intermediate render buffer, used only by the pipeline          
    // This buffer is then compiled into an image inside ASCIILayer      
-   mutable ASCIIBuffer<RGBA>  mBuffer;
+   mutable ASCIIBuffer<RGBAf>  mBuffer;
 
    // Intermediate (may be sub-pixel) depth buffer, that also acts as   
    // a stencil buffer (pixel is valid if depth is not at max)          
@@ -86,7 +86,7 @@ private:
 public:
    ASCIIPipeline(ASCIIRenderer*, const Many&);
 
-   void Clear(RGBA, float);
+   void Clear(const RGBAf&, float);
    void Resize(int x, int y);
    void Render(const ASCIILayer*, const Mat4&, const PipeSubscriber&) const;
    void Assemble(const ASCIILayer*) const;

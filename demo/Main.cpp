@@ -11,6 +11,7 @@
 #include <Langulus/Mesh.hpp>
 #include <Langulus/Input.hpp>
 #include <Langulus/Flow/Time.hpp>
+#include <Langulus/Profiler.hpp>
 #include <thread>
 
 using namespace Langulus;
@@ -19,6 +20,8 @@ LANGULUS_RTTI_BOUNDARY(RTTI::MainBoundary)
 
 
 int main(int, char**) {
+   LANGULUS(PROFILE);
+
    // Suppress any logging messages, so that we don't interfere with    
    // the ASCII renderer in the console. Instead, redirect all logging  
    // to an external HTML file.                                         

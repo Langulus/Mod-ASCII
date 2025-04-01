@@ -6,6 +6,7 @@
 /// SPDX-License-Identifier: GPL-3.0-or-later                                 
 ///                                                                           
 #include "ASCII.hpp"
+#include <Langulus/Profiler.hpp>
 
 
 /// Descriptor constructor                                                    
@@ -41,7 +42,7 @@ ASCIIPipeline::ASCIIPipeline(ASCIIRenderer* producer, const Many& descriptor)
 /// Resize the pipeline's internal buffer                                     
 ///   @param color - uniform color value                                      
 ///   @param depth - uniform depth value                                      
-void ASCIIPipeline::Clear(RGBA color, float depth) {
+void ASCIIPipeline::Clear(const RGBAf& color, float depth) {
    mBuffer.Fill(color);
    mDepth.Fill(depth);
 }
@@ -64,6 +65,7 @@ void ASCIIPipeline::Resize(int x, int y) {
 void ASCIIPipeline::Render(
    const ASCIILayer* layer, const Mat4& pv, const PipeSubscriber& sub
 ) const {
+   LANGULUS(PROFILE);
    if (not sub.mesh)
       return;
 
@@ -74,6 +76,8 @@ void ASCIIPipeline::Render(
 /// Merge the pipeline with the layer's image, assembling any ASCII symbols   
 ///   @param layer - the layer that we're rendering to                        
 void ASCIIPipeline::Assemble(const ASCIILayer* layer) const {
+   LANGULUS(PROFILE);
+
    // Depth and normals are written directly into layer, but this       
    // pipeline might have some odd ways of deciding color and symbols,  
    // so assemble those here, and write to layer                        
@@ -193,10 +197,11 @@ void ASCIIPipeline::RasterizeTriangle(
    const ASCIIGeometry::Vertex* triangle,
    const Triangle4& clipped
 ) const {
+   LANGULUS(PROFILE);
    const Vec3 p0 = clipped[0].xyz();
    const Vec3 p1 = clipped[1].xyz();
    const Vec3 p2 = clipped[2].xyz();
-   const RGBA   fogColor {80, 0, 0, 255};
+   const RGBAf  fogColor {0.30f, 0, 0, 1.0f};
    const Range1 fogRange {5, 25};
 
    // Ignore degenerate triangles                                       
@@ -234,12 +239,12 @@ void ASCIIPipeline::RasterizeTriangle(
       * ps.mResolution, ps.mResolution);
 
    // Clip                                                              
-   if (maxp.x < 0 or maxp.y < 0
+   /*if (maxp.x < 0 or maxp.y < 0
    or  minp.x >= ps.mResolution.x
    or  minp.y >= ps.mResolution.y) {
       // Triangle is fully outside view                                 
       return;
-   }
+   }*/
 
    Normal n {0, 0, 1};
 
@@ -293,7 +298,19 @@ void ASCIIPipeline::RasterizeTriangle(
 
          //                                                             
          // If reached, pixel is overwritten                            
-         RGBA& pixel = mBuffer.Get(x, y);
+         auto& pixel = mBuffer.Get(x, y);
+
+         /*const auto fog = Clamp(
+            (fogRange.GetMax() - z) / fogRange.Length(),
+            0_real, 1_real
+         );*/ //TODO clamp not working in this context, check TODO.md
+         auto fog = (fogRange.GetMax() - (1 - z) * 1000) / fogRange.Length();
+         if (fog >= 1) {
+            pixel = fogColor;
+            continue;
+         }
+         else if (fog < 0)
+            fog = 0;
 
          // Interpolate the color                                       
          //TODO fix color multiplication with normalization, see todo.md
@@ -310,12 +327,12 @@ void ASCIIPipeline::RasterizeTriangle(
 
                //TODO apply light sources
                pixel = ps.mSubscriber.color
-                     * n.Dot(Normal(1, 1, 0).Normalize());
+                     * n.Dot(Normal(1, 1, 0)/*.Normalize()*/);
             }
             else {
                // Flat triangles                                        
                pixel = ps.mSubscriber.color
-                     * n.Dot(Normal(1, 1, 0).Normalize());
+                     * n.Dot(Normal(1, 1, 0)/*.Normalize()*/);
             }
          }
          else {
@@ -324,13 +341,6 @@ void ASCIIPipeline::RasterizeTriangle(
             pixel *= ps.mSubscriber.color;
          }
 
-         /*const auto fog = Clamp(
-            (fogRange.GetMax() - z) / fogRange.Length(),
-            0_real, 1_real
-         );*/ //TODO clamp not working in this context, check TODO.md
-         auto fog = (fogRange.GetMax() - (1 - z) * 1000) / fogRange.Length();
-         if (fog < 0) fog = 0;
-         if (fog > 1) fog = 1;
          pixel = fogColor*fog + pixel*(1 - fog);
       }
    }

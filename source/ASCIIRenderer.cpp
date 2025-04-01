@@ -7,6 +7,7 @@
 ///                                                                           
 #include "ASCII.hpp"
 #include <Langulus/Platform.hpp>
+#include <Langulus/Profiler.hpp>
 #include <set>
 
 
@@ -78,6 +79,7 @@ void ASCIIRenderer::Interpret(Verb& verb) {
 /// Render an object, along with all of its children                          
 /// Rendering pipeline depends on each entity's components                    
 void ASCIIRenderer::Draw() {
+   LANGULUS(PROFILE);
    if (mWindow->IsMinimized())
       return;
 
