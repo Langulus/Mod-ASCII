@@ -101,7 +101,7 @@ struct ASCIIImage final : A::Image {
    using Style = Logger::Emphasis;
 
 private:
-   mutable TMany<Text>  mSymbols;   // Array of utf8 encoded symbols    
+   mutable TMany<char>  mSymbols;   // Array of symbols                 
    mutable TMany<RGBAf> mBgColors;  // Array of foreground colors       
    mutable TMany<RGBAf> mFgColors;  // Array of background colors       
    mutable TMany<Style> mStyle;     // Array of styles for each pixel   
@@ -122,7 +122,7 @@ public:
 
    /// A single pixel from the image                                          
    struct Pixel {
-      Text&  mSymbol;
+      char&  mSymbol;
       RGBAf& mFgColor;
       RGBAf& mBgColor;
       Style& mStyle;
@@ -132,7 +132,7 @@ public:
 
    void Resize(int x, int y);
    auto GetPixel(int x, int y) const -> Pixel;
-   void Fill(const Text&, RGBAf fg = Colors::White, RGBAf bg = Colors::Black, Style = {});
+   void Fill(char, RGBAf fg = Colors::White, RGBAf bg = Colors::Black, Style = {});
    void Compare(Verb&) const;
    void Copy(const ASCIIImage&);
    auto ForEachPixel(auto&&) const;

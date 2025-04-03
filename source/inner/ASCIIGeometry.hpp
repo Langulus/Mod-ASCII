@@ -25,10 +25,10 @@ struct ASCIIGeometry : A::Graphics, ProducedFrom<ASCIIRenderer> {
    // this general purpose vertex format should be sufficient for       
    // nearly 99% of the use cases.                                      
    struct Vertex {
-      Vec4    mPos {0, 0, 0, 1};    // Vertex position                  
-      Normal3 mNor {0, 0, 1};       // Vertex normal                    
-      Vec2    mTex;                 // Vertex texture coordinates       
-      RGBA    mCol = Colors::White; // Vertex color                     
+      Vec4 mPos {0, 0, 0, 1};       // Vertex position                  
+      Vec3 mNor {0, 0, 1};          // Vertex normal                    
+      Vec2 mTex;                    // Vertex texture coordinates       
+      RGBA mCol = Colors::White;    // Vertex color                     
    };
 
 private:

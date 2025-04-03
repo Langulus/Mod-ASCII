@@ -79,11 +79,11 @@ ASCIIImage::Pixel ASCIIImage::GetPixel(int x, int y) const {
 }
 
 /// Fill the image with a single symbol and style                             
-///   @param s - the utf8 encoded symbol that will be displayed everywhere    
+///   @param s - the symbol that will be displayed everywhere                 
 ///   @param fg - the color that will be used for the background              
 ///   @param bg - the color that will be used for the foreground              
 ///   @param f - the emphasis that will be used                               
-void ASCIIImage::Fill(const Text& s, RGBAf fg, RGBAf bg, Style f) {
+void ASCIIImage::Fill(char s, RGBAf fg, RGBAf bg, Style f) {
    mSymbols.Fill(s);
    mFgColors.Fill(fg);
    mBgColors.Fill(bg);
@@ -91,7 +91,6 @@ void ASCIIImage::Fill(const Text& s, RGBAf fg, RGBAf bg, Style f) {
 }
 
 /// Iterate all pixels using the local Pixel representation                   
-///   @tparam F - the function signature (deducible)                          
 ///   @param call - the function to execute for each pixel                    
 ///   @return the number of pixels that were iterated                         
 auto ASCIIImage::ForEachPixel(auto&& call) const {
@@ -118,20 +117,9 @@ auto ASCIIImage::ForEachPixel(auto&& call) const {
       return counter;
 }
 
-/// Now, since this is an ASCII image, pixel-color comparisons are a bit weird
-/// - we must either compare against fullblock “█” (U+2588) symbol with the   
-/// same foreground color, or a space " " symbol with the same background     
-/// color (unless inverted)                                                   
+/// Compare with a true color                                                 
 bool ASCIIImage::Pixel::operator == (const RGBAf& color) const noexcept {
-   if (mStyle == Style::Default) {
-      return (mSymbol == "█" and mFgColor == color)
-          or (mSymbol == " " and mBgColor == color);
-   }
-   else if (mStyle == Style::Reverse) {
-      return (mSymbol == "█" and mBgColor == color)
-          or (mSymbol == " " and mFgColor == color);
-   }
-   else return false;
+   return mSymbol == ' ' and mBgColor == color;
 }
 
 /// Compare image to another image/uniform color, etc.                        
@@ -196,21 +184,17 @@ bool ASCIIImage::CompareInner(const A::Image& rhs) const {
    return false;
 }
 
-/// Copy another image, skip symbols that are space - they are considered     
-/// 'transparent'                                                             
+/// Copy another image                                                        
 ///   @param other - the image to copy                                        
 void ASCIIImage::Copy(const ASCIIImage& other) {
    for (uint32_t y = 0; y < GetView().mHeight; ++y) {
       for (uint32_t x = 0; x < GetView().mWidth; ++x) {
          auto to = GetPixel(x, y);
          auto from = other.GetPixel(x, y);
-
-         if (from.mSymbol != " ") {
-            to.mSymbol  = from.mSymbol;
-            to.mBgColor = from.mBgColor;
-            to.mFgColor = from.mFgColor;
-            to.mStyle   = from.mStyle;
-         }
+         to.mSymbol  = from.mSymbol;
+         to.mBgColor = from.mBgColor;
+         to.mFgColor = from.mFgColor;
+         to.mStyle   = from.mStyle;
       }
    }
 }

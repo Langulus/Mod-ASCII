@@ -72,35 +72,6 @@ void ASCIIPipeline::Render(
    RasterizeMesh(ps);
 }
 
-/// Merge the pipeline with the layer's image, assembling any ASCII symbols   
-///   @param layer - the layer that we're rendering to                        
-void ASCIIPipeline::Assemble(const ASCIILayer* layer) const {
-   LANGULUS(PROFILE);
-
-   // Depth and normals are written directly into layer, but this       
-   // pipeline might have some odd ways of deciding color and symbols,  
-   // so assemble those here, and write to layer                        
-   for (uint32_t y = 0; y < layer->mImage.GetView().mHeight; ++y) {
-      for (uint32_t x = 0; x < layer->mImage.GetView().mWidth; ++x) {
-         // mBufferXScale x mBufferYScale pixels -> 1 layer pixel       
-         auto to = layer->mImage.GetPixel(x, y);
-
-         if (mBufferScale == 1) {
-            // Pixels map 1:1                                           
-            auto d = layer->mDepth.Get(x, y);
-            if (d > 0.0f and d < 1000.0f) {
-               // Write pixel only if in valid depth range              
-               auto& from = mBuffer.Get(x, y);
-               to.mSymbol = "█";
-               to.mFgColor = from;
-               to.mBgColor = from;
-            }
-         }
-         else TODO();
-      }
-   }
-}
-
 /// Credit: https://github.com/Gaukler/Software-Rasterizer                    
 /// However the mentioned code clips in NDC space, which presumably works     
 /// only if there's no chance at anything getting behind the camera.          
@@ -204,7 +175,7 @@ void ASCIIPipeline::RasterizeTriangle(
    const Range1 fogRange {5, 25};
 
    // Ignore degenerate triangles                                       
-   //if (p0 == p1 or p0 == p2 or p1 == p2)
+   //if (p0 == p1 or p0 == p2 or p1 == p2) // don't think this branch is worth it, but measure measure measure
    //   return;
 
    const auto a = 0.5_real * (
@@ -230,16 +201,23 @@ void ASCIIPipeline::RasterizeTriangle(
    const auto term_t2 = p0.y - p1.y;
    const auto term_t3 = p1.x - p0.x;
 
+   const auto term_s1_a = term_a * term_s1;
+   const auto term_t1_a = term_a * term_t1;
+   const auto term_s2_a = term_a * term_s2;
+   const auto term_t2_a = term_a * term_t2;
+   const auto term_s3_a = term_a * term_s3;
+   const auto term_t3_a = term_a * term_t3;
+
    // p0, p1, and p2 should be in NDC space                             
-   Vec2i minp = Math::Min(p0.xy(), p1.xy(), p2.xy()) * ps.mResolution;
+   Vec2i minp = Math::Floor(Math::Min(p0.xy(), p1.xy(), p2.xy()) * ps.mResolution);
+   minp.y -= ps.mResolution.y * 2;
    minp = Math::Min(Math::Max(minp, -ps.mResolution), ps.mResolution);
    minp = (minp + ps.mResolution) / 2;
-   minp.y = 0;
 
-   Vec2i maxp = Math::Max(p0.xy(), p1.xy(), p2.xy()) * ps.mResolution;
+   Vec2i maxp = Math::Ceil(Math::Max(p0.xy(), p1.xy(), p2.xy()) * ps.mResolution);
+   maxp.y += ps.mResolution.y * 2;
    maxp = Math::Min(Math::Max(maxp, -ps.mResolution), ps.mResolution);
    maxp = (maxp + ps.mResolution) / 2;
-   maxp.y = ps.mResolution.y;
 
    // Clip                                                              
    /*if (maxp.x < 0 or maxp.y < 0
@@ -247,35 +225,33 @@ void ASCIIPipeline::RasterizeTriangle(
    or  minp.y >= ps.mResolution.y) {
       // Triangle is fully outside view                                 
       return;
-   }*/
+   }*/ // this i think happens in ClipTriangle anyways
 
-   Normal n {0, 0, 1};
+   Vec3 n {0, 0, 1};
 
    if constexpr (not SMOOTH) {
       // Get an average normal for the triangle for flat rendering      
-      n = M * Vec3(triangle[0].mNor + triangle[1].mNor + triangle[2].mNor)
-              .Normalize();
+      n = M * (triangle[0].mNor + triangle[1].mNor + triangle[2].mNor);
    }
 
    // Iterate all pixels in the area of interest                        
    for (int y = minp.y; y < maxp.y; ++y) {
       bool row_started = false;
+      const auto screenv = -(y * 2 - ps.mResolution.y + 0.5_real) / ps.mResolution.y;
+      const auto term_s3_v = term_s1_a + term_s3_a * screenv;
+      const auto term_t3_v = term_t1_a + term_t3_a * screenv;
 
       for (int x = minp.x; x < maxp.x; ++x) {
-         const Vec2 screenuv = (Vec2(x, y) * 2 - ps.mResolution + 0.5)
-            / ps.mResolution;
-         const auto s = term_a * (term_s1
-            + term_s2 *  screenuv.x
-            + term_s3 * -screenuv.y);
-         const auto t = term_a * (term_t1
-            + term_t2 *  screenuv.x
-            + term_t3 * -screenuv.y);
+         const auto screenu = (x * 2 - ps.mResolution.x + 0.5_real) / ps.mResolution.x;
+         const auto s = term_s2_a * screenu + term_s3_v;
+         const auto t = term_t2_a * screenu + term_t3_v;
          const auto d = 1 - s - t;
 
          if (s < 0 or t < 0 or d < 0) {
             // Pixel discarded (not inside the triangle)                
             // Was a row started? If so, then there's not any chance to 
-            // find a point in the triangle again on this row.          
+            // find a point in the triangle again on this row - just    
+            // jump to the next row by breaking                         
             if (row_started) {
                row_started = false;
                break;
@@ -329,11 +305,11 @@ void ASCIIPipeline::RasterizeTriangle(
                            + triangle[2].mNor * t);
 
                //TODO apply light sources
-               pixel = ps.mSubscriber.color * n.Dot(Normal(1, 1, 0));
+               pixel = ps.mSubscriber.color * n.Normalize().Dot(Normal(1, 1, 0));
             }
             else {
                // Flat triangles                                        
-               pixel = ps.mSubscriber.color * n.Dot(Normal(1, 1, 0));
+               pixel = ps.mSubscriber.color * n.Normalize().Dot(Normal(1, 1, 0));
             }
          }
          else {
@@ -420,6 +396,33 @@ void ASCIIPipeline::RasterizeMesh(const PipelineState& ps) const {
                ClipTriangle(MVP, vertices + i, [&](const Triangle4& t) {
                   RasterizeTriangle<false, false, false>(ps, M, vertices + i, t);
                });
+            }
+         }
+      }
+   }
+   else TODO();
+}
+
+/// Merge the pipeline with the layer's image, assembling any ASCII symbols   
+///   @param layer - the layer that we're rendering to                        
+void ASCIIPipeline::Assemble(const ASCIILayer* layer) const {
+   LANGULUS(PROFILE);
+
+   // Depth and normals are written directly into layer, but this       
+   // pipeline might have some odd ways of deciding color and symbols,  
+   // so assemble those here, and write to layer                        
+   // mBufferXScale x mBufferYScale pixels -> 1 layer pixel             
+   if (mBufferScale == 1) {
+      // Pixels map 1:1                                                 
+      for (uint32_t y = 0; y < layer->mImage.GetView().mHeight; ++y) {
+         for (uint32_t x = 0; x < layer->mImage.GetView().mWidth; ++x) {
+            auto to = layer->mImage.GetPixel(x, y);
+            auto d  = layer->mDepth.Get(x, y);
+            if (d > 0.0f and d < 1000.0f) {
+               // Write pixel only if in valid depth range              
+               auto& from = mBuffer.Get(x, y);
+               to.mFgColor = from;
+               to.mBgColor = from;
             }
          }
       }
