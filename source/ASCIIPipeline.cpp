@@ -230,12 +230,16 @@ void ASCIIPipeline::RasterizeTriangle(
    const auto term_t2 = p0.y - p1.y;
    const auto term_t3 = p1.x - p0.x;
 
-   const Vec2i minp
-      = Math::Max(Math::Floor(Math::Min(p0, p1, p2) * 0.5 + 0.5)
-      * ps.mResolution, 0);
-   const Vec2i maxp
-      = Math::Min(Math::Ceil (Math::Max(p0, p1, p2) * 0.5 + 0.5)
-      * ps.mResolution, ps.mResolution);
+   // p0, p1, and p2 should be in NDC space                             
+   Vec2i minp = Math::Min(p0.xy(), p1.xy(), p2.xy()) * ps.mResolution;
+   minp = Math::Min(Math::Max(minp, -ps.mResolution), ps.mResolution);
+   minp = (minp + ps.mResolution) / 2;
+   minp.y = 0;
+
+   Vec2i maxp = Math::Max(p0.xy(), p1.xy(), p2.xy()) * ps.mResolution;
+   maxp = Math::Min(Math::Max(maxp, -ps.mResolution), ps.mResolution);
+   maxp = (maxp + ps.mResolution) / 2;
+   maxp.y = ps.mResolution.y;
 
    // Clip                                                              
    /*if (maxp.x < 0 or maxp.y < 0
@@ -325,13 +329,11 @@ void ASCIIPipeline::RasterizeTriangle(
                            + triangle[2].mNor * t);
 
                //TODO apply light sources
-               pixel = ps.mSubscriber.color
-                     * n.Dot(Normal(1, 1, 0)/*.Normalize()*/);
+               pixel = ps.mSubscriber.color * n.Dot(Normal(1, 1, 0));
             }
             else {
                // Flat triangles                                        
-               pixel = ps.mSubscriber.color
-                     * n.Dot(Normal(1, 1, 0)/*.Normalize()*/);
+               pixel = ps.mSubscriber.color * n.Dot(Normal(1, 1, 0));
             }
          }
          else {
@@ -366,12 +368,14 @@ void ASCIIPipeline::RasterizeMesh(const PipelineState& ps) const {
          else
             dataRangeBeforeW.Embrace(p);
 
-         if (p.w != 0)
+         p /= p.w;
+
+         /*if (p.w != 0)
             p /= p.w;
          else {
-            Logger::Info(Self(), "Bad point: ", p);
+            Logger::Error(Self(), "Bad point: ", p);
             continue;
-         }
+         }*/
 
          if (firstVertex)
             dataRangeAfterW.mMin = dataRangeAfterW.mMax = p;
@@ -380,8 +384,6 @@ void ASCIIPipeline::RasterizeMesh(const PipelineState& ps) const {
 
          firstVertex = false;
       }
-      Logger::Info(Self(), "Range before w: ", dataRangeBeforeW);
-      Logger::Info(Self(), "Range after w:  ", dataRangeAfterW);
 
       if (mLit) {
          // Do a lighting pass, too                                     
