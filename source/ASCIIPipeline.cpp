@@ -61,14 +61,18 @@ void ASCIIPipeline::Resize(int x, int y) {
 ///   @param layer - the layer that we're rendering to                        
 ///   @param pv - the projection-view matrix                                  
 ///   @param sub - prepared renderable instance LOD to draw                   
+///   @param lights - list of lights to apply                                 
 void ASCIIPipeline::Render(
-   const ASCIILayer* layer, const Mat4& pv, const PipeSubscriber& sub
+   const ASCIILayer* layer,
+   const Mat4& pv,
+   const PipeSubscriber& sub,
+   const TMany<LightSubscriber>& lights
 ) const {
    LANGULUS(PROFILE);
    if (not sub.mesh)
       return;
 
-   PipelineState ps {layer, mBuffer.GetView().GetScale(), pv, sub};
+   PipelineState ps {layer, mBuffer.GetView().GetScale(), pv, sub, lights};
    RasterizeMesh(ps);
 }
 
@@ -158,12 +162,16 @@ void ASCIIPipeline::ClipTriangle(
 ///   @tparam LIT - whether or not to calculate lights and speculars          
 ///   @tparam DEPTH - whether or not to perform depth test and write depth    
 ///   @tparam SMOOTH - interpolate normals/colors inside trianlges            
+///   @tparam FOG - apply fog                                                 
+///   @tparam COLORIZE - apply vertex colors                                  
+///   @tparam SHADOWED - apply shadowmaps                                     
 ///   @param ps - the pipeline state                                          
-///   @param M - precomputed model orientation matrix for rotating normals    
-///   @param triangle - pointer to the first vertex of three consecutive ones 
-template<bool LIT, bool DEPTH, bool SMOOTH>
+///   @param M - precomputed world matrix for light computation               
+///   @param triangle - three consecutive original vertices (object space)    
+///   @param clipped - a clipped triangle in NDC space                        
+template<bool LIT, bool DEPTH, bool SMOOTH, bool FOG, bool COLORIZE, bool SHADOWED>
 void ASCIIPipeline::RasterizeTriangle(
-   const PipelineState& ps, const Mat3& M,
+   const PipelineState& ps, const Mat4& M,
    const ASCIIGeometry::Vertex* triangle,
    const Triangle4& clipped
 ) const {
@@ -171,13 +179,6 @@ void ASCIIPipeline::RasterizeTriangle(
    const Vec3 p0 = clipped[0].xyz();
    const Vec3 p1 = clipped[1].xyz();
    const Vec3 p2 = clipped[2].xyz();
-   const RGBAf  fogColor {0.30f, 0, 0, 1.0f};
-   const Range1 fogRange {5, 25};
-
-   // Ignore degenerate triangles                                       
-   //if (p0 == p1 or p0 == p2 or p1 == p2) // don't think this branch is worth it, but measure measure measure
-   //   return;
-
    const auto a = 0.5_real * (
       -p1.y *   p2.x + 
        p0.y * (-p1.x + p2.x) + 
@@ -219,19 +220,44 @@ void ASCIIPipeline::RasterizeTriangle(
    maxp = Math::Min(Math::Max(maxp, -ps.mResolution), ps.mResolution);
    maxp = (maxp + ps.mResolution) / 2;
 
-   // Clip                                                              
-   /*if (maxp.x < 0 or maxp.y < 0
-   or  minp.x >= ps.mResolution.x
-   or  minp.y >= ps.mResolution.y) {
-      // Triangle is fully outside view                                 
-      return;
-   }*/ // this i think happens in ClipTriangle anyways
+   // The normal                                                        
+   [[maybe_unused]] Vec3  n {0, 0, 1};
+   // The accumulated light colors                                      
+   [[maybe_unused]] RGBAf lit = 0;
 
-   Vec3 n {0, 0, 1};
-
-   if constexpr (not SMOOTH) {
+   if constexpr (LIT and not SMOOTH) {
       // Get an average normal for the triangle for flat rendering      
-      n = M * (triangle[0].mNor + triangle[1].mNor + triangle[2].mNor);
+      n = Mat3(M) * (triangle[0].mNor + triangle[1].mNor + triangle[2].mNor);
+      n = n.Normalize();
+
+      // Just get the center of the triangle (in world space)           
+      auto p = M * (( triangle[0].mPos 
+                    + triangle[1].mPos
+                    + triangle[2].mPos ) / 3);
+
+      // Accumulate all lights                                          
+      for (auto& light : ps.mLights) {
+         // Determine light direction                                   
+         switch (light.type) {
+         case A::Light::Directional:
+         case A::Light::Spot:
+            // Direction is taken from the light instance               
+            lit += light.color * n.Dot(light.direction);
+            break;
+         case A::Light::Point:
+            // Direction is relative to light position                  
+            lit += light.color * n.Dot((light.position - p).Normalize());
+            break;
+         case A::Light::Domain:
+            TODO();
+         }
+      }
+
+      // And then clamp                                                 
+      if (lit.r > 1) lit.r = 1;
+      if (lit.g > 1) lit.g = 1;
+      if (lit.b > 1) lit.b = 1;
+      lit.a = 1;
    }
 
    // Iterate all pixels in the area of interest                        
@@ -263,8 +289,7 @@ void ASCIIPipeline::RasterizeTriangle(
          row_started = true;
 
          // Interpolate depth at the current pixel                      
-         const Real z = p1.z * s + p2.z * t + p0.z * d;
-
+         [[maybe_unused]] const Real z = p1.z * s + p2.z * t + p0.z * d;
          if constexpr (DEPTH) {
             auto& global_depth = ps.mLayer->mDepth.Get(x / mBufferScale.x, y / mBufferScale.y);
 
@@ -272,56 +297,118 @@ void ASCIIPipeline::RasterizeTriangle(
             if (z >= global_depth or z <= 0 or z >= 1)
                continue;
 
+            //                                                          
+            // If reached, pixel depth is overwritten                   
             global_depth = mDepth.Get(x, y) = z;
          }
 
-         //                                                             
-         // If reached, pixel is overwritten                            
-         auto& pixel = mBuffer.Get(x, y);
+         if constexpr (FOG or COLORIZE or (LIT and SMOOTH)) {
+            //                                                          
+            // If reached, pixel color is overwritten                   
+            auto& pixel = mBuffer.Get(x, y);
 
-         /*const auto fog = Clamp(
-            (fogRange.GetMax() - z) / fogRange.Length(),
-            0_real, 1_real
-         );*/ //TODO clamp not working in this context, check TODO.md
-         auto fog = (fogRange.GetMax() - (1 - z) * 1000) / fogRange.Length();
-         if (fog >= 1) {
-            pixel = fogColor;
-            continue;
-         }
-         else if (fog < 0)
-            fog = 0;
+            /*const auto fog = Clamp(
+               (fogRange.GetMax() - z) / fogRange.Length(),
+               0_real, 1_real
+            );*/ //TODO clamp not working in this context, check TODO.md
+            [[maybe_unused]] RGBAf fogColor = mFogColor;
+            [[maybe_unused]] Real  fog = 0;
+            if constexpr (FOG) {
+               auto fog = (mFogRange.GetMax() - (1 - z) * 1000) / mFogRange.Length();
+               if (fog >= 1) {
+                  // Fog can optimize-out far pixels                    
+                  pixel = fogColor;
+                  continue;
+               }
+               else if (fog < 0)
+                  fog = 0;
 
-         // Interpolate the color                                       
-         //TODO fix color multiplication with normalization, see todo.md
-         /*pixel = triangle[1].mCol * s
-               + triangle[2].mCol * t
-               + triangle[0].mCol * d;*/
+               fogColor *= fog;
+            }
 
-         if constexpr (LIT) {
-            if constexpr (SMOOTH) {
-               // Interpolate and transform the normal                  
-               n = M * Vec3( triangle[0].mNor * d
-                           + triangle[1].mNor * s
-                           + triangle[2].mNor * t);
+            if constexpr (COLORIZE) {
+               // Interpolate the color                                 
+               //TODO fix color multiplication with normalization, see todo.md
+               pixel = triangle[1].mCol * s
+                     + triangle[2].mCol * t
+                     + triangle[0].mCol * d;
+            }
 
-               //TODO apply light sources
-               pixel = ps.mSubscriber.color * n.Normalize().Dot(Normal(1, 1, 0));
+            if constexpr (LIT and SMOOTH) {
+               // Interpolate and transform the normal per-pixel        
+               n = Mat3(M) * Vec3( triangle[0].mNor * d
+                                 + triangle[1].mNor * s
+                                 + triangle[2].mNor * t );
+               n = n.Normalize();
+
+               // Interpolate and transform the position per-pixel      
+               // (in world space)                                      
+               auto p  = M * ( triangle[0].mPos * d
+                             + triangle[1].mPos * s
+                             + triangle[2].mPos * t );
+
+               // Accumulate all lights                                 
+               for (auto& light : ps.mLights) {
+                  // Determine light direction                          
+                  switch (light.type) {
+                  case A::Light::Directional:
+                  case A::Light::Spot:
+                     // Direction is taken from the light instance      
+                     lit += light.color * n.Dot(light.direction);
+                     break;
+                  case A::Light::Point:
+                     // Direction is relative to light position         
+                     lit += light.color * n.Dot((light.position - p).Normalize());
+                     break;
+                  case A::Light::Domain:
+                     TODO();
+                  }
+               }
+
+               // And then clamp                                        
+               if (lit.r > 1) lit.r = 1;
+               if (lit.g > 1) lit.g = 1;
+               if (lit.b > 1) lit.b = 1;
+               lit.a = 1;
+
+               if constexpr (COLORIZE)
+                  // Blend with vertex colors                           
+                  pixel *= ps.mSubscriber.color * lit;
+               else
+                  // Just assign the instance color * light color       
+                  pixel  = ps.mSubscriber.color * lit;
+            }
+            else if constexpr (COLORIZE) {
+               // Blend with vertex colors                              
+               if constexpr (LIT)
+                  pixel *= ps.mSubscriber.color * lit;
+               else
+                  pixel *= ps.mSubscriber.color;
             }
             else {
-               // Flat triangles                                        
-               pixel = ps.mSubscriber.color * n.Normalize().Dot(Normal(1, 1, 0));
+               // Just assign the instance color                        
+               if constexpr (LIT)
+                  pixel = ps.mSubscriber.color * lit;
+               else
+                  pixel = ps.mSubscriber.color;
             }
-         }
-         else {
-            // Just blend vertex color with the one provided from the   
-            // instance                                                 
-            pixel *= ps.mSubscriber.color;
-         }
 
-         pixel = fogColor*fog + pixel*(1 - fog);
+            if constexpr (FOG)
+               pixel = fogColor + pixel * (1 - fog);
+         }
       }
    }
 }
+
+#define MAP_ARGUMENT_TO_TEMPLATE(Arg, tArgId, Nest) \
+   if (Arg) { \
+      constexpr bool tArg##tArgId = true;  \
+      Nest \
+   } \
+   else { \
+      constexpr bool tArg##tArgId = false; \
+      Nest \
+   }
 
 /// Rasterize all primitives inside a mesh                                    
 ///   @param ps - pipeline state                                              
@@ -333,7 +420,6 @@ void ASCIIPipeline::RasterizeMesh(const PipelineState& ps) const {
    if (mesh->MadeOfTriangles()) {
       // Rasterize triangles...                                         
       auto vertices = mesh->GetVertices().GetRaw();
-
       bool firstVertex = true;
       Range4 dataRangeBeforeW;
       Range4 dataRangeAfterW;
@@ -346,13 +432,6 @@ void ASCIIPipeline::RasterizeMesh(const PipelineState& ps) const {
 
          p /= p.w;
 
-         /*if (p.w != 0)
-            p /= p.w;
-         else {
-            Logger::Error(Self(), "Bad point: ", p);
-            continue;
-         }*/
-
          if (firstVertex)
             dataRangeAfterW.mMin = dataRangeAfterW.mMax = p;
          else
@@ -361,44 +440,18 @@ void ASCIIPipeline::RasterizeMesh(const PipelineState& ps) const {
          firstVertex = false;
       }
 
-      if (mLit) {
-         // Do a lighting pass, too                                     
-         if (mDepthTest) {
-            // Do a depth test and write                                
-            for (Offset i = 0; i < mesh->GetVertices().GetCount(); i += 3) {
-               ClipTriangle(MVP, vertices + i, [&](const Triangle4& t) {
-                  RasterizeTriangle<true, true, false>(ps, M, vertices + i, t);
-               });
-            }
+      MAP_ARGUMENT_TO_TEMPLATE(mLit,      0,
+      MAP_ARGUMENT_TO_TEMPLATE(mDepthTest,1,
+      MAP_ARGUMENT_TO_TEMPLATE(mSmooth,   2,
+      MAP_ARGUMENT_TO_TEMPLATE(mFog,      3,
+      MAP_ARGUMENT_TO_TEMPLATE(mColorize, 4,
+      MAP_ARGUMENT_TO_TEMPLATE(mShadows,  5,
+         for (Offset i = 0; i < mesh->GetVertices().GetCount(); i += 3) {
+            ClipTriangle(MVP, vertices + i, [&](const Triangle4& t) {
+               RasterizeTriangle<tArg0, tArg1, tArg2, tArg3, tArg4, tArg5>(ps, M, vertices + i, t);
+            });
          }
-         else {
-            // No depth testing/writing                                 
-            for (Offset i = 0; i < mesh->GetVertices().GetCount(); i += 3) {
-               ClipTriangle(MVP, vertices + i, [&](const Triangle4& t) {
-                  RasterizeTriangle<true, false, false>(ps, M, vertices + i, t);
-               });
-            }
-         }
-      }
-      else {
-         // No lighting                                                 
-         if (mDepthTest) {
-            // Do a depth test and write                                
-            for (Offset i = 0; i < mesh->GetVertices().GetCount(); i += 3) {
-               ClipTriangle(MVP, vertices + i, [&](const Triangle4& t) {
-                  RasterizeTriangle<false, true, false>(ps, M, vertices + i, t);
-               });
-            }
-         }
-         else {
-            // No depth testing/writing                                 
-            for (Offset i = 0; i < mesh->GetVertices().GetCount(); i += 3) {
-               ClipTriangle(MVP, vertices + i, [&](const Triangle4& t) {
-                  RasterizeTriangle<false, false, false>(ps, M, vertices + i, t);
-               });
-            }
-         }
-      }
+      ))))));
    }
    else TODO();
 }
@@ -418,12 +471,12 @@ void ASCIIPipeline::Assemble(const ASCIILayer* layer) const {
          for (uint32_t x = 0; x < layer->mImage.GetView().mWidth; ++x) {
             auto to = layer->mImage.GetPixel(x, y);
             auto d  = layer->mDepth.Get(x, y);
-            if (d > 0.0f and d < 1000.0f) {
+            //if (d > 0.0f and d < 1000.0f) {
                // Write pixel only if in valid depth range              
                auto& from = mBuffer.Get(x, y);
                to.mFgColor = from;
                to.mBgColor = from;
-            }
+            //}
          }
       }
    }

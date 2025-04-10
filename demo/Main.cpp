@@ -63,6 +63,11 @@ int main(int, char**) {
    castle->CreateUnit<A::Instance>(Traits::Size {450}, Traits::Place {0, -5, 0});
    castle->CreateUnit<A::Mesh>("castle.obj");
 
+   // Create a directional light source                                 
+   auto sun = root.CreateChild("Sun");
+   sun->CreateUnits<A::Light>();
+   sun->CreateUnit<A::Instance>(Traits::Place {-10, -50, 0}, Traits::Aim {1, 1, 0});
+
    // Loop until quit                                                   
    while (root.Update(fps.GetDeltaTime()))
       fps.Tick();

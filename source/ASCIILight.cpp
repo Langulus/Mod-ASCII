@@ -18,3 +18,29 @@ ASCIILight::ASCIILight(ASCIILayer* producer, const Many& descriptor)
    Couple(descriptor);
    VERBOSE_ASCII("Initialized");
 }
+
+/// First stage of destruction                                                
+void ASCIILight::Teardown() {
+   mInstances.Reset();
+}
+
+/// Get light color                                                           
+///   @return the color                                                       
+auto ASCIILight::GetColor() const -> RGBA {
+   return *mColor;
+}
+
+/// Called on environment change                                              
+void ASCIILight::Refresh() {
+   Teardown();
+
+   // Gather all instances for this renderable, and calculate levels    
+   mInstances = GatherUnits<A::Instance, Seek::Here>();
+   if (mInstances)
+      mLevelRange = mInstances[0]->GetLevel();
+   else
+      mLevelRange = {};
+
+   for (auto instance : mInstances)
+      mLevelRange.Embrace(instance->GetLevel());
+}

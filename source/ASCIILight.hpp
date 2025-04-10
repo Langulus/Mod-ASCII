@@ -12,9 +12,24 @@
 ///                                                                           
 ///   Light source unit                                                       
 ///                                                                           
-struct ASCIILight : A::Graphics, ProducedFrom<ASCIILayer> {
+struct ASCIILight final : A::Light, ProducedFrom<ASCIILayer> {
    LANGULUS(ABSTRACT) false;
-   LANGULUS_BASES(A::Graphics);
+   LANGULUS(PRODUCER) ASCIILayer;
+   LANGULUS_BASES(A::Light);
 
+protected:
+   friend struct ASCIILayer;
+
+   // Precompiled instances and levels, updated on Refresh()            
+   RTTI::Tag<Pin<RGBA>, Traits::Color> mColor = Colors::White;
+   TMany<const A::Instance*> mInstances;
+   TRange<Level> mLevelRange;
+
+public:
    ASCIILight(ASCIILayer*, const Many&);
+
+   auto GetColor() const -> RGBA;
+
+   void Refresh();
+   void Teardown();
 };
