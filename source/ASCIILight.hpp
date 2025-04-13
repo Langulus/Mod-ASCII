@@ -24,11 +24,14 @@ protected:
    RTTI::Tag<Pin<RGBA>, Traits::Color> mColor = Colors::White;
    TMany<const A::Instance*> mInstances;
    TRange<Level> mLevelRange;
+   Scale2 mShadowmapSize = {64, 64};
+   Degrees mSpotlightSize = 90;
 
 public:
    ASCIILight(ASCIILayer*, const Many&);
 
    auto GetColor() const -> RGBA;
+   auto GetProjection(Range1 depth) const -> Mat4;
 
    void Refresh();
    void Teardown();

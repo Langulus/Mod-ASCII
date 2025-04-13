@@ -120,6 +120,15 @@ void ASCIILayer::CompileLevelBatched(const ASCIICamera& cam, Level level) {
       else for (auto instance : renderable.mInstances)
          CompileInstance(&renderable, instance, lod, cam);
    }
+
+   // Iterate all lights. Lights will be added only if there are        
+   // renderables for the given camera                                  
+   for (const auto& light : mLights) {
+      if (not light.mInstances)
+         CompileLight(&light, nullptr, lod, cam);
+      else for (auto instance : light.mInstances)
+         CompileLight(&light, instance, lod, cam);
+   }
 }
 
 /// Compile an entity and all of its children entities                        
@@ -131,8 +140,6 @@ void ASCIILayer::CompileThing(const Thing* thing, LOD& lod, const ASCIICamera& c
    // Iterate all renderables of the entity, which are part of this     
    // layer - disregard all others layers                               
    auto renderables = thing->GatherUnits<ASCIIRenderable, Seek::Here>();
-
-   // Compile the instances associated with these renderables           
    for (auto renderable : renderables) {
       if (not mRenderables.Owns(renderable))
          continue;
@@ -141,6 +148,20 @@ void ASCIILayer::CompileThing(const Thing* thing, LOD& lod, const ASCIICamera& c
          CompileInstance(renderable, nullptr, lod, cam);
       else for (auto instance : renderable->mInstances)
          CompileInstance(renderable, instance, lod, cam);
+   }
+
+   // Iterate all lights of the entity, which are part of this          
+   // layer - disregard all others layers. Lights will be added only    
+   // if there are renderables for the given camera                     
+   auto lights = thing->GatherUnits<ASCIILight, Seek::Here>();
+   for (auto light : lights) {
+      if (not mLights.Owns(light))
+         continue;
+
+      if (not light->mInstances)
+         CompileLight(light, nullptr, lod, cam);
+      else for (auto instance : light->mInstances)
+         CompileLight(light, instance, lod, cam);
    }
 
    // Nest to children                                                  
@@ -195,7 +216,7 @@ void ASCIILayer::CompileInstance(
          cachedLvl = cachedCam.GetValue().FindIt(-lod.mLevel);
       }
 
-      auto& cachedPipes = cachedLvl.GetValue();
+      auto& cachedPipes = cachedLvl.GetValue().mPipelines;
       cachedPipes << TPair { pipeline, PipeSubscriber {
          instance
             ? renderable->GetColor() * instance->GetColor()
@@ -218,10 +239,10 @@ void ASCIILayer::CompileInstance(
          cachedLvl = cachedCam.GetValue().FindIt(-lod.mLevel);
       }
 
-      auto cachedPipe = cachedLvl.GetValue().FindIt(pipeline);
+      auto cachedPipe = cachedLvl.GetValue().mPipelines.FindIt(pipeline);
       if (not cachedPipe) {
-         cachedLvl.GetValue().Insert(pipeline);
-         cachedPipe = cachedLvl.GetValue().FindIt(pipeline);
+         cachedLvl.GetValue().mPipelines.Insert(pipeline);
+         cachedPipe = cachedLvl.GetValue().mPipelines.FindIt(pipeline);
       }
 
       auto& cachedRends = cachedPipe.GetValue();
@@ -234,6 +255,65 @@ void ASCIILayer::CompileInstance(
          renderable->GetTexture(lod)
       };
    }
+}
+
+/// Compile a single light instance                                           
+///   @attention lights aren't added to scenes that do not have renderables,  
+///      and compiling them relies on the precompiled renderables to hint at  
+///      what depth range is relevant in the scene, so that the shadowmaps    
+///      are packed as tightly as possible                                    
+///   @param light - the light to compile                                     
+///   @param instance - the instance to compile                               
+///   @param lod - the lod state to use                                       
+///   @param cam - the camera to compile                                      
+void ASCIILayer::CompileLight(
+   const ASCIILight* light,
+   const A::Instance* instance,
+   LOD& lod, const ASCIICamera& cam
+) {
+   if (not instance) {
+      // No instances, so culling based only on default level           
+      if (lod.mLevel != Level::Default)
+         return;
+      lod.Transform();
+   }
+   else {
+      // Instance available, so do frustum culling                      
+      //TODO lights need a bit more complicated culling
+      //if (instance->Cull(lod))
+      //   return;
+      lod.Transform(instance->GetModelTransform(lod));
+   }
+
+   auto push_in = [&](auto& sequence) {
+      auto cachedCam = sequence.FindIt(&cam);
+      if (not cachedCam)
+         return;
+
+      auto cachedLvl = cachedCam.GetValue().FindIt(-lod.mLevel);
+      if (not cachedLvl)
+         return;
+
+      const Mat4 MV = instance
+         ? instance->GetViewTransform(cachedLvl.GetKey())
+         : Mat4 {};
+
+      cachedLvl.GetValue().mLights << LightSubscriber {
+         instance ? light->GetColor() * instance->GetColor()
+                  : light->GetColor(),
+         instance ? light->GetProjection(cachedLvl.GetValue().mDepthRange) * MV.Invert()
+                  : light->GetProjection(cachedLvl.GetValue().mDepthRange),
+         MV.GetPosition(),
+         MV.GetView().Normalize(),
+         light->mType
+      };
+   };
+
+   // Cache the instance in the appropriate sequence                    
+   if (mStyle & Style::Hierarchical)
+      push_in(mHierarchicalSequence);
+   else
+      push_in(mBatchSequence);
 }
 
 /// Render the layer to a specific command buffer and framebuffer             
@@ -257,7 +337,7 @@ void ASCIILayer::Render(const RenderConfig& config) const {
 
 /// Render all instanced renderables in the order with least overhead         
 /// This is used only for Batched style layers                                
-///   @param config - where to render to                                      
+///   @param cfg - render configuration                                       
 void ASCIILayer::RenderBatched(const RenderConfig& cfg) const {
    // Rendering from each custom camera's point of view                 
    for (const auto camera : mBatchSequence) {
@@ -267,11 +347,11 @@ void ASCIILayer::RenderBatched(const RenderConfig& cfg) const {
             * camera.GetKey()->GetViewTransform(level.GetKey()).Invert();
 
          // Involve all relevant pipelines for that level               
-         for (const auto pipeline : level.GetValue()) {
+         for (const auto pipeline : level.GetValue().mPipelines) {
             // Draw all renderables that use that pipeline in their     
             // current LOD state, from that particular level & POV      
             for (const auto& instance : pipeline.GetValue())
-               pipeline.GetKey()->Render(this, projectedView, instance);
+               pipeline.GetKey()->Render(this, projectedView, instance, level.GetValue().mLights);
 
             // Assemble after everything has been drawn                 
             pipeline.GetKey()->Assemble(this);
@@ -285,7 +365,7 @@ void ASCIILayer::RenderBatched(const RenderConfig& cfg) const {
 
 /// Render all instanced renderables in the order they appear in the scene    
 /// This is used only for Hierarchical style layers                           
-///   @param cfg - where to render to                                         
+///   @param cfg - render configuration                                       
 void ASCIILayer::RenderHierarchical(const RenderConfig& cfg) const {
    // Rendering from each custom camera's point of view                 
    for (const auto camera : mHierarchicalSequence) {
@@ -295,8 +375,8 @@ void ASCIILayer::RenderHierarchical(const RenderConfig& cfg) const {
             * camera.GetKey()->GetViewTransform(level.GetKey()).Invert();
 
          // Render all relevant pipe-renderable pairs for that level    
-         for (const auto& instance : level.GetValue()) {
-            instance.GetKey()->Render(this, projectedView, instance.GetValue());
+         for (const auto& instance : level.GetValue().mPipelines) {
+            instance.GetKey()->Render(this, projectedView, instance.GetValue(), level.GetValue().mLights);
 
             // Assemble after each draw in order to keep hierarchy      
             instance.GetKey()->Assemble(this);

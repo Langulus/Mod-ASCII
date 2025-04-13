@@ -18,25 +18,33 @@ struct RenderConfig {
    float mClearDepth;
 };
 
+/// Each cached level contains something renderable. Each level contains      
+/// a set of relevant pipelines, and each of these pipelines draws a list of  
+/// precompiled renderables. Each level contains also a list of precompiled   
+/// lights and a depth range for drawing shadowmaps tightly.                  
+struct CachedLevelBatched {
+   TMany<LightSubscriber> mLights;
+   Range1 mDepthRange = {0, 1000};
+   TUnorderedMap<const ASCIIPipeline*, TMany<PipeSubscriber>> mPipelines;
+};
 
-/// For each enabled camera, there exist N levels sorted in a descending      
-/// order. Each level contains something renderable.                          
-/// For each of these levels, there's a set of relevant pipelines             
-/// And each of these pipelines draws a list of collapsed renderables         
-using BatchSequence = 
-   TUnorderedMap<const ASCIICamera*,
-      TOrderedMap<Level,
-         TUnorderedMap<const ASCIIPipeline*, TMany<PipeSubscriber>>>>;
+/// Each cached level contains something renderable. Each level contains      
+/// a a list if pipe-renderable pairs that have to be drawn in the order they 
+/// appear. Each level contains also a list of precompiled lights and a depth 
+/// range for drawing shadowmaps tightly.                                     
+struct CachedLevelHierarchical {
+   TMany<LightSubscriber> mLights;
+   Range1 mDepthRange = {0, 1000};
+   TMany<TPair<const ASCIIPipeline*, PipeSubscriber>> mPipelines;
+};
 
+/// For each enabled camera, there exist N cached levels optimized for batch  
+/// rendering                                                                 
+using BatchSequence = TUnorderedMap<const ASCIICamera*, TOrderedMap<Level, CachedLevelBatched>>;
 
-/// For each enabled camera, there exist N levels sorted in a descending      
-/// order. Each level contains something renderable.                          
-/// For each of these levels, there's a list of pipe-renderable pairs that    
-/// have to be drawn in the order they appear                                 
-using HierarchicalSequence = 
-   TUnorderedMap<const ASCIICamera*,
-      TOrderedMap<Level,
-         TMany<TPair<const ASCIIPipeline*, PipeSubscriber>>>>;
+/// For each enabled camera, there exist N cached levels sorted in a          
+/// descending hierarchical order                                             
+using HierarchicalSequence = TUnorderedMap<const ASCIICamera*, TOrderedMap<Level, CachedLevelHierarchical>>;
 
 
 ///                                                                           
@@ -140,6 +148,7 @@ private:
 
    void CompileThing(const Thing*, LOD&, const ASCIICamera&);
    void CompileInstance(const ASCIIRenderable*, const A::Instance*, LOD&, const ASCIICamera&);
+   void CompileLight(const ASCIILight*, const A::Instance*, LOD&, const ASCIICamera&);
 
    void RenderBatched(const RenderConfig&) const;
    void RenderHierarchical(const RenderConfig&) const;

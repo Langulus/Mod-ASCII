@@ -66,7 +66,7 @@ int main(int, char**) {
    // Create a directional light source                                 
    auto sun = root.CreateChild("Sun");
    sun->CreateUnits<A::Light>();
-   sun->CreateUnit<A::Instance>(Traits::Place {-10, -50, 0}, Traits::Aim {1, 1, 0});
+   sun->CreateUnit<A::Instance>(Traits::Place {-10, -50, 0}, Traits::Aim {-1, -1, 0});
 
    // Loop until quit                                                   
    while (root.Update(fps.GetDeltaTime()))

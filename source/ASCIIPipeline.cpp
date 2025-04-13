@@ -314,7 +314,7 @@ void ASCIIPipeline::RasterizeTriangle(
             [[maybe_unused]] RGBAf fogColor = mFogColor;
             [[maybe_unused]] Real  fog = 0;
             if constexpr (FOG) {
-               auto fog = (mFogRange.GetMax() - (1 - z) * 1000) / mFogRange.Length();
+               fog = (mFogRange.GetMax() - (1 - z) * 1000) / mFogRange.Length();
                if (fog >= 1) {
                   // Fog can optimize-out far pixels                    
                   pixel = fogColor;
@@ -470,7 +470,7 @@ void ASCIIPipeline::Assemble(const ASCIILayer* layer) const {
       for (uint32_t y = 0; y < layer->mImage.GetView().mHeight; ++y) {
          for (uint32_t x = 0; x < layer->mImage.GetView().mWidth; ++x) {
             auto to = layer->mImage.GetPixel(x, y);
-            auto d  = layer->mDepth.Get(x, y);
+            //auto d  = layer->mDepth.Get(x, y);
             //if (d > 0.0f and d < 1000.0f) {
                // Write pixel only if in valid depth range              
                auto& from = mBuffer.Get(x, y);

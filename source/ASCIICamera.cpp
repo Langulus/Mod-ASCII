@@ -49,7 +49,7 @@ void ASCIICamera::Compile() {
       //                      v                                         
       //                  -Aspect*Y                                     
       //                                                                
-      mProjection = A::Matrix::PerspectiveFOV(
+      mProjection = A::Matrix::PerspectiveFOV<Real>(
          mFOV, mAspectRatio, mViewport.mMin.z, mViewport.mMax.z
       );
    }

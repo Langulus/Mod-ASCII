@@ -30,11 +30,11 @@ struct PipeSubscriber {
 struct LightSubscriber {
    // Light color premultiplied by intensity                            
    RGBAf color;
-   // Light MVP                                                         
+   // Light MVP, used as a camera transformation for drawing shadowmaps 
    Mat4 transform;
-   // Light position in world space                                     
+   // Light position in world space, used for calculating point lights  
    Vec3 position;
-   // Light direction for directional/spotlights                        
+   // Light direction in world space, for directional/spot lights       
    Vec3 direction;
    // Type of the light                                                 
    A::Light::Type type;
