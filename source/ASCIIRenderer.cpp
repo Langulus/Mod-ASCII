@@ -93,7 +93,7 @@ void ASCIIRenderer::Draw() {
    const int sizey = static_cast<int>(mWindow->GetSize().y);
 
    mBackbuffer.Resize(sizex, sizey);
-   mBackbuffer.Fill(' ', Colors::White, config.mClearColor);
+   mBackbuffer.Fill(" ", Colors::White, config.mClearColor);
 
    if (mLayers) {
       // Resize and clear all pipelines                                 

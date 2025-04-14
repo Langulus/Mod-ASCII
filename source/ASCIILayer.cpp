@@ -326,7 +326,7 @@ void ASCIILayer::Render(const RenderConfig& config) const {
    mImage.Resize(sizex, sizey);
    mDepth.Resize(sizex, sizey);
 
-   mImage.Fill(' ', Colors::White, Colors::Red);
+   mImage.Fill(" ", Colors::White, Colors::Red);
    mDepth.Fill(config.mClearDepth);
 
    if (mStyle & Style::Hierarchical)

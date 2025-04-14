@@ -44,7 +44,7 @@ void ASCIIImage::Resize(int x, int y) {
 
    const auto count = x * y;
    mSymbols.Clear();
-   mSymbols.New(count, ' ');
+   mSymbols.New(count, " ");
 
    mFgColors.Clear();
    mFgColors.New(count, RGBAf {Colors::White});
@@ -83,7 +83,7 @@ ASCIIImage::Pixel ASCIIImage::GetPixel(int x, int y) const {
 ///   @param fg - the color that will be used for the background              
 ///   @param bg - the color that will be used for the foreground              
 ///   @param f - the emphasis that will be used                               
-void ASCIIImage::Fill(char s, RGBAf fg, RGBAf bg, Style f) {
+void ASCIIImage::Fill(::std::string_view s, RGBAf fg, RGBAf bg, Style f) {
    mSymbols.Fill(s);
    mFgColors.Fill(fg);
    mBgColors.Fill(bg);
@@ -119,7 +119,7 @@ auto ASCIIImage::ForEachPixel(auto&& call) const {
 
 /// Compare with a true color                                                 
 bool ASCIIImage::Pixel::operator == (const RGBAf& color) const noexcept {
-   return mSymbol == ' ' and mBgColor == color;
+   return mSymbol == " " and mBgColor == color;
 }
 
 /// Compare image to another image/uniform color, etc.                        

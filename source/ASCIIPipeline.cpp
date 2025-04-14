@@ -6,6 +6,7 @@
 /// SPDX-License-Identifier: GPL-3.0-or-later                                 
 ///                                                                           
 #include "ASCII.hpp"
+#include <bitset>
 
 
 /// Descriptor constructor                                                    
@@ -210,12 +211,12 @@ void ASCIIPipeline::RasterizeTriangle(
    const auto term_t3_a = term_a * term_t3;
 
    // p0, p1, and p2 should be in NDC space                             
-   Vec2i minp = Math::Floor(Math::Min(p0.xy(), p1.xy(), p2.xy()) * ps.mResolution);
+   Vec2i minp = Math::Floor(Math::Min(p0.xy(), p1.xy(), p2.xy()) * ps.mResolution + 0.5);
    minp.y -= ps.mResolution.y * 2;
    minp = Math::Min(Math::Max(minp, -ps.mResolution), ps.mResolution);
    minp = (minp + ps.mResolution) / 2;
 
-   Vec2i maxp = Math::Ceil(Math::Max(p0.xy(), p1.xy(), p2.xy()) * ps.mResolution);
+   Vec2i maxp = Math::Ceil(Math::Max(p0.xy(), p1.xy(), p2.xy()) * ps.mResolution + 0.5);
    maxp.y += ps.mResolution.y * 2;
    maxp = Math::Min(Math::Max(maxp, -ps.mResolution), ps.mResolution);
    maxp = (maxp + ps.mResolution) / 2;
@@ -456,10 +457,248 @@ void ASCIIPipeline::RasterizeMesh(const PipelineState& ps) const {
    else TODO();
 }
 
-/// Merge the pipeline with the layer's image, assembling any ASCII symbols   
+/// Merge the pipeline with the layer's image, assembling any symbols         
 ///   @param layer - the layer that we're rendering to                        
 void ASCIIPipeline::Assemble(const ASCIILayer* layer) const {
    LANGULUS(PROFILE);
+
+   auto gradient3x3 = [&](
+      ::std::array<RGBAf, 9>&& colors,
+      ::std::array<Real,  9>&& gather
+   ) -> ::std::string_view {
+      //  [0][1][2]                                                     
+      //  [3][4][5]                                                     
+      //  [6][7][8]                                                     
+      const auto center = gather[4];
+      for (auto& n : gather)
+         n -= center;
+
+      constexpr Real colorThreshold = 0.025;
+      auto mid40c = (colors[4] + colors[0]) / 2;
+      auto mid48c = (colors[4] + colors[8]) / 2;
+      auto mid40  = (gather[4] + gather[0]) / 2;
+      auto mid48  = (gather[4] + gather[8]) / 2;
+      if (gather[3] < mid40     and mid40     > gather[1]
+      and gather[6] < gather[4] and gather[4] > gather[2]
+      and gather[5] < mid48     and mid48     > gather[7]) {
+         auto dia0 = (colors[1] + colors[2] + colors[5]).Length() / 3;
+         auto dia1 = (colors[0] + colors[4] + colors[8]).Length() / 3;
+         auto dia2 = (colors[3] + colors[6] + colors[7]).Length() / 3;
+         if (Abs(dia0 - dia1) < colorThreshold and Abs(dia2 - dia1) < colorThreshold)
+            return "╲";
+      }
+
+      if (gather[3] > mid40     and mid40     < gather[1]
+      and gather[6] > gather[4] and gather[4] < gather[2]
+      and gather[5] > mid48     and mid48     < gather[7]) {
+         // Add detail only if colors don't already provide it          
+         auto dia0 = (colors[1] + colors[2] + colors[5]).Length() / 3;
+         auto dia1 = (colors[0] + colors[4] + colors[8]).Length() / 3;
+         auto dia2 = (colors[3] + colors[6] + colors[7]).Length() / 3;
+         if (Abs(dia0 - dia1) < colorThreshold and Abs(dia2 - dia1) < colorThreshold)
+            return "╲";
+      }
+
+      auto mid42c = (colors[4] + colors[2]) / 2;
+      auto mid46c = (colors[4] + colors[6]) / 2;
+      auto mid42  = (gather[4] + gather[2]) / 2;
+      auto mid46  = (gather[4] + gather[6]) / 2;
+      if (gather[1] < mid42     and mid42     > gather[5]
+      and gather[0] < gather[4] and gather[4] > gather[8]
+      and gather[3] < mid46     and mid46     > gather[7]) {
+         // Add detail only if colors don't already provide it          
+         auto dia0 = (colors[0] + colors[1] + colors[3]).Length() / 3;
+         auto dia1 = (colors[2] + colors[4] + colors[6]).Length() / 3;
+         auto dia2 = (colors[5] + colors[7] + colors[8]).Length() / 3;
+         if (Abs(dia0 - dia1) < colorThreshold and Abs(dia2 - dia1) < colorThreshold)
+            return "╱";
+      }
+
+      if (gather[1] > mid42     and mid42     < gather[5]
+      and gather[0] > gather[4] and gather[4] < gather[8]
+      and gather[3] > mid46     and mid46     < gather[7]) {
+         // Add detail only if colors don't already provide it          
+         auto dia0 = (colors[0] + colors[1] + colors[3]).Length() / 3;
+         auto dia1 = (colors[2] + colors[4] + colors[6]).Length() / 3;
+         auto dia2 = (colors[5] + colors[7] + colors[8]).Length() / 3;
+         if (Abs(dia0 - dia1) < colorThreshold and Abs(dia2 - dia1) < colorThreshold)
+            return "╱";
+      }
+
+      if (gather[0] < gather[1] and gather[1] > gather[2]
+      and gather[3] < gather[4] and gather[4] > gather[5]
+      and gather[6] < gather[7] and gather[7] > gather[8]) {
+         // Add detail only if colors don't already provide it          
+         auto col0 = (colors[0] + colors[3] + colors[6]).Length() / 3;
+         auto col1 = (colors[1] + colors[4] + colors[7]).Length() / 3;
+         auto col2 = (colors[2] + colors[5] + colors[8]).Length() / 3;
+         if (Abs(col0 - col1) < colorThreshold and Abs(col2 - col1) < colorThreshold)
+            return "│";
+      }
+
+      if (gather[0] > gather[1] and gather[1] < gather[2]
+      and gather[3] > gather[4] and gather[4] < gather[5]
+      and gather[6] > gather[7] and gather[7] < gather[8]) {
+         // Add detail only if colors don't already provide it          
+         auto col0 = (colors[0] + colors[3] + colors[6]).Length() / 3;
+         auto col1 = (colors[1] + colors[4] + colors[7]).Length() / 3;
+         auto col2 = (colors[2] + colors[5] + colors[8]).Length() / 3;
+         if (Abs(col0 - col1) < colorThreshold and Abs(col2 - col1) < colorThreshold)
+            return "│";
+      }
+
+      if (gather[0] < gather[3] and gather[3] > gather[6]
+      and gather[1] < gather[4] and gather[4] > gather[7]
+      and gather[2] < gather[5] and gather[5] > gather[8]) {
+         // Add detail only if colors don't already provide it          
+         auto row0 = (colors[0] + colors[1] + colors[2]).Length() / 3;
+         auto row1 = (colors[3] + colors[4] + colors[5]).Length() / 3;
+         auto row2 = (colors[6] + colors[7] + colors[8]).Length() / 3;
+         if (Abs(row0 - row1) < colorThreshold and Abs(row2 - row1) < colorThreshold)
+            return "─";
+      }
+
+      if (gather[0] > gather[3] and gather[3] < gather[6]
+      and gather[1] > gather[4] and gather[4] < gather[7]
+      and gather[2] > gather[5] and gather[5] < gather[8]) {
+         // Add detail only if colors don't already provide it          
+         auto row0 = (colors[0] + colors[1] + colors[2]).Length() / 3;
+         auto row1 = (colors[3] + colors[4] + colors[5]).Length() / 3;
+         auto row2 = (colors[6] + colors[7] + colors[8]).Length() / 3;
+         if (Abs(row0 - row1) < colorThreshold and Abs(row2 - row1) < colorThreshold)
+            return "─";
+      }
+
+      // Map depth values to 1 if slope is >= 0, 0 if otherwise         
+      // [ 4][ 2][-1]      [ 1][ 1][ 0]                                 
+      // [ 2][ 0][-2]  ->  [ 1]    [ 0]                                 
+      // [-1][-2][-2]      [ 0][ 0][ 0]                                 
+      /*::std::bitset<8> pattern = 0;
+      pattern |= (gather[0] >= 0) << 0;
+      pattern |= (gather[1] >= 0) << 1;
+      pattern |= (gather[2] >= 0) << 2;
+      pattern |= (gather[3] >= 0) << 3;
+      // ...skip center cell...                                         
+      pattern |= (gather[5] >= 0) << 4;
+      pattern |= (gather[6] >= 0) << 5;
+      pattern |= (gather[7] >= 0) << 6;
+      pattern |= (gather[8] >= 0) << 7;
+
+      // Check key combinations that correspond to characters           
+      // [0][0][0]                                                      
+      // [1][1][1]  ->  '─'                                             
+      // [0][0][0]                                                      
+      if (pattern == 0b00011000 or pattern == ~0b00011000)
+         return "─";
+
+      // [0][0][0]                                                      
+      // [1][1][0]  ->  '╴'                                             
+      // [0][0][0]                                                      
+      else if (pattern == 0b00010000 or pattern == ~0b00010000)
+         return "╴";
+
+      // [0][0][0]                                                      
+      // [0][1][1]  ->  '╶'                                             
+      // [0][0][0]                                                      
+      else if (pattern == 0b00001000 or pattern == ~0b00001000)
+         return "╶";
+
+      // [0][1][0]                                                      
+      // [0][1][0]  ->  '│'                                             
+      // [0][1][0]                                                      
+      else if (pattern == 0b01000010 or pattern == ~0b01000010)
+         return "│";
+
+      // [0][0][0]                                                      
+      // [0][1][0]  ->  '╷'                                             
+      // [0][1][0]                                                      
+      else if (pattern == 0b00000010 or pattern == ~0b00000010)
+         return "╷";
+
+      // [0][1][0]                                                      
+      // [0][1][0]  ->  '╵'                                             
+      // [0][0][0]                                                      
+      else if (pattern == 0b01000000 or pattern == ~0b01000000)
+         return "╵";
+
+      // [0][1][0]                                                      
+      // [0][1][1]  ->  '└'                                             
+      // [0][0][0]                                                      
+      else if (pattern == 0b01001000 or pattern == ~0b01001000)
+         return "└";
+
+      // [0][1][0]                                                      
+      // [0][1][1]  ->  '├'                                             
+      // [0][1][0]                                                      
+      else if (pattern == 0b01001010 or pattern == ~0b01001010)
+         return "├";
+
+      // [0][1][0]                                                      
+      // [1][1][0]  ->  '┘'                                             
+      // [0][0][0]                                                      
+      else if (pattern == 0b01010000 or pattern == ~0b01010000)
+         return "┘";
+
+      // [0][1][0]                                                      
+      // [1][1][1]  ->  '┴'                                             
+      // [0][0][0]                                                      
+      else if (pattern == 0b01011000 or pattern == ~0b01011000)
+         return "┴";
+
+      // [0][0][0]                                                      
+      // [1][1][0]  ->  '┐'                                             
+      // [0][1][0]                                                      
+      else if (pattern == 0b00010010 or pattern == ~0b00010010)
+         return "┐";
+
+      // [0][1][0]                                                      
+      // [1][1][0]  ->  '┤'                                             
+      // [0][1][0]                                                      
+      else if (pattern == 0b01010010 or pattern == ~0b01010010)
+         return "┤";
+
+      // [0][0][0]                                                      
+      // [0][1][1]  ->  '┌'                                             
+      // [0][1][0]                                                      
+      else if (pattern == 0b00001010 or pattern == ~0b00001010)
+         return "┌";
+
+      // [0][0][0]                                                      
+      // [1][1][1]  ->  '┬'                                             
+      // [0][1][0]                                                      
+      else if (pattern == 0b00011010 or pattern == ~0b00011010)
+         return "┬";
+
+      // [0][1][0]                                                      
+      // [1][1][1]  ->  '┼'                                             
+      // [0][1][0]                                                      
+      else if (pattern == 0b01011010 or pattern == ~0b01011010)
+         return "┼";
+
+      // [1][0][0]                                                      
+      // [0][1][0]  ->  '╲'                                             
+      // [0][0][1]                                                      
+      else if (pattern == 0b10000001 or pattern == ~0b10000001
+      or       pattern == 0b10010011 or pattern == ~0b10010011
+      or       pattern == 0b11001001 or pattern == ~0b11001001)
+         return "╲";
+
+      // [0][0][1]                                                      
+      // [0][1][0]  ->  '╱'                                             
+      // [1][0][0]                                                      
+      else if (pattern == 0b00100100 or pattern == ~0b00100100
+      or       pattern == 0b01110100 or pattern == ~0b01110100
+      or       pattern == 0b00101110 or pattern == ~0b00101110)
+         return "╱";
+
+      // [1][0][1]                                                      
+      // [0][1][0]  ->  '╳'                                             
+      // [1][0][1]                                                      
+      else if (pattern == 0b10100101 or pattern == ~0b10100101)
+         return "╳";*/
+
+      return " ";
+   };
 
    // Depth and normals are written directly into layer, but this       
    // pipeline might have some odd ways of deciding color and symbols,  
@@ -470,10 +709,26 @@ void ASCIIPipeline::Assemble(const ASCIILayer* layer) const {
       for (uint32_t y = 0; y < layer->mImage.GetView().mHeight; ++y) {
          for (uint32_t x = 0; x < layer->mImage.GetView().mWidth; ++x) {
             auto to = layer->mImage.GetPixel(x, y);
-            //auto d  = layer->mDepth.Get(x, y);
+            auto& from = mBuffer.Get(x, y);
+            ::std::string_view c = " ";
+
+            if (x and y and y < layer->mImage.GetView().mHeight-1
+                        and x < layer->mImage.GetView().mWidth-1
+            ) {
+               c = gradient3x3({
+                  mBuffer.Get(x-1, y-1), mBuffer.Get(x, y-1), mBuffer.Get(x+1, y-1),
+                  mBuffer.Get(x-1, y  ), mBuffer.Get(x, y  ), mBuffer.Get(x+1, y  ),
+                  mBuffer.Get(x-1, y+1), mBuffer.Get(x, y+1), mBuffer.Get(x+1, y+1),
+               }, {
+                  layer->mDepth.Get(x-1, y-1), layer->mDepth.Get(x, y-1), layer->mDepth.Get(x+1, y-1),
+                  layer->mDepth.Get(x-1, y  ), layer->mDepth.Get(x, y  ), layer->mDepth.Get(x+1, y  ),
+                  layer->mDepth.Get(x-1, y+1), layer->mDepth.Get(x, y+1), layer->mDepth.Get(x+1, y+1),
+               });
+            }
+
             //if (d > 0.0f and d < 1000.0f) {
                // Write pixel only if in valid depth range              
-               auto& from = mBuffer.Get(x, y);
+               to.mSymbol = c;
                to.mFgColor = from;
                to.mBgColor = from;
             //}
