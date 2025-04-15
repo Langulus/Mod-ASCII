@@ -457,6 +457,25 @@ void ASCIIPipeline::RasterizeMesh(const PipelineState& ps) const {
    else TODO();
 }
 
+namespace
+{
+   template<int FIRST, int SECOND, int...TAIL>
+   bool IsEdgeInner(const ::std::array<Real, 9>& data, auto slope) {
+      auto next_slope = data[FIRST] - data[SECOND];
+      if constexpr (sizeof...(TAIL))
+         return Abs(next_slope - slope) < 0.001 and IsEdge<SECOND, TAIL...>(data, slope);
+      else
+         return Abs(next_slope - slope) < 0.001;
+   }
+
+   template<int FIRST, int SECOND, int...TAIL>
+   bool IsEdge(const ::std::array<Real, 9>& data) {
+      static_assert(sizeof...(TAIL), "Need at least three indices");
+      auto next_slope = data[FIRST] - data[SECOND];
+      return IsEdgeInner<SECOND, TAIL...>(data, next_slope);
+   }
+}
+
 /// Merge the pipeline with the layer's image, assembling any symbols         
 ///   @param layer - the layer that we're rendering to                        
 void ASCIIPipeline::Assemble(const ASCIILayer* layer) const {
@@ -469,28 +488,15 @@ void ASCIIPipeline::Assemble(const ASCIILayer* layer) const {
       //  [0][1][2]                                                     
       //  [3][4][5]                                                     
       //  [6][7][8]                                                     
+      constexpr Real colorThreshold = 0.05;
       const auto center = gather[4];
       for (auto& n : gather)
          n -= center;
 
-      constexpr Real colorThreshold = 0.025;
-      auto mid40c = (colors[4] + colors[0]) / 2;
-      auto mid48c = (colors[4] + colors[8]) / 2;
-      auto mid40  = (gather[4] + gather[0]) / 2;
-      auto mid48  = (gather[4] + gather[8]) / 2;
-      if (gather[3] < mid40     and mid40     > gather[1]
-      and gather[6] < gather[4] and gather[4] > gather[2]
-      and gather[5] < mid48     and mid48     > gather[7]) {
-         auto dia0 = (colors[1] + colors[2] + colors[5]).Length() / 3;
-         auto dia1 = (colors[0] + colors[4] + colors[8]).Length() / 3;
-         auto dia2 = (colors[3] + colors[6] + colors[7]).Length() / 3;
-         if (Abs(dia0 - dia1) < colorThreshold and Abs(dia2 - dia1) < colorThreshold)
-            return "╲";
-      }
-
-      if (gather[3] > mid40     and mid40     < gather[1]
-      and gather[6] > gather[4] and gather[4] < gather[2]
-      and gather[5] > mid48     and mid48     < gather[7]) {
+      if (IsEdge<0,4,8>(gather) and not IsEdge<6,4,2>(gather)
+      and IsEdge<3,6,7>(gather) and not IsEdge<3,0,1>(gather)
+      and IsEdge<1,2,5>(gather) and not IsEdge<7,8,5>(gather)
+      ) {
          // Add detail only if colors don't already provide it          
          auto dia0 = (colors[1] + colors[2] + colors[5]).Length() / 3;
          auto dia1 = (colors[0] + colors[4] + colors[8]).Length() / 3;
@@ -499,13 +505,10 @@ void ASCIIPipeline::Assemble(const ASCIILayer* layer) const {
             return "╲";
       }
 
-      auto mid42c = (colors[4] + colors[2]) / 2;
-      auto mid46c = (colors[4] + colors[6]) / 2;
-      auto mid42  = (gather[4] + gather[2]) / 2;
-      auto mid46  = (gather[4] + gather[6]) / 2;
-      if (gather[1] < mid42     and mid42     > gather[5]
-      and gather[0] < gather[4] and gather[4] > gather[8]
-      and gather[3] < mid46     and mid46     > gather[7]) {
+      if (IsEdge<6,4,2>(gather) and not IsEdge<0,4,8>(gather)
+      and IsEdge<3,0,1>(gather) and not IsEdge<3,6,7>(gather)
+      and IsEdge<7,8,5>(gather) and not IsEdge<1,2,5>(gather)
+      ) {
          // Add detail only if colors don't already provide it          
          auto dia0 = (colors[0] + colors[1] + colors[3]).Length() / 3;
          auto dia1 = (colors[2] + colors[4] + colors[6]).Length() / 3;
@@ -514,20 +517,10 @@ void ASCIIPipeline::Assemble(const ASCIILayer* layer) const {
             return "╱";
       }
 
-      if (gather[1] > mid42     and mid42     < gather[5]
-      and gather[0] > gather[4] and gather[4] < gather[8]
-      and gather[3] > mid46     and mid46     < gather[7]) {
-         // Add detail only if colors don't already provide it          
-         auto dia0 = (colors[0] + colors[1] + colors[3]).Length() / 3;
-         auto dia1 = (colors[2] + colors[4] + colors[6]).Length() / 3;
-         auto dia2 = (colors[5] + colors[7] + colors[8]).Length() / 3;
-         if (Abs(dia0 - dia1) < colorThreshold and Abs(dia2 - dia1) < colorThreshold)
-            return "╱";
-      }
-
-      if (gather[0] < gather[1] and gather[1] > gather[2]
-      and gather[3] < gather[4] and gather[4] > gather[5]
-      and gather[6] < gather[7] and gather[7] > gather[8]) {
+      if (IsEdge<1,4,7>(gather) and not IsEdge<3,4,5>(gather)
+                                and not IsEdge<0,1,2>(gather)
+                                and not IsEdge<6,7,8>(gather)
+      ) {
          // Add detail only if colors don't already provide it          
          auto col0 = (colors[0] + colors[3] + colors[6]).Length() / 3;
          auto col1 = (colors[1] + colors[4] + colors[7]).Length() / 3;
@@ -536,20 +529,10 @@ void ASCIIPipeline::Assemble(const ASCIILayer* layer) const {
             return "│";
       }
 
-      if (gather[0] > gather[1] and gather[1] < gather[2]
-      and gather[3] > gather[4] and gather[4] < gather[5]
-      and gather[6] > gather[7] and gather[7] < gather[8]) {
-         // Add detail only if colors don't already provide it          
-         auto col0 = (colors[0] + colors[3] + colors[6]).Length() / 3;
-         auto col1 = (colors[1] + colors[4] + colors[7]).Length() / 3;
-         auto col2 = (colors[2] + colors[5] + colors[8]).Length() / 3;
-         if (Abs(col0 - col1) < colorThreshold and Abs(col2 - col1) < colorThreshold)
-            return "│";
-      }
-
-      if (gather[0] < gather[3] and gather[3] > gather[6]
-      and gather[1] < gather[4] and gather[4] > gather[7]
-      and gather[2] < gather[5] and gather[5] > gather[8]) {
+      if (IsEdge<3,4,5>(gather) and not IsEdge<1,4,7>(gather)
+                                and not IsEdge<0,3,6>(gather)
+                                and not IsEdge<2,5,8>(gather)
+      ) {
          // Add detail only if colors don't already provide it          
          auto row0 = (colors[0] + colors[1] + colors[2]).Length() / 3;
          auto row1 = (colors[3] + colors[4] + colors[5]).Length() / 3;
@@ -558,7 +541,7 @@ void ASCIIPipeline::Assemble(const ASCIILayer* layer) const {
             return "─";
       }
 
-      if (gather[0] > gather[3] and gather[3] < gather[6]
+      /*if (gather[0] > gather[3] and gather[3] < gather[6]
       and gather[1] > gather[4] and gather[4] < gather[7]
       and gather[2] > gather[5] and gather[5] < gather[8]) {
          // Add detail only if colors don't already provide it          
@@ -566,8 +549,8 @@ void ASCIIPipeline::Assemble(const ASCIILayer* layer) const {
          auto row1 = (colors[3] + colors[4] + colors[5]).Length() / 3;
          auto row2 = (colors[6] + colors[7] + colors[8]).Length() / 3;
          if (Abs(row0 - row1) < colorThreshold and Abs(row2 - row1) < colorThreshold)
-            return "─";
-      }
+            return "-";
+      }*/
 
       // Map depth values to 1 if slope is >= 0, 0 if otherwise         
       // [ 4][ 2][-1]      [ 1][ 1][ 0]                                 
