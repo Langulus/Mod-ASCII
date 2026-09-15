@@ -13,7 +13,7 @@
 #include <Langulus/Verbs/Create.hpp>
 #include <Langulus/Verbs/Interpret.hpp>
 #include <Langulus/Math/Gradient.hpp>
-#include <Langulus/Entity/Pin.hpp>
+#include <Langulus/Things/Pin.hpp>
 
 
 ///                                                                           

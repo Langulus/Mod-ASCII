@@ -9,7 +9,7 @@
 #include "ASCIICamera.hpp"
 #include "ASCIIRenderable.hpp"
 #include "ASCIILight.hpp"
-#include <Langulus/Anyness/TSet.hpp>
+#include <Langulus/Annies/TSet.hpp>
 #include <Langulus/Flow/Factory.hpp>
 
 
