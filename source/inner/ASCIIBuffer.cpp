@@ -37,7 +37,7 @@ void ASCIIImage::Reset() {
 ///   @param x - new width                                                    
 ///   @param y - new height                                                   
 void ASCIIImage::Resize(int x, int y) {
-   LANGULUS_ASSUME(DevAssumes, x and y, "Invalid resize dimensions");
+   LglsAssumeDev(x and y, "Invalid resize dimensions");
    if (x == static_cast<int>(mView.mWidth)
    and y == static_cast<int>(mView.mHeight))
       return;
@@ -64,9 +64,9 @@ void ASCIIImage::Resize(int x, int y) {
 ///   @param y - the y coordinate                                             
 ///   @return the pixel interface                                             
 ASCIIImage::Pixel ASCIIImage::GetPixel(int x, int y) const {
-   LANGULUS_ASSUME(DevAssumes, x < static_cast<int>(mView.mWidth) and x >= 0,
+   LglsAssumeDev(x < static_cast<int>(mView.mWidth) and x >= 0,
       "Pixel out of horizontal limits");
-   LANGULUS_ASSUME(DevAssumes, y < static_cast<int>(mView.mHeight) and y >= 0,
+   LglsAssumeDev(y < static_cast<int>(mView.mHeight) and y >= 0,
       "Pixel out of vertical limits");
 
    const auto index = y * static_cast<int>(mView.mWidth) + x;

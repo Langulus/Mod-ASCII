@@ -34,7 +34,7 @@ public:
    ASCIIBuffer() : Resolvable {this} {}
 
    void Resize(int x, int y) {
-      LANGULUS_ASSUME(DevAssumes, x and y, "Invalid resize dimensions");
+      LglsAssumeDev(x and y, "Invalid resize dimensions");
       if (x == static_cast<int>(mView.mWidth)
       and y == static_cast<int>(mView.mHeight))
          return;
@@ -47,10 +47,10 @@ public:
    }
 
    T& Get(int x, int y) {
-      LANGULUS_ASSUME(DevAssumes,
+      LglsAssumeDev(
          x < static_cast<int>(mView.mWidth) and x >= 0,
          "Pixel out of horizontal limits");
-      LANGULUS_ASSUME(DevAssumes,
+      LglsAssumeDev(
          y < static_cast<int>(mView.mHeight) and y >= 0,
          "Pixel out of vertical limits");
       return mData[y * static_cast<int>(mView.mWidth) + x];
