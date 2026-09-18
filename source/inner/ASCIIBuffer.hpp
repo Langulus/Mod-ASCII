@@ -67,7 +67,7 @@ public:
       static_assert(CT::Similar<A, T>,
          "Pixel iterator must be CT::Similar to T");
 
-      [[maybe_unused]] Count counter = 0;
+      [[maybe_unused]] size_t counter = 0;
       for (uint32_t y = 0; y < mView.mHeight; ++y) {
          for (uint32_t x = 0; x < mView.mWidth; ++x) {
             if constexpr (CT::Bool<R>) {

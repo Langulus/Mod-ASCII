@@ -424,7 +424,7 @@ void ASCIIPipeline::RasterizeMesh(const PipelineState& ps) const {
       bool firstVertex = true;
       Range4 dataRangeBeforeW;
       Range4 dataRangeAfterW;
-      for (Offset i = 0; i < mesh->GetVertices().GetCount(); ++i) {
+      for (size_t i = 0; i < mesh->GetVertices().GetCount(); ++i) {
          auto p = MVP * vertices[i].mPos;
          if (firstVertex)
             dataRangeBeforeW.mMin = dataRangeBeforeW.mMax = p;
@@ -447,7 +447,7 @@ void ASCIIPipeline::RasterizeMesh(const PipelineState& ps) const {
       MAP_ARGUMENT_TO_TEMPLATE(mFog,      3,
       MAP_ARGUMENT_TO_TEMPLATE(mColorize, 4,
       MAP_ARGUMENT_TO_TEMPLATE(mShadows,  5,
-         for (Offset i = 0; i < mesh->GetVertices().GetCount(); i += 3) {
+         for (size_t i = 0; i < mesh->GetVertices().GetCount(); i += 3) {
             ClipTriangle(MVP, vertices + i, [&](const Triangle4& t) {
                RasterizeTriangle<tArg0, tArg1, tArg2, tArg3, tArg4, tArg5>(ps, M, vertices + i, t);
             });
