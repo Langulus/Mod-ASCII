@@ -117,7 +117,7 @@ private:
    mutable TMany<ASCIIBuffer<float>> mShadowmaps;
 
 public:
-   ASCIIPipeline(ASCIIRenderer*, const Many&);
+   ASCIIPipeline(ASCIIRenderer*, Many const&);
 
    void Clear(const RGBAf&, float);
    void Resize(int x, int y);

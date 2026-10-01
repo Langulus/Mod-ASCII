@@ -11,7 +11,7 @@
 /// Descriptor constructor                                                    
 ///   @param producer - the camera producer                                   
 ///   @param descriptor - the camera descriptor                               
-ASCIICamera::ASCIICamera(ASCIILayer* producer, const Many& descriptor)
+ASCIICamera::ASCIICamera(ASCIILayer* producer, Many const& descriptor)
    : Resolvable   {this}
    , ProducedFrom {producer, descriptor} {
    VERBOSE_ASCII("Initializing...");
@@ -98,7 +98,7 @@ void ASCIICamera::Teardown() {
 
 /// Recompile the camera                                                      
 void ASCIICamera::Refresh() {
-   mInstances = GatherUnits<A::Instance, Seek::Here>();
+   mInstances = GatherParts<A::Instance, Seek::Here>();
 }
 
 /// Get view transformation for a given LOD state                             

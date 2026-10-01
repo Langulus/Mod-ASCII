@@ -12,7 +12,7 @@
 /// Descriptor constructor                                                    
 ///   @param producer - the pipeline producer                                 
 ///   @param descriptor - the pipeline descriptor                             
-ASCIIPipeline::ASCIIPipeline(ASCIIRenderer* producer, const Many& descriptor)
+ASCIIPipeline::ASCIIPipeline(ASCIIRenderer* producer, Many const& descriptor)
    : Resolvable   {this}
    , ProducedFrom {producer, descriptor} {
    VERBOSE_ASCII("Initializing graphics pipeline from: ", descriptor);

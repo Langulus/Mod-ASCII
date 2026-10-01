@@ -129,7 +129,7 @@ protected:
    Style mStyle = Style::Default;
 
 public:
-   ASCIILayer(ASCIIRenderer*, const Many&);
+   ASCIILayer(ASCIIRenderer*, Many const&);
 
    void Create(Verb&);
    void Generate();

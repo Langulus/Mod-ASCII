@@ -39,7 +39,7 @@ private:
    TMany<Vertex> mVertices;
 
 public:
-   ASCIIGeometry(ASCIIRenderer*, const Many&);
+   ASCIIGeometry(ASCIIRenderer*, Many const&);
 
    auto MadeOfTriangles() const noexcept -> bool;
    auto GetVertices() const noexcept -> const TMany<Vertex>&;

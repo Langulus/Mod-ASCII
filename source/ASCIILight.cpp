@@ -11,7 +11,7 @@
 /// Descriptor constructor                                                    
 ///   @param producer - the light producer                                    
 ///   @param descriptor - the light descriptor                                
-ASCIILight::ASCIILight(ASCIILayer* producer, const Many& descriptor)
+ASCIILight::ASCIILight(ASCIILayer* producer, Many const& descriptor)
    : Resolvable   {this}
    , ProducedFrom {producer, descriptor} {
    VERBOSE_ASCII("Initializing...");
@@ -55,7 +55,7 @@ void ASCIILight::Refresh() {
    Teardown();
 
    // Gather all instances for this renderable, and calculate levels    
-   mInstances = GatherUnits<A::Instance, Seek::Here>();
+   mInstances = GatherParts<A::Instance, Seek::Here>();
    if (mInstances)
       mLevelRange = mInstances[0]->GetLevel();
    else

@@ -13,14 +13,14 @@
 /// Descriptor constructor                                                    
 ///   @param producer - the renderer producer                                 
 ///   @param descriptor - the renderer descriptor                             
-ASCIIRenderer::ASCIIRenderer(ASCII* producer, const Many& descriptor)
+ASCIIRenderer::ASCIIRenderer(ASCII* producer, Many const& descriptor)
    : Resolvable   {this}
    , ProducedFrom {producer, descriptor}
    , mBackbuffer  {this} {
    VERBOSE_ASCII("Initializing...");
 
    // Retrieve relevant traits from the environment                     
-   mWindow = SeekUnitAux<A::Window>(descriptor);
+   mWindow = SeekPartAux<A::Window>(descriptor);
    LANGULUS_ASSERT(mWindow, Construct,
       "No window available for renderer - did you create a window component "
       "_before_ creating the renderer?"); //TODO just find one on Refresh()?

@@ -13,7 +13,7 @@
 /// Descriptor constructor                                                    
 ///   @param producer - the producer of the unit                              
 ///   @param descriptor - the unit descriptor                                 
-ASCIIGeometry::ASCIIGeometry(ASCIIRenderer* producer, const Many& descriptor)
+ASCIIGeometry::ASCIIGeometry(ASCIIRenderer* producer, Many const& descriptor)
    : Resolvable   {this}
    , ProducedFrom {producer, descriptor} {
    bool firstVertex = true;

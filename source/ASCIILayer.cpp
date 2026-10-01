@@ -13,7 +13,7 @@
 /// Descriptor constructor                                                    
 ///   @param producer - the camera producer                                   
 ///   @param descriptor - the camera descriptor                               
-ASCIILayer::ASCIILayer(ASCIIRenderer* producer, const Many& descriptor)
+ASCIILayer::ASCIILayer(ASCIIRenderer* producer, Many const& descriptor)
    : Resolvable      {this}
    , ProducedFrom    {producer, descriptor}
    , mFallbackCamera {this}
@@ -139,7 +139,7 @@ void ASCIILayer::CompileLevelBatched(const ASCIICamera& cam, Level level) {
 void ASCIILayer::CompileThing(const Thing* thing, LOD& lod, const ASCIICamera& cam) {
    // Iterate all renderables of the entity, which are part of this     
    // layer - disregard all others layers                               
-   auto renderables = thing->GatherUnits<ASCIIRenderable, Seek::Here>();
+   auto renderables = thing->GatherParts<ASCIIRenderable, Seek::Here>();
    for (auto renderable : renderables) {
       if (not mRenderables.Owns(renderable))
          continue;
@@ -153,7 +153,7 @@ void ASCIILayer::CompileThing(const Thing* thing, LOD& lod, const ASCIICamera& c
    // Iterate all lights of the entity, which are part of this          
    // layer - disregard all others layers. Lights will be added only    
    // if there are renderables for the given camera                     
-   auto lights = thing->GatherUnits<ASCIILight, Seek::Here>();
+   auto lights = thing->GatherParts<ASCIILight, Seek::Here>();
    for (auto light : lights) {
       if (not mLights.Owns(light))
          continue;

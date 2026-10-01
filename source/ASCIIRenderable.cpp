@@ -12,7 +12,7 @@
 /// Descriptor constructor                                                    
 ///   @param producer - the renderable producer                               
 ///   @param descriptor - the renderable descriptor                           
-ASCIIRenderable::ASCIIRenderable(ASCIILayer* producer, const Many& descriptor)
+ASCIIRenderable::ASCIIRenderable(ASCIILayer* producer, Many const& descriptor)
    : Resolvable   {this}
    , ProducedFrom {producer, descriptor} {
    VERBOSE_ASCII("Initializing...");
@@ -101,7 +101,7 @@ auto ASCIIRenderable::GetOrCreatePipeline(
    // Construct a pipeline                                              
    bool usingGlobalPipeline = false;
    auto construct = Construct::From<ASCIIPipeline>();
-   auto color = SeekTrait<Traits::Color>();
+   auto color = SeekTag<Traits::Color>();
    if (color)
       construct << color;
    if (layer)
@@ -129,7 +129,7 @@ void ASCIIRenderable::Refresh() {
    Teardown();
 
    // Gather all instances for this renderable, and calculate levels    
-   mInstances = GatherUnits<A::Instance, Seek::Here>();
+   mInstances = GatherParts<A::Instance, Seek::Here>();
    if (mInstances)
       mLevelRange = mInstances[0]->GetLevel();
    else
@@ -139,12 +139,12 @@ void ASCIIRenderable::Refresh() {
       mLevelRange.Embrace(instance->GetLevel());
 
    // Attempt extracting pipeline/material/geometry/textures from owners
-   const auto pipeline = SeekUnit<ASCIIPipeline, Seek::Here>();
+   const auto pipeline = SeekPart<ASCIIPipeline, Seek::Here>();
    if (pipeline) {
       mPredefinedPipeline = pipeline;
       return;
    }
 
-   mGeometryContent = SeekUnit<A::Mesh,  Seek::Here>();
-   mTextureContent  = SeekUnit<A::Image, Seek::Here>();
+   mGeometryContent = SeekPart<A::Mesh,  Seek::Here>();
+   mTextureContent  = SeekPart<A::Image, Seek::Here>();
 }
