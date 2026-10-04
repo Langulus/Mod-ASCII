@@ -6,9 +6,9 @@
 /// SPDX-License-Identifier: GPL-3.0-or-later                                 
 ///                                                                           
 #pragma once
-#include "../Common.hpp"
+#include "../Export.hpp"
 #include <Langulus/Math/Normal.hpp>
-#include <Langulus/Mesh.hpp>
+#include <Langulus/CppAPI/Mesh.hpp>
 
 
 ///                                                                           
@@ -17,7 +17,7 @@
 /// Optimizes a geometry asset for cache friendly CPU bound rasterization     
 ///                                                                           
 struct ASCIIGeometry : A::Graphics, ProducedFrom<ASCIIRenderer> {
-   LANGULUS(ABSTRACT) false;
+   using CTTI_Abstract = No;
    LANGULUS_BASES(A::Graphics);
 
    // An interleaved cache-friendly vertex format                       

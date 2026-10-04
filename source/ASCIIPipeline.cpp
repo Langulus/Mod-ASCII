@@ -240,16 +240,16 @@ void ASCIIPipeline::RasterizeTriangle(
       for (auto& light : ps.mLights) {
          // Determine light direction                                   
          switch (light.type) {
-         case A::Light::Directional:
-         case A::Light::Spot:
+         case Things::Light::Directional:
+         case Things::Light::Spot:
             // Direction is taken from the light instance               
             lit += light.color * n.Dot(light.direction);
             break;
-         case A::Light::Point:
+         case Things::Light::Point:
             // Direction is relative to light position                  
             lit += light.color * n.Dot((light.position - p).Normalize());
             break;
-         case A::Light::Domain:
+         case Things::Light::Domain:
             TODO();
          }
       }
@@ -352,16 +352,16 @@ void ASCIIPipeline::RasterizeTriangle(
                for (auto& light : ps.mLights) {
                   // Determine light direction                          
                   switch (light.type) {
-                  case A::Light::Directional:
-                  case A::Light::Spot:
+                  case Things::Light::Directional:
+                  case Things::Light::Spot:
                      // Direction is taken from the light instance      
                      lit += light.color * n.Dot(light.direction);
                      break;
-                  case A::Light::Point:
+                  case Things::Light::Point:
                      // Direction is relative to light position         
                      lit += light.color * n.Dot((light.position - p).Normalize());
                      break;
-                  case A::Light::Domain:
+                  case Things::Light::Domain:
                      TODO();
                   }
                }

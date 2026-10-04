@@ -6,8 +6,8 @@
 /// SPDX-License-Identifier: GPL-3.0-or-later                                 
 ///                                                                           
 #include "ASCII.hpp"
-#include <Langulus/Platform.hpp>
-#include <Langulus/Physical.hpp>
+#include <Langulus/CppAPI/Platform.hpp>
+#include <Langulus/CppAPI/Physical.hpp>
 
 
 /// Descriptor constructor                                                    
@@ -177,7 +177,7 @@ void ASCIILayer::CompileThing(const Thing* thing, LOD& lod, const ASCIICamera& c
 ///   @param cam - the camera to compile                                      
 void ASCIILayer::CompileInstance(
    const ASCIIRenderable* renderable,
-   const A::Instance* instance,
+   const Things::Instance* instance,
    LOD& lod, const ASCIICamera& cam
 ) {
    if (not instance) {
@@ -268,7 +268,7 @@ void ASCIILayer::CompileInstance(
 ///   @param cam - the camera to compile                                      
 void ASCIILayer::CompileLight(
    const ASCIILight* light,
-   const A::Instance* instance,
+   const Things::Instance* instance,
    LOD& lod, const ASCIICamera& cam
 ) {
    if (not instance) {
@@ -396,6 +396,6 @@ auto ASCIILayer::GetStyle() const noexcept -> Style {
 
 /// Get the window of a layer                                                 
 ///   @return the window interface                                            
-auto ASCIILayer::GetWindow() const noexcept -> const A::Window* {
+auto ASCIILayer::GetWindow() const noexcept -> const Things::Window* {
    return mProducer->GetWindow();
 }

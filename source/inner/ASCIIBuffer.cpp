@@ -17,8 +17,8 @@ ASCIIImage::ASCIIImage(ASCIIRenderer* renderer)
    // but beware of descriptor-content disparity if this Image class    
    // is produced from factories at some point                          
    Commit(&mSymbols);
-   Commit<Traits::Color>(&mFgColors);
-   Commit<Traits::Color>(&mBgColors);
+   Commit<Tags::Color>(&mFgColors);
+   Commit<Tags::Color>(&mBgColors);
    Commit(&mStyle);
    VERBOSE_ASCII("Initialized");
 }
@@ -144,7 +144,7 @@ void ASCIIImage::Compare(Verb& verb) const {
             : Compared::Unequal);
       }
    }
-   else if (verb.CastsTo<A::Image>()) {
+   else if (verb.CastsTo<Things::Image>()) {
       // Compare against other images                                   
       verb << (CompareInner(verb->As<Image>())
          ? Compared::Equal
@@ -164,7 +164,7 @@ void ASCIIImage::Compare(Verb& verb) const {
 /// Accounts for inversed pixel formats                                       
 ///   @param rhs - the image to compare against                               
 ///   @return true if both images match exactly                               
-bool ASCIIImage::CompareInner(const A::Image& rhs) const {
+bool ASCIIImage::CompareInner(const Things::Image& rhs) const {
    if (rhs.GetView() == GetView()
    and dynamic_cast<const ASCIIImage*>(&rhs)) {
       // We can batch-compare - both images are ASCII                   

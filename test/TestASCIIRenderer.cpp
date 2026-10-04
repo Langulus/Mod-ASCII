@@ -6,10 +6,10 @@
 /// SPDX-License-Identifier: GPL-3.0-or-later                                 
 ///                                                                           
 #include <Langulus/Flow/Time.hpp>
-#include <Langulus/Platform.hpp>
+#include <Langulus/CppAPI/Platform.hpp>
 #include <Langulus/Graphics.hpp>
-#include <Langulus/Physical.hpp>
-#include <Langulus/Mesh.hpp>
+#include <Langulus/CppAPI/Physical.hpp>
+#include <Langulus/CppAPI/Mesh.hpp>
 #include <Langulus/Image.hpp>
 #include <Langulus/Verbs/Interpret.hpp>
 #include <Langulus/Verbs/Compare.hpp>
@@ -25,34 +25,34 @@ SCENARIO("Renderer creation inside a window", "[renderer]") {
          auto root = Thing::Root<false>("FTXUI", "ASCII");
          
          WHEN("A renderer is created via abstractions") {
-            auto window = root.CreateUnit<A::Window>();
-            auto renderer = root.CreateUnit<A::Renderer>();
+            auto window = root.CreateUnit<Things::Window>();
+            auto renderer = root.CreateUnit<Things::Renderer>();
             root.DumpHierarchy();
                
             REQUIRE(window);
             REQUIRE(window.IsSparse());
-            REQUIRE(window.CastsTo<A::Window>());
+            REQUIRE(window.CastsTo<Things::Window>());
 
             REQUIRE(renderer);
             REQUIRE(renderer.IsSparse());
-            REQUIRE(renderer.CastsTo<A::Renderer>());
+            REQUIRE(renderer.CastsTo<Things::Renderer>());
 
             REQUIRE(root.GetUnits().GetCount() == 2);
          }
 
       #if LANGULUS_FEATURE(MANAGED_REFLECTION)
          WHEN("A renderer is created via tokens") {
-            auto window = root.CreateUnitToken("A::Window");
+            auto window = root.CreateUnitToken("Things::Window");
             auto renderer = root.CreateUnitToken("Renderer");
             root.DumpHierarchy();
                
             REQUIRE(window);
             REQUIRE(window.IsSparse());
-            REQUIRE(window.CastsTo<A::Window>());
+            REQUIRE(window.CastsTo<Things::Window>());
 
             REQUIRE(renderer);
             REQUIRE(renderer.IsSparse());
-            REQUIRE(renderer.CastsTo<A::Renderer>());
+            REQUIRE(renderer.CastsTo<Things::Renderer>());
 
             REQUIRE(root.GetUnits().GetCount() == 2);
          }
@@ -70,7 +70,7 @@ SCENARIO("Drawing an empty window", "[renderer]") {
    GIVEN("A window with a renderer") {
       // Create the scene                                               
       auto root = Thing::Root<false>("FTXUI", "ASCII");
-      root.CreateUnits<A::Window, A::Renderer>();
+      root.CreateUnits<Things::Window, Things::Renderer>();
 
       static Allocator::State memoryState2;
 
@@ -81,15 +81,15 @@ SCENARIO("Drawing an empty window", "[renderer]") {
 
             // And interpret the scene as an image, i.e. taking a       
             // screenshot                                               
-            Verbs::InterpretAs<A::Image*> interpret;
+            Verbs::InterpretAs<Things::Image*> interpret;
             root.Run(interpret);
 
             REQUIRE(root.GetUnits().GetCount() == 2);
-            REQUIRE_FALSE(root.HasUnits<A::Image>());
+            REQUIRE_FALSE(root.HasUnits<Things::Image>());
             REQUIRE(interpret.IsDone());
             REQUIRE(interpret->GetCount() == 1);
             REQUIRE(interpret->IsSparse());
-            REQUIRE(interpret->template CastsTo<A::Image>());
+            REQUIRE(interpret->template CastsTo<Things::Image>());
 
             Verbs::Compare compare {Colors::Red};
             interpret.Then(compare);
@@ -123,15 +123,15 @@ SCENARIO("Drawing solid polygons", "[renderer]") {
          "AssetsGeometry",
          "Physics"
       );
-      root.CreateUnits<A::Window, A::Renderer, A::Layer, A::World>();
+      root.CreateUnits<Things::Window, Things::Renderer, Things::Layer, A::World>();
 
       auto rect = root.CreateChild(Traits::Size {10, 5}, "Rectangles");
-      rect->CreateUnit<A::Renderable>();
-      rect->CreateUnit<A::Mesh>(Math::Box2 {});
-      rect->CreateUnit<A::Instance>(Traits::Place(10, 10), Colors::Black);
-      rect->CreateUnit<A::Instance>(Traits::Place(50, 10), Colors::Green);
-      rect->CreateUnit<A::Instance>(Traits::Place(10, 30), Colors::Blue);
-      rect->CreateUnit<A::Instance>(Traits::Place(50, 30), Colors::White);
+      rect->CreateUnit<Things::Renderable>();
+      rect->CreateUnit<Things::Mesh>(Math::Box2 {});
+      rect->CreateUnit<Things::Instance>(Traits::Place(10, 10), Colors::Black);
+      rect->CreateUnit<Things::Instance>(Traits::Place(50, 10), Colors::Green);
+      rect->CreateUnit<Things::Instance>(Traits::Place(10, 30), Colors::Blue);
+      rect->CreateUnit<Things::Instance>(Traits::Place(50, 30), Colors::White);
       root.DumpHierarchy();
 
       //static Allocator::State memoryState2;
@@ -143,17 +143,17 @@ SCENARIO("Drawing solid polygons", "[renderer]") {
 
             // And interpret the scene as an image, i.e. taking a       
             // screenshot                                               
-            Verbs::InterpretAs<A::Image*> interpret;
+            Verbs::InterpretAs<Things::Image*> interpret;
             root.Run(interpret);
 
             REQUIRE(root.GetUnits().GetCount() == 4);
             REQUIRE(rect->GetUnits().GetCount() == 6);
             REQUIRE(root.GetChildren().GetCount() == 1);
-            REQUIRE_FALSE(root.HasUnits<A::Image>());
+            REQUIRE_FALSE(root.HasUnits<Things::Image>());
             REQUIRE(interpret.IsDone());
             REQUIRE(interpret->GetCount() == 1);
             REQUIRE(interpret->IsSparse());
-            REQUIRE(interpret->template CastsTo<A::Image>());
+            REQUIRE(interpret->template CastsTo<Things::Image>());
 
             /*Verbs::Compare compare {"polygons.png"};
             interpret.Then(compare);

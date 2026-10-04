@@ -13,7 +13,7 @@
 #include <Langulus/Verbs/Create.hpp>
 #include <Langulus/Verbs/Interpret.hpp>
 #include <Langulus/Math/Gradient.hpp>
-#include <Langulus/Things/Pin.hpp>
+#include <Langulus/TPin.hpp>
 
 
 ///                                                                           
@@ -22,11 +22,11 @@
 /// Binds with a window and renders to it. Manages framebuffers, VRAM         
 /// contents, and layers                                                      
 ///                                                                           
-struct ASCIIRenderer : A::Renderer, ProducedFrom<ASCII> {
-   LANGULUS(ABSTRACT) false;
-   LANGULUS(PRODUCER) ASCII;
-   LANGULUS_BASES(A::Renderer);
-   LANGULUS_VERBS(Verbs::Create, Verbs::Interpret);
+struct ASCIIRenderer : Things::Renderer, ProducedFrom<ASCII> {
+   using CTTI_Abstract = No;
+   using CTTI_Producer = ASCII;
+   using CTTI_Bases    = Things::Renderer;
+   using CTTI_Ability  = Types<Verbs::Create, Verbs::Interpret>;
 
 protected:
    friend struct ASCIIPipeline;
@@ -38,7 +38,7 @@ protected:
    //                                                                   
    
    // The platform window, where the renderer is created                
-   Ref<const A::Window> mWindow;
+   Ref<Things::Window const> mWindow;
    // The time gradient, used for animations                            
    Ref<TGradient<Time>> mTime;
    // Mouse position, can be passed to shaders                          
@@ -69,6 +69,6 @@ public:
    void Refresh() override;
    void Draw();
 
-   auto GetWindow() const noexcept -> const A::Window*;
+   auto GetWindow() const noexcept -> Things::Window const*;
    auto GetResolution() const noexcept -> Scale2;
 };

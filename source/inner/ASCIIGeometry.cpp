@@ -20,14 +20,14 @@ ASCIIGeometry::ASCIIGeometry(ASCIIRenderer* producer, Many const& descriptor)
    Range4 dataRange;
 
    // Scan the descriptor                                               
-   descriptor.ForEachDeep([&](const A::Mesh& mesh) {
+   descriptor.ForEachDeep([&](const Things::Mesh& mesh) {
       if (mesh.MadeOfTriangles()) {
          // Cache a triangle list                                       
          mesh.ForEachVertex(
             [&](const Traits::Place&   p,
                 const Traits::Aim&     n,
                 const Traits::Sampler& t,
-                const Traits::Color&   c
+                const Tags::Color&   c
             ) {
                Vertex output;
                LANGULUS_ASSERT(p, Access, "No vertex position");

@@ -15,14 +15,14 @@ ASCIITexture::ASCIITexture(ASCIIRenderer* producer, Many const& descriptor)
    : Resolvable   {this}
    , ProducedFrom {producer, descriptor}
    , mImage       {producer} {
-   descriptor.ForEachDeep([&](const A::Image& content) {
+   descriptor.ForEachDeep([&](const Things::Image& content) {
       Upload(content);
    });
 }
 
 /// Initialize from the provided content                                      
 ///   @param content - the abstract texture content interface                 
-void ASCIITexture::Upload(const A::Image&) {
+void ASCIITexture::Upload(const Things::Image&) {
    TODO(); //compile into intermediate format
 }
 

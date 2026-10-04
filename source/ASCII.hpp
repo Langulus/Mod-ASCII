@@ -15,7 +15,7 @@
 /// Manages and produces ASCII renderers                                      
 ///                                                                           
 struct ASCII final : A::GraphicsModule {
-   LANGULUS(ABSTRACT) false;
+   using CTTI_Abstract = No;
    LANGULUS_BASES(A::GraphicsModule);
    LANGULUS_VERBS(Verbs::Create);
 

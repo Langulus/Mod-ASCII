@@ -5,11 +5,11 @@
 ///                                                                           
 /// SPDX-License-Identifier: GPL-3.0-or-later                                 
 ///                                                                           
-#include <Langulus/Platform.hpp>
+#include <Langulus/CppAPI/Platform.hpp>
 #include <Langulus/Graphics.hpp>
-#include <Langulus/Physical.hpp>
-#include <Langulus/Mesh.hpp>
-#include <Langulus/Input.hpp>
+#include <Langulus/CppAPI/Physical.hpp>
+#include <Langulus/CppAPI/Mesh.hpp>
+#include <Langulus/CppAPI/Input.hpp>
 #include <Langulus/Flow/Time.hpp>
 #include <thread>
 
@@ -38,17 +38,17 @@ int main(int, char**) {
       "InputSDL"
    );
    root.CreateUnits<
-      A::Window,
-      A::Renderer,
-      A::Layer,
+      Things::Window,
+      Things::Renderer,
+      Things::Layer,
       A::World,
-      A::InputGatherer
+      Things::InputGatherer
    >();
 
    // Create a player entity with controllable camera                   
    auto player = root.CreateChild("Player");
-   player->CreateUnits<A::Camera, A::InputListener>();
-   player->CreateUnit<A::Instance>(Traits::Place {0, 20, 20});
+   player->CreateUnits<Things::Camera, Things::InputListener>();
+   player->CreateUnit<Things::Instance>(Traits::Place {0, 20, 20});
    player->Run("? create Anticipator(MouseMove,          {thing? move (Yaw(?.x * 0.05), Pitch(?.y * 0.05))})");
    player->Run("? create Anticipator(Keys::W,            {thing? move (Axes::Forward  * 4, relative)})");
    player->Run("? create Anticipator(Keys::S,            {thing? move (Axes::Backward * 4, relative)})");
@@ -59,14 +59,14 @@ int main(int, char**) {
 
    // Create a castle                                                   
    auto castle = root.CreateChild("Castle");
-   castle->CreateUnits<A::Renderable>();
-   castle->CreateUnit<A::Instance>(Traits::Size {450}, Traits::Place {0, -5, 0});
-   castle->CreateUnit<A::Mesh>("castle.obj");
+   castle->CreateUnits<Things::Renderable>();
+   castle->CreateUnit<Things::Instance>(Traits::Size {450}, Traits::Place {0, -5, 0});
+   castle->CreateUnit<Things::Mesh>("castle.obj");
 
    // Create a directional light source                                 
    auto sun = root.CreateChild("Sun");
-   sun->CreateUnits<A::Light>();
-   sun->CreateUnit<A::Instance>(Traits::Aim {-1, -1, 0});
+   sun->CreateUnits<Things::Light>();
+   sun->CreateUnit<Things::Instance>(Traits::Aim {-1, -1, 0});
    sun->Run("? move^1 (Yaw(1), relative)");
 
    // Loop until quit                                                   

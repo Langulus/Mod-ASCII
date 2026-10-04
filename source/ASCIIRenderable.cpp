@@ -6,7 +6,7 @@
 /// SPDX-License-Identifier: GPL-3.0-or-later                                 
 ///                                                                           
 #include "ASCII.hpp"
-#include <Langulus/Physical.hpp>
+#include <Langulus/CppAPI/Physical.hpp>
 
 
 /// Descriptor constructor                                                    
@@ -101,7 +101,7 @@ auto ASCIIRenderable::GetOrCreatePipeline(
    // Construct a pipeline                                              
    bool usingGlobalPipeline = false;
    auto construct = Construct::From<ASCIIPipeline>();
-   auto color = SeekTag<Traits::Color>();
+   auto color = SeekTag<Tags::Color>();
    if (color)
       construct << color;
    if (layer)
@@ -129,7 +129,7 @@ void ASCIIRenderable::Refresh() {
    Teardown();
 
    // Gather all instances for this renderable, and calculate levels    
-   mInstances = GatherParts<A::Instance, Seek::Here>();
+   mInstances = GatherParts<Things::Instance, Seek::Here>();
    if (mInstances)
       mLevelRange = mInstances[0]->GetLevel();
    else
@@ -145,6 +145,6 @@ void ASCIIRenderable::Refresh() {
       return;
    }
 
-   mGeometryContent = SeekPart<A::Mesh,  Seek::Here>();
-   mTextureContent  = SeekPart<A::Image, Seek::Here>();
+   mGeometryContent = SeekPart<Things::Mesh,  Seek::Here>();
+   mTextureContent  = SeekPart<Things::Image, Seek::Here>();
 }

@@ -6,12 +6,12 @@
 /// SPDX-License-Identifier: GPL-3.0-or-later                                 
 ///                                                                           
 #pragma once
-#include "Common.hpp"
+#include "Export.hpp"
 #include "inner/ASCIITexture.hpp"
 #include "inner/ASCIIGeometry.hpp"
 #include <Langulus/Math/Normal.hpp>
-#include <Langulus/Mesh.hpp>
-#include <Langulus/IO.hpp>
+#include <Langulus/CppAPI/Mesh.hpp>
+#include <Langulus/CppAPI/IO.hpp>
 
 
 /// Compiled renderable                                                       
@@ -37,7 +37,7 @@ struct LightSubscriber {
    // Light direction in world space, for directional/spot lights       
    Vec3 direction;
    // Type of the light                                                 
-   A::Light::Type type;
+   Things::Light::Type type;
 };
 
 
@@ -74,7 +74,7 @@ enum class ASCIIStyle {
 /// Rasterizes vector graphics into the backbuffer of an ASCIILayer           
 ///                                                                           
 struct ASCIIPipeline : A::Graphics, ProducedFrom<ASCIIRenderer> {
-   LANGULUS(ABSTRACT) false;
+   using CTTI_Abstract = No;
    LANGULUS_BASES(A::Graphics);
 
 private:

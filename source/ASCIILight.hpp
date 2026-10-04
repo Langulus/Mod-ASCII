@@ -6,23 +6,23 @@
 /// SPDX-License-Identifier: GPL-3.0-or-later                                 
 ///                                                                           
 #pragma once
-#include "Common.hpp"
+#include "Export.hpp"
 
 
 ///                                                                           
 ///   Light source unit                                                       
 ///                                                                           
-struct ASCIILight final : A::Light, ProducedFrom<ASCIILayer> {
-   LANGULUS(ABSTRACT) false;
-   LANGULUS(PRODUCER) ASCIILayer;
-   LANGULUS_BASES(A::Light);
+struct ASCIILight final : Things::Light, ProducedFrom<ASCIILayer> {
+   using CTTI_Abstract = No;
+   using CTTI_Producer = ASCIILayer;
+   LANGULUS_BASES(Things::Light);
 
 protected:
    friend struct ASCIILayer;
 
    // Precompiled instances and levels, updated on Refresh()            
-   RTTI::Tag<Pin<RGBA>, Traits::Color> mColor = Colors::White;
-   TMany<const A::Instance*> mInstances;
+   Pin<RGBA, Tags::Color> mColor = Colors::White;
+   TMany<const Things::Instance*> mInstances;
    TRange<Level> mLevelRange;
    Scale2 mShadowmapSize = {64, 64};
    Degrees mSpotlightSize = 90;

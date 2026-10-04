@@ -6,7 +6,7 @@
 /// SPDX-License-Identifier: GPL-3.0-or-later                                 
 ///                                                                           
 #include "ASCII.hpp"
-#include <Langulus/Platform.hpp>
+#include <Langulus/CppAPI/Platform.hpp>
 #include <set>
 
 
@@ -20,7 +20,7 @@ ASCIIRenderer::ASCIIRenderer(ASCII* producer, Many const& descriptor)
    VERBOSE_ASCII("Initializing...");
 
    // Retrieve relevant traits from the environment                     
-   mWindow = SeekPartAux<A::Window>(descriptor);
+   mWindow = SeekPartAux<Things::Window>(descriptor);
    LANGULUS_ASSERT(mWindow, Construct,
       "No window available for renderer - did you create a window component "
       "_before_ creating the renderer?"); //TODO just find one on Refresh()?
@@ -70,7 +70,7 @@ void ASCIIRenderer::Create(Verb& verb) {
 ///   @param verb - interpret verb                                            
 void ASCIIRenderer::Interpret(Verb& verb) {
    verb.ForEach([&](DMeta meta) {
-      if (meta->template CastsTo<A::Image>())
+      if (meta->template CastsTo<Things::Image>())
          verb << &mBackbuffer;
    });
 }
@@ -117,7 +117,7 @@ void ASCIIRenderer::Draw() {
 
 /// Get the window interface                                                  
 ///   @return the window interface                                            
-auto ASCIIRenderer::GetWindow() const noexcept -> const A::Window* {
+auto ASCIIRenderer::GetWindow() const noexcept -> const Things::Window* {
    return mWindow;
 }
 

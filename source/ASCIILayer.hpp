@@ -9,8 +9,8 @@
 #include "ASCIICamera.hpp"
 #include "ASCIIRenderable.hpp"
 #include "ASCIILight.hpp"
-#include <Langulus/Annies/TSet.hpp>
-#include <Langulus/Flow/Factory.hpp>
+#include <Langulus/TSet.hpp>
+#include <Langulus/Factory.hpp>
 
 
 struct RenderConfig {
@@ -25,7 +25,7 @@ struct RenderConfig {
 struct CachedLevelBatched {
    TMany<LightSubscriber> mLights;
    Range1 mDepthRange = {0, 1000};
-   TUnorderedMap<const ASCIIPipeline*, TMany<PipeSubscriber>> mPipelines;
+   TMapUnsorted<const ASCIIPipeline*, TMany<PipeSubscriber>> mPipelines;
 };
 
 /// Each cached level contains something renderable. Each level contains      
@@ -40,11 +40,11 @@ struct CachedLevelHierarchical {
 
 /// For each enabled camera, there exist N cached levels optimized for batch  
 /// rendering                                                                 
-using BatchSequence = TUnorderedMap<const ASCIICamera*, TOrderedMap<Level, CachedLevelBatched>>;
+using BatchSequence = TMapUnsorted<const ASCIICamera*, TOrderedMap<Level, CachedLevelBatched>>;
 
 /// For each enabled camera, there exist N cached levels sorted in a          
 /// descending hierarchical order                                             
-using HierarchicalSequence = TUnorderedMap<const ASCIICamera*, TOrderedMap<Level, CachedLevelHierarchical>>;
+using HierarchicalSequence = TMapUnsorted<const ASCIICamera*, TOrderedMap<Level, CachedLevelHierarchical>>;
 
 
 ///                                                                           
@@ -54,11 +54,11 @@ using HierarchicalSequence = TUnorderedMap<const ASCIICamera*, TOrderedMap<Level
 /// other layers. Useful for capsulating a GUI, for example. Layers can blend 
 /// with each other, but never interact in any other way.                     
 ///                                                                           
-struct ASCIILayer : A::Layer, ProducedFrom<ASCIIRenderer> {
-   LANGULUS(ABSTRACT) false;
-   LANGULUS(PRODUCER) ASCIIRenderer;
-   LANGULUS_BASES(A::Layer);
-   LANGULUS_VERBS(Verbs::Create);
+struct ASCIILayer : Things::Layer, ProducedFrom<ASCIIRenderer> {
+   using CTTI_Abstract  = No;
+   using CTTI_Producer  = ASCIIRenderer;
+   using CTTI_Bases     = Things::Layer;
+   using CTTI_Ability   = Verbs::Create;
 
 protected:
    friend struct ASCIICamera;
@@ -137,7 +137,7 @@ public:
    void Teardown();
 
    auto GetStyle()  const noexcept -> Style;
-   auto GetWindow() const noexcept -> const A::Window*;
+   auto GetWindow() const noexcept -> const Things::Window*;
 
 private:
    void CompileCameras();
@@ -147,8 +147,8 @@ private:
    void CompileLevelHierarchical(const ASCIICamera&, Level);
 
    void CompileThing(const Thing*, LOD&, const ASCIICamera&);
-   void CompileInstance(const ASCIIRenderable*, const A::Instance*, LOD&, const ASCIICamera&);
-   void CompileLight(const ASCIILight*, const A::Instance*, LOD&, const ASCIICamera&);
+   void CompileInstance(const ASCIIRenderable*, const Things::Instance*, LOD&, const ASCIICamera&);
+   void CompileLight(const ASCIILight*, const Things::Instance*, LOD&, const ASCIICamera&);
 
    void RenderBatched(const RenderConfig&) const;
    void RenderHierarchical(const RenderConfig&) const;

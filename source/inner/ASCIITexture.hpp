@@ -15,13 +15,13 @@
 /// Optimizes a image asset for cache friendly CPU bound rasterization        
 ///                                                                           
 struct ASCIITexture : A::Graphics, ProducedFrom<ASCIIRenderer> {
-   LANGULUS(ABSTRACT) false;
+   using CTTI_Abstract = No;
    LANGULUS_BASES(A::Graphics);
 
 private:
    ASCIIImage mImage;
 
-   void Upload(const A::Image&);
+   void Upload(const Things::Image&);
 
 public:
    ASCIITexture(ASCIIRenderer*, Many const&);

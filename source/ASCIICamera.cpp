@@ -98,7 +98,7 @@ void ASCIICamera::Teardown() {
 
 /// Recompile the camera                                                      
 void ASCIICamera::Refresh() {
-   mInstances = GatherParts<A::Instance, Seek::Here>();
+   mInstances = GatherParts<Things::Instance, Seek::Here>();
 }
 
 /// Get view transformation for a given LOD state                             

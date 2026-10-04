@@ -6,7 +6,7 @@
 /// SPDX-License-Identifier: GPL-3.0-or-later                                 
 ///                                                                           
 #pragma once
-#include "Common.hpp"
+#include "Export.hpp"
 
 
 ///                                                                           
@@ -16,20 +16,20 @@
 /// graphical resources from the context, and generates a graphical pipeline  
 /// capable of visualizing them                                               
 ///                                                                           
-struct ASCIIRenderable final : A::Renderable, ProducedFrom<ASCIILayer> {
-   LANGULUS(ABSTRACT) false;
-   LANGULUS(PRODUCER) ASCIILayer;
-   LANGULUS_BASES(A::Renderable);
+struct ASCIIRenderable final : Things::Renderable, ProducedFrom<ASCIILayer> {
+   using CTTI_Abstract  = No;
+   using CTTI_Producer  = ASCIILayer;
+   using CTTI_Bases     = Things::Renderable;
 
 protected:
    friend struct ASCIILayer;
 
    // Precompiled instances and levels, updated on Refresh()            
-   RTTI::Tag<Pin<RGBA>, Traits::Color> mColor = Colors::White;
-   TMany<const A::Instance*> mInstances;
+   Pin<RGBA, Tags::Color> mColor = Colors::White;
+   TMany<const Things::Instance*> mInstances;
    TRange<Level> mLevelRange;
-   Ref<A::Mesh>  mGeometryContent;
-   Ref<A::Image> mTextureContent;
+   Ref<Things::Mesh>  mGeometryContent;
+   Ref<Things::Image> mTextureContent;
    mutable Ref<ASCIIPipeline> mPredefinedPipeline;
 
    // Precompiled content, updated on Refresh()                         

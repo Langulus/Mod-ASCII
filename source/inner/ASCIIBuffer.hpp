@@ -6,8 +6,8 @@
 /// SPDX-License-Identifier: GPL-3.0-or-later                                 
 ///                                                                           
 #pragma once
-#include "../Common.hpp"
-#include <Langulus/Image.hpp>
+#include "../Export.hpp"
+#include <Langulus/CppAPI/Image.hpp>
 #include <Langulus/Verbs/Compare.hpp>
 
 
@@ -22,14 +22,14 @@
 /// resolution and pixel->symbol mapping.                                     
 ///                                                                           
 template<class T>
-struct ASCIIBuffer final : A::Image {
+struct ASCIIBuffer final : Things::Image {
 private:
    // Data for the buffer                                               
    mutable TMany<T> mData;
 
 public:
-   LANGULUS(ABSTRACT) false;
-   LANGULUS_BASES(A::Image);
+   using CTTI_Abstract = No;
+   LANGULUS_BASES(Things::Image);
 
    ASCIIBuffer() : Resolvable {this} {}
 
@@ -97,7 +97,7 @@ public:
 /// Used for a backbuffer by the ASCII renderer, as well as a target type     
 /// to Verbs::Interpret as, in order to render ASCII graphics                 
 ///                                                                           
-struct ASCIIImage final : A::Image {
+struct ASCIIImage final : Things::Image {
    using Style = Logger::Emphasis;
 
 private:
@@ -110,11 +110,11 @@ private:
    // provided by a filename                                            
    ASCIIRenderer* mRenderer;
 
-   bool CompareInner(const A::Image&) const;
+   bool CompareInner(const Things::Image&) const;
 
 public:
-   LANGULUS(ABSTRACT) false;
-   LANGULUS_BASES(A::Image);
+   using CTTI_Abstract = No;
+   LANGULUS_BASES(Things::Image);
    LANGULUS_VERBS(Verbs::Compare);
 
    ASCIIImage() = delete;

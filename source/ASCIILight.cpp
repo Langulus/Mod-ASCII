@@ -55,7 +55,7 @@ void ASCIILight::Refresh() {
    Teardown();
 
    // Gather all instances for this renderable, and calculate levels    
-   mInstances = GatherParts<A::Instance, Seek::Here>();
+   mInstances = GatherParts<Things::Instance, Seek::Here>();
    if (mInstances)
       mLevelRange = mInstances[0]->GetLevel();
    else
