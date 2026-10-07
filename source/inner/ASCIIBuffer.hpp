@@ -56,7 +56,7 @@ public:
       return mData[y * static_cast<int>(mView.mWidth) + x];
    }
 
-   void Fill(const T& v) {
+   void Fill(T const& v) {
       mData.Fill(v);
    }
 
