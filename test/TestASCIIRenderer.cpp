@@ -5,9 +5,9 @@
 ///                                                                           
 /// SPDX-License-Identifier: GPL-3.0-or-later                                 
 ///                                                                           
-#include <Langulus/Flow/Time.hpp>
+#include <Langulus/Time.hpp>
 #include <Langulus/CppAPI/Platform.hpp>
-#include <Langulus/Graphics.hpp>
+#include <Langulus/CppAPI/Graphics.hpp>
 #include <Langulus/CppAPI/Physical.hpp>
 #include <Langulus/CppAPI/Mesh.hpp>
 #include <Langulus/Image.hpp>

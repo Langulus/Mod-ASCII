@@ -6,11 +6,11 @@
 /// SPDX-License-Identifier: GPL-3.0-or-later                                 
 ///                                                                           
 #include <Langulus/CppAPI/Platform.hpp>
-#include <Langulus/Graphics.hpp>
+#include <Langulus/CppAPI/Graphics.hpp>
 #include <Langulus/CppAPI/Physical.hpp>
 #include <Langulus/CppAPI/Mesh.hpp>
 #include <Langulus/CppAPI/Input.hpp>
-#include <Langulus/Flow/Time.hpp>
+#include <Langulus/Time.hpp>
 #include <thread>
 
 using namespace Langulus;

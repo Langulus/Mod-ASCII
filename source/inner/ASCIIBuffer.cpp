@@ -125,7 +125,7 @@ bool ASCIIImage::Pixel::operator == (const RGBAf& color) const noexcept {
 /// Compare image to another image/uniform color, etc.                        
 ///   @param verb - the comparison verb                                       
 void ASCIIImage::Compare(Verb& verb) const {
-   if (verb.CastsTo<A::Color>()) {
+   if (verb.CastsTo<Math::Color>()) {
       // Compare against colors                                         
       if (verb.GetCount() == 1) {
          // Check if texture is filled with a uniform color             
@@ -150,7 +150,7 @@ void ASCIIImage::Compare(Verb& verb) const {
          ? Compared::Equal
          : Compared::Unequal);
    }
-   else if (verb.CastsTo<A::Text>()) {
+   else if (verb.CastsTo<Text>()) {
       // Compare against other image files (need to be loaded by an     
       // asset module)                                                  
       Verbs::Create rhs {Recipe::From<Image>(verb.GetArgument())};
