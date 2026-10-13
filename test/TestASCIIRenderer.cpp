@@ -125,13 +125,13 @@ SCENARIO("Drawing solid polygons", "[renderer]") {
       );
       root.CreateUnits<Things::Window, Things::Renderer, Things::Layer, A::World>();
 
-      auto rect = root.CreateChild(Traits::Size {10, 5}, "Rectangles");
+      auto rect = root.CreateChild(Tags::Size {10, 5}, "Rectangles");
       rect->CreateUnit<Things::Renderable>();
       rect->CreateUnit<Things::Mesh>(Math::Box2 {});
-      rect->CreateUnit<Things::Instance>(Traits::Place(10, 10), Colors::Black);
-      rect->CreateUnit<Things::Instance>(Traits::Place(50, 10), Colors::Green);
-      rect->CreateUnit<Things::Instance>(Traits::Place(10, 30), Colors::Blue);
-      rect->CreateUnit<Things::Instance>(Traits::Place(50, 30), Colors::White);
+      rect->CreateUnit<Things::Instance>(Tags::Place(10, 10), Colors::Black);
+      rect->CreateUnit<Things::Instance>(Tags::Place(50, 10), Colors::Green);
+      rect->CreateUnit<Things::Instance>(Tags::Place(10, 30), Colors::Blue);
+      rect->CreateUnit<Things::Instance>(Tags::Place(50, 30), Colors::White);
       root.DumpHierarchy();
 
       //static Allocator::State memoryState2;

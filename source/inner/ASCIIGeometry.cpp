@@ -11,8 +11,8 @@
 
 
 /// Descriptor constructor                                                    
-///   @param producer - the producer of the unit                              
-///   @param descriptor - the unit descriptor                                 
+///   @param producer - the producer of the part                              
+///   @param descriptor - the part descriptor                                 
 ASCIIGeometry::ASCIIGeometry(ASCIIRenderer* producer, Many const& descriptor)
    : Resolvable   {this}
    , ProducedFrom {producer, descriptor} {
@@ -24,9 +24,9 @@ ASCIIGeometry::ASCIIGeometry(ASCIIRenderer* producer, Many const& descriptor)
       if (mesh.MadeOfTriangles()) {
          // Cache a triangle list                                       
          mesh.ForEachVertex(
-            [&](const Traits::Place&   p,
-                const Traits::Aim&     n,
-                const Traits::Sampler& t,
+            [&](const Tags::Place&   p,
+                const Tags::Aim&     n,
+                const Tags::Sampler& t,
                 const Tags::Color&   c
             ) {
                Vertex output;

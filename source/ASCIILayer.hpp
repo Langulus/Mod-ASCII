@@ -48,7 +48,7 @@ using HierarchicalSequence = TMapUnsorted<const ASCIICamera*, TOrderedMap<Level,
 
 
 ///                                                                           
-///   Graphics layer unit                                                     
+///   Graphics layer part                                                     
 ///                                                                           
 ///   A logical group of cameras, renderables, and lights, isolated from      
 /// other layers. Useful for capsulating a GUI, for example. Layers can blend 

@@ -10,7 +10,7 @@
 
 
 ///                                                                           
-///   Light source unit                                                       
+///   Light source part                                                       
 ///                                                                           
 struct ASCIILight final : Things::Light, ProducedFrom<ASCIILayer> {
    using CTTI_Abstract = No;

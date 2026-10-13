@@ -25,9 +25,9 @@ ASCIIRenderer::ASCIIRenderer(ASCII* producer, Many const& descriptor)
       "No window available for renderer - did you create a window component "
       "_before_ creating the renderer?"); //TODO just find one on Refresh()?
 
-   SeekValueAux<Traits::Time         >(descriptor, mTime);
-   SeekValueAux<Traits::MousePosition>(descriptor, mMousePosition);
-   SeekValueAux<Traits::MouseScroll  >(descriptor, mMouseScroll);
+   SeekValueAux<Tags::Time         >(descriptor, mTime);
+   SeekValueAux<Tags::MousePosition>(descriptor, mMousePosition);
+   SeekValueAux<Tags::MouseScroll  >(descriptor, mMouseScroll);
 
    Couple(descriptor);
    VERBOSE_ASCII("Initialized");
@@ -51,9 +51,9 @@ void ASCIIRenderer::Teardown()  {
 /// React to changes in environment                                           
 void ASCIIRenderer::Refresh() {
    // Refresh time and mouse properties                                 
-   SeekValue<Traits::Time>(mTime);
-   SeekValue<Traits::MousePosition>(mMousePosition);
-   SeekValue<Traits::MouseScroll>(mMouseScroll);
+   SeekValue<Tags::Time>(mTime);
+   SeekValue<Tags::MousePosition>(mMousePosition);
+   SeekValue<Tags::MouseScroll>(mMouseScroll);
 }
 
 /// Introduce renderables, cameras, lights, shaders, textures, geometry       

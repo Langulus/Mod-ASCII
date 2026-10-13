@@ -12,7 +12,7 @@
 ///                                                                           
 ///   ASCII renderable element                                                
 ///                                                                           
-/// Gives things the ability to be drawn to screen. The unit gathers relevant 
+/// Gives things the ability to be drawn to screen. The part gathers relevant 
 /// graphical resources from the context, and generates a graphical pipeline  
 /// capable of visualizing them                                               
 ///                                                                           

@@ -14,7 +14,7 @@ using LevelRange = TRange<Level>;
 
 
 ///                                                                           
-///   ASCII Camera unit                                                       
+///   ASCII Camera part                                                       
 ///                                                                           
 /// Provides fine control over camera properties, like field of view,         
 /// screen viewport, aspect ratio, etc.                                       
