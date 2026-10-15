@@ -69,7 +69,7 @@ void ASCIIPipeline::Render(
    const PipeSubscriber& sub,
    const TMany<LightSubscriber>& lights
 ) const {
-   LANGULUS(PROFILE);
+   LglsProfile();
    if (not sub.mesh)
       return;
 
@@ -176,7 +176,7 @@ void ASCIIPipeline::RasterizeTriangle(
    const ASCIIGeometry::Vertex* triangle,
    const Triangle4& clipped
 ) const {
-   LANGULUS(PROFILE);
+   LglsProfile();
    const Vec3 p0 = clipped[0].xyz();
    const Vec3 p1 = clipped[1].xyz();
    const Vec3 p2 = clipped[2].xyz();
@@ -479,7 +479,7 @@ namespace
 /// Merge the pipeline with the layer's image, assembling any symbols         
 ///   @param layer - the layer that we're rendering to                        
 void ASCIIPipeline::Assemble(const ASCIILayer* layer) const {
-   LANGULUS(PROFILE);
+   LglsProfile();
 
    auto gradient3x3 = [&](
       ::std::array<RGBAf, 9>&& colors,

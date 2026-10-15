@@ -19,7 +19,7 @@ ASCIIRenderer::ASCIIRenderer(ASCII* producer, Many const& descriptor)
    , mBackbuffer  {this} {
    VERBOSE_ASCII("Initializing...");
 
-   // Retrieve relevant traits from the environment                     
+   // Retrieve relevant tags from the environment                     
    mWindow = SeekPartAux<Things::Window>(descriptor);
    LANGULUS_ASSERT(mWindow, Construct,
       "No window available for renderer - did you create a window component "
@@ -78,7 +78,7 @@ void ASCIIRenderer::Interpret(Verb& verb) {
 /// Render an object, along with all of its children                          
 /// Rendering pipeline depends on each entity's components                    
 void ASCIIRenderer::Draw() {
-   LANGULUS(PROFILE);
+   LglsProfile();
    if (mWindow->IsMinimized())
       return;
 
@@ -103,7 +103,7 @@ void ASCIIRenderer::Draw() {
       }
 
       // Render all layers                                              
-      for (const auto& layer : mLayers) {
+      for (auto const& layer : mLayers) {
          layer.Render(config);
 
          // Copy the result into the backbuffer                         

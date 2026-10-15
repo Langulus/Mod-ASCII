@@ -32,7 +32,7 @@ void ASCII::Teardown() {
 /// Module update routine                                                     
 ///   @param dt - time from last update                                       
 bool ASCII::Update(Time) {
-   LANGULUS(PROFILE);
+   LglsProfile();
    for (auto& renderer : mRenderers)
       renderer.Draw();
    return true;

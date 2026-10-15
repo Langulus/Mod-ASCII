@@ -73,7 +73,7 @@ void ASCIILayer::CompileLevels() {
       else
          CompileLevelBatched(mFallbackCamera, Level::Default);
    }
-   else for (const auto& cam : mCameras) {
+   else for (auto const& cam : mCameras) {
       if (mStyle & Style::Multilevel) {
          // Multilevel style - tests all camera-visible levels          
          for (auto level  = cam.mObservableRange.mMax;
@@ -102,7 +102,7 @@ void ASCIILayer::CompileLevelHierarchical(const ASCIICamera& cam, Level level) {
    LOD lod {level, cam.GetViewTransform(level), cam.mProjection};
 
    // Nest-iterate all children of the layer owner                      
-   for (const auto& owner : GetOwners())
+   for (auto const& owner : GetOwners())
       CompileThing(owner, lod, cam);
 }
 
@@ -114,7 +114,7 @@ void ASCIILayer::CompileLevelBatched(const ASCIICamera& cam, Level level) {
    LOD lod {level, cam.GetViewTransform(level), cam.mProjection};
 
    // Iterate all renderables                                           
-   for (const auto& renderable : mRenderables) {
+   for (auto const& renderable : mRenderables) {
       if (not renderable.mInstances)
          CompileInstance(&renderable, nullptr, lod, cam);
       else for (auto instance : renderable.mInstances)
@@ -123,7 +123,7 @@ void ASCIILayer::CompileLevelBatched(const ASCIICamera& cam, Level level) {
 
    // Iterate all lights. Lights will be added only if there are        
    // renderables for the given camera                                  
-   for (const auto& light : mLights) {
+   for (auto const& light : mLights) {
       if (not light.mInstances)
          CompileLight(&light, nullptr, lod, cam);
       else for (auto instance : light.mInstances)
@@ -319,7 +319,7 @@ void ASCIILayer::CompileLight(
 /// Render the layer to a specific command buffer and framebuffer             
 ///   @param config - where to render to                                      
 void ASCIILayer::Render(const RenderConfig& config) const {
-   LANGULUS(PROFILE);
+   LglsProfile();
    const int sizex = static_cast<int>(GetWindow()->GetSize().x);
    const int sizey = static_cast<int>(GetWindow()->GetSize().y);
 
@@ -350,7 +350,7 @@ void ASCIILayer::RenderBatched(const RenderConfig& cfg) const {
          for (const auto pipeline : level.GetValue().mPipelines) {
             // Draw all renderables that use that pipeline in their     
             // current LOD state, from that particular level & POV      
-            for (const auto& instance : pipeline.GetValue())
+            for (auto const& instance : pipeline.GetValue())
                pipeline.GetKey()->Render(this, projectedView, instance, level.GetValue().mLights);
 
             // Assemble after everything has been drawn                 
@@ -375,7 +375,7 @@ void ASCIILayer::RenderHierarchical(const RenderConfig& cfg) const {
             * camera.GetKey()->GetViewTransform(level.GetKey()).Invert();
 
          // Render all relevant pipe-renderable pairs for that level    
-         for (const auto& instance : level.GetValue().mPipelines) {
+         for (auto const& instance : level.GetValue().mPipelines) {
             instance.GetKey()->Render(this, projectedView, instance.GetValue(), level.GetValue().mLights);
 
             // Assemble after each draw in order to keep hierarchy      
