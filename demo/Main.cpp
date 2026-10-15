@@ -19,7 +19,7 @@ LANGULUS_RTTI_BOUNDARY(RTTI::MainBoundary)
 
 
 int main(int, char**) {
-   LANGULUS(PROFILE);
+   LglsProfile();
 
    // Suppress any logging messages, so that we don't interfere with    
    // the ASCII renderer in the console. Instead, redirect all logging  
