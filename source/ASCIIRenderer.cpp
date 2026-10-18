@@ -21,9 +21,10 @@ ASCIIRenderer::ASCIIRenderer(ASCII* producer, Many const& descriptor)
 
    // Retrieve relevant tags from the environment                     
    mWindow = SeekPartAux<Things::Window>(descriptor);
-   LANGULUS_ASSERT(mWindow, Construct,
+   LglsAssert(mWindow,
       "No window available for renderer - did you create a window component "
-      "_before_ creating the renderer?"); //TODO just find one on Refresh()?
+      "_before_ creating the renderer?"
+   ); //TODO just find one on Refresh()?
 
    SeekValueAux<Tags::Time         >(descriptor, mTime);
    SeekValueAux<Tags::MousePosition>(descriptor, mMousePosition);

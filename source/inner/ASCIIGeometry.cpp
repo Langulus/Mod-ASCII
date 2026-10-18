@@ -11,11 +11,11 @@
 
 
 /// Descriptor constructor                                                    
-///   @param producer - the producer of the part                              
-///   @param descriptor - the part descriptor                                 
+///   @param producer the producer of the part                                
+///   @param descriptor the part descriptor                                   
 ASCIIGeometry::ASCIIGeometry(ASCIIRenderer* producer, Many const& descriptor)
-   : Resolvable   {this}
-   , ProducedFrom {producer, descriptor} {
+   : /*Resolvable   {this}
+   ,*/ ProducedFrom {producer, descriptor} {
    bool firstVertex = true;
    Range4 dataRange;
 
@@ -30,16 +30,16 @@ ASCIIGeometry::ASCIIGeometry(ASCIIRenderer* producer, Many const& descriptor)
                 const Tags::Color&   c
             ) {
                Vertex output;
-               LANGULUS_ASSERT(p, Access, "No vertex position");
+               LglsAssert(p, "No vertex position");
 
-               if (p.IsSimilar<Vec3>())
+               if (p.IsSame<Vec3>())
                   output.mPos = Vec4(*p.GetRaw<Vec3>(), 1);
-               else if (p.IsSimilar<Vec2>())
+               else if (p.IsSame<Vec2>())
                   output.mPos = Vec4(*p.GetRaw<Vec2>(), 0, 1);
-               else if (p.IsSimilar<Vec4>())
+               else if (p.IsSame<Vec4>())
                   output.mPos = *p.GetRaw<Vec4>();
                else
-                  LANGULUS_OOPS(Access, "Unsupported place type");
+                  LglsError("Unsupported place type");
 
                if (firstVertex) {
                   dataRange.mMin = dataRange.mMax = output.mPos;
@@ -48,17 +48,17 @@ ASCIIGeometry::ASCIIGeometry(ASCIIRenderer* producer, Many const& descriptor)
                else dataRange.Embrace(output.mPos);
 
                if (n) {
-                  if (n.IsSimilar<Vec3>())
+                  if (n.IsSame<Vec3>())
                      output.mNor = *n.GetRaw<Vec3>();
                   else
-                     LANGULUS_OOPS(Access, "Unsupported normal type");
+                     LglsError("Unsupported normal type");
                }
 
                if (t) {
-                  if (t and t.IsSimilar<Vec2>())
+                  if (t and t.IsSame<Vec2>())
                      output.mTex = *t.GetRaw<Vec2>();
                   else
-                     LANGULUS_OOPS(Access, "Unsupported sampler type");
+                     LglsError("Unsupported sampler type");
                }
 
                if (c)
@@ -69,7 +69,7 @@ ASCIIGeometry::ASCIIGeometry(ASCIIRenderer* producer, Many const& descriptor)
             }
          );
 
-         mView.mTopology = MetaDataOf<A::Triangle>();
+         mView.mTopology = MetaDataOf<Math::Triangle>();
          mView.mPrimitiveCount = static_cast<uint32_t>(mVertices.GetCount() / 3);
          mView.mTextureMapping = Math::MapMode::Custom;
       }
@@ -82,7 +82,7 @@ ASCIIGeometry::ASCIIGeometry(ASCIIRenderer* producer, Many const& descriptor)
 /// Check if the cached geometry is made of triangles                         
 ///   @return true if made of triangle list, otherwise it is line list        
 auto ASCIIGeometry::MadeOfTriangles() const noexcept -> bool {
-   return mView.mTopology and mView.mTopology->IsSimilar<A::Triangle>();
+   return mView.mTopology and mView.mTopology->IsSame<Math::Triangle>();
 }
 
 /// Get the vertex array                                                      
