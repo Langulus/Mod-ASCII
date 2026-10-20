@@ -123,7 +123,7 @@ SCENARIO("Drawing solid polygons", "[renderer]") {
          "AssetsGeometry",
          "Physics"
       );
-      root.CreateUnits<Things::Window, Things::Renderer, Things::Layer, A::World>();
+      root.CreateUnits<Things::Window, Things::Renderer, Things::Layer, Things::World>();
 
       auto rect = root.CreateChild(Tags::Size {10, 5}, "Rectangles");
       rect->CreateUnit<Things::Renderable>();

@@ -16,9 +16,9 @@
 ///                                                                           
 /// Optimizes a geometry asset for cache friendly CPU bound rasterization     
 ///                                                                           
-struct ASCIIGeometry : A::Graphics, ProducedFrom<ASCIIRenderer> {
+struct ASCIIGeometry : Things::Graphics, ProducedFrom<ASCIIRenderer> {
    using CTTI_Abstract = No;
-   LANGULUS_BASES(A::Graphics);
+   LANGULUS_BASES(Things::Graphics);
 
    // An interleaved cache-friendly vertex format                       
    // We can't really do that much detail with an ASCII renderer, so    

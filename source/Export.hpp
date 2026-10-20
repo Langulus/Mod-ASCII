@@ -6,7 +6,7 @@
 /// SPDX-License-Identifier: GPL-3.0-or-later                                 
 ///                                                                           
 #pragma once
-#include <Langulus/Color.hpp>
+#include <Langulus/Math/Color.hpp>
 #include <Langulus/CppAPI/Material.hpp>
 #include <Langulus/CppAPI/Graphics.hpp>
 #include <Langulus/CppAPI/Platform.hpp>

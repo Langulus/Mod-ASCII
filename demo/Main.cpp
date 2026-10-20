@@ -41,7 +41,7 @@ int main(int, char**) {
       Things::Window,
       Things::Renderer,
       Things::Layer,
-      A::World,
+      Things::World,
       Things::InputGatherer
    >();
 

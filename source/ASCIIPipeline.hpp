@@ -73,9 +73,9 @@ enum class ASCIIStyle {
 ///                                                                           
 /// Rasterizes vector graphics into the backbuffer of an ASCIILayer           
 ///                                                                           
-struct ASCIIPipeline : A::Graphics, ProducedFrom<ASCIIRenderer> {
+struct ASCIIPipeline : Things::Graphics, ProducedFrom<ASCIIRenderer> {
    using CTTI_Abstract = No;
-   LANGULUS_BASES(A::Graphics);
+   LANGULUS_BASES(Things::Graphics);
 
 private:
    // Toggle depth testing and writing                                  

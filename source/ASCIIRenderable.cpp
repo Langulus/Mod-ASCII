@@ -100,15 +100,15 @@ auto ASCIIRenderable::GetOrCreatePipeline(
 
    // Construct a pipeline                                              
    bool usingGlobalPipeline = false;
-   auto construct = Recipe::From<ASCIIPipeline>();
+   auto recipe = Recipe::From<ASCIIPipeline>();
    auto color = SeekTag<Tags::Color>();
    if (color)
-      construct << color;
+      recipe << color;
    if (layer)
-      construct << layer;
+      recipe << layer;
 
    // Get, or create the pipeline                                       
-   Verbs::Create creator {Abandon(construct)};
+   Verbs::Create creator {Abandon(recipe)};
    GetRenderer()->Create(creator);
 
    creator->ForEachDeep([&](ASCIIPipeline& p) {

@@ -14,9 +14,9 @@
 ///                                                                           
 /// Optimizes a image asset for cache friendly CPU bound rasterization        
 ///                                                                           
-struct ASCIITexture : A::Graphics, ProducedFrom<ASCIIRenderer> {
+struct ASCIITexture : Things::Graphics, ProducedFrom<ASCIIRenderer> {
    using CTTI_Abstract = No;
-   LANGULUS_BASES(A::Graphics);
+   LANGULUS_BASES(Things::Graphics);
 
 private:
    ASCIIImage mImage;

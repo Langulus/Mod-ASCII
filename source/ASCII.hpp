@@ -14,9 +14,9 @@
 ///                                                                           
 /// Manages and produces ASCII renderers                                      
 ///                                                                           
-struct ASCII final : A::GraphicsModule {
+struct ASCII final : Things::GraphicsModule {
    using CTTI_Abstract = No;
-   LANGULUS_BASES(A::GraphicsModule);
+   LANGULUS_BASES(Things::GraphicsModule);
    LANGULUS_VERBS(Verbs::Create);
 
 protected:
