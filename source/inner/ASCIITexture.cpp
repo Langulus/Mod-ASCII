@@ -12,7 +12,7 @@
 ///   @param producer - the texture producer                                  
 ///   @param descriptor - the texture descriptor                              
 ASCIITexture::ASCIITexture(ASCIIRenderer* producer, Many const& descriptor)
-   : Resolvable   {this}
+   : Downcastable   {this}
    , ProducedFrom {producer, descriptor}
    , mImage       {producer} {
    descriptor.ForEachDeep([&](const Things::Image& content) {

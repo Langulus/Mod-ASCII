@@ -31,7 +31,7 @@ public:
    using CTTI_Abstract = No;
    LANGULUS_BASES(Things::Image);
 
-   ASCIIBuffer() : Resolvable {this} {}
+   ASCIIBuffer() : Downcastable {this} {}
 
    void Resize(int x, int y) {
       LglsAssumeDev(x and y, "Invalid resize dimensions");

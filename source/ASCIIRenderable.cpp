@@ -13,7 +13,7 @@
 ///   @param producer - the renderable producer                               
 ///   @param descriptor - the renderable descriptor                           
 ASCIIRenderable::ASCIIRenderable(ASCIILayer* producer, Many const& descriptor)
-   : Resolvable   {this}
+   : Downcastable   {this}
    , ProducedFrom {producer, descriptor} {
    VERBOSE_ASCII("Initializing...");
    Couple(descriptor);

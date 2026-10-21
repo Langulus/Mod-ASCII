@@ -14,7 +14,7 @@
 ///   @param producer - the camera producer                                   
 ///   @param descriptor - the camera descriptor                               
 ASCIILayer::ASCIILayer(ASCIIRenderer* producer, Many const& descriptor)
-   : Resolvable      {this}
+   : Downcastable      {this}
    , ProducedFrom    {producer, descriptor}
    , mFallbackCamera {this}
    , mImage          {producer} {

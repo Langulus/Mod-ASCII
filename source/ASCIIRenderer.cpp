@@ -14,7 +14,7 @@
 ///   @param producer - the renderer producer                                 
 ///   @param descriptor - the renderer descriptor                             
 ASCIIRenderer::ASCIIRenderer(ASCII* producer, Many const& descriptor)
-   : Resolvable   {this}
+   : Downcastable   {this}
    , ProducedFrom {producer, descriptor}
    , mBackbuffer  {this} {
    VERBOSE_ASCII("Initializing...");

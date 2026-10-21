@@ -10,7 +10,7 @@
 
 /// Default constructor                                                       
 ASCIIImage::ASCIIImage(ASCIIRenderer* renderer)
-   : Resolvable {this}
+   : Downcastable {this}
    , mRenderer  {renderer} {
    VERBOSE_ASCII("Initializing...");
    // Member arrays are commited as references to reduce boilerplate    

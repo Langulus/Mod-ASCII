@@ -12,7 +12,7 @@
 ///   @param producer - the camera producer                                   
 ///   @param descriptor - the camera descriptor                               
 ASCIICamera::ASCIICamera(ASCIILayer* producer, Many const& descriptor)
-   : Resolvable   {this}
+   : Downcastable   {this}
    , ProducedFrom {producer, descriptor} {
    VERBOSE_ASCII("Initializing...");
    Couple(descriptor);

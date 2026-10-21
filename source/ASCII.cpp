@@ -18,7 +18,7 @@ LANGULUS_DEFINE_MODULE(
 ///   @param system - the system that owns the module instance                
 ///   @param handle - the library handle                                      
 ASCII::ASCII(Runtime* runtime, Many const&)
-   : Resolvable {this}
+   : Downcastable {this}
    , Module     {runtime} {
    VERBOSE_ASCII("Initializing...");
    VERBOSE_ASCII("Initialized");
