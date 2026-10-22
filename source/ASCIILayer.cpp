@@ -136,7 +136,7 @@ void ASCIILayer::CompileLevelBatched(const ASCIICamera& cam, Level level) {
 ///   @param thing - entity to compile                                        
 ///   @param lod - the lod state to use                                       
 ///   @param cam - the camera to compile                                      
-void ASCIILayer::CompileThing(const Thing* thing, LOD& lod, const ASCIICamera& cam) {
+void ASCIILayer::CompileThing(Thing const* thing, LOD& lod, const ASCIICamera& cam) {
    // Iterate all renderables of the entity, which are part of this     
    // layer - disregard all others layers                               
    auto renderables = thing->GatherParts<ASCIIRenderable, Seek::Here>();

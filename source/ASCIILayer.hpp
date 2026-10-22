@@ -146,7 +146,7 @@ private:
    void CompileLevelBatched(const ASCIICamera&, Level);
    void CompileLevelHierarchical(const ASCIICamera&, Level);
 
-   void CompileThing(const Thing*, LOD&, const ASCIICamera&);
+   void CompileThing(Thing const*, LOD&, const ASCIICamera&);
    void CompileInstance(const ASCIIRenderable*, const Things::Instance*, LOD&, const ASCIICamera&);
    void CompileLight(const ASCIILight*, const Things::Instance*, LOD&, const ASCIICamera&);
 
