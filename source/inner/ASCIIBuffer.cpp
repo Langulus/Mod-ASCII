@@ -153,7 +153,7 @@ void ASCIIImage::Compare(Verb& verb) const {
    else if (verb.CastsTo<Text>()) {
       // Compare against other image files (need to be loaded by an     
       // asset module)                                                  
-      Verbs::Create rhs {Recipe::From<Image>(verb.GetArgument())};
+      Verbs::Create rhs {Recipe::From<Image>(verb.GetRHS())};
       verb << (CompareInner(mRenderer->RunIn(rhs)->As<Image>())
          ? Compared::Equal
          : Compared::Unequal);
