@@ -44,7 +44,7 @@ auto ASCIIRenderable::GetRenderer() const noexcept -> ASCIIRenderer* {
 /// This is the point where content might be generated upon request           
 ///   @param lod - information used to extract the best LOD                   
 ///   @return the VRAM geometry or nullptr if content is not available        
-auto ASCIIRenderable::GetGeometry(const LOD& lod) const -> const ASCIIGeometry* {
+auto ASCIIRenderable::GetGeometry(LOD const& lod) const -> const ASCIIGeometry* {
    const auto i = lod.GetAbsoluteIndex();
    if (not mLOD[i].mGeometry and mGeometryContent) {
       // Cache geometry to a more cache-friendly format                 
@@ -62,7 +62,7 @@ auto ASCIIRenderable::GetGeometry(const LOD& lod) const -> const ASCIIGeometry* 
 /// This is the point where content might be generated upon request           
 ///   @param lod - information used to extract the best LOD                   
 ///   @return the VRAM texture or nullptr if content is not available         
-auto ASCIIRenderable::GetTexture(const LOD& lod) const -> const ASCIITexture* {
+auto ASCIIRenderable::GetTexture(LOD const& lod) const -> const ASCIITexture* {
    const auto i = lod.GetAbsoluteIndex();
    if (not mLOD[i].mTexture and mTextureContent) {
       // Cache texture to a more cache-friendly format                  
@@ -87,7 +87,7 @@ auto ASCIIRenderable::GetColor() const -> RGBA {
 ///   @param layer - additional settings might be provided by the used layer  
 ///   @return the pipeline                                                    
 auto ASCIIRenderable::GetOrCreatePipeline(
-   const LOD& lod, const ASCIILayer* layer
+   LOD const& lod, const ASCIILayer* layer
 ) const -> ASCIIPipeline* {
    // Always return the predefined pipeline if available                
    if (mPredefinedPipeline)

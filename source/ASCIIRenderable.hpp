@@ -43,10 +43,10 @@ public:
    ASCIIRenderable(ASCIILayer*, Many const&);
 
    auto GetRenderer() const noexcept -> ASCIIRenderer*;
-   auto GetGeometry(const LOD&) const -> const ASCIIGeometry*;
-   auto GetTexture(const LOD&) const -> const ASCIITexture*;
+   auto GetGeometry(LOD const&) const -> const ASCIIGeometry*;
+   auto GetTexture(LOD const&) const -> const ASCIITexture*;
    auto GetColor() const -> RGBA;
-   auto GetOrCreatePipeline(const LOD&, const ASCIILayer*) const -> ASCIIPipeline*;
+   auto GetOrCreatePipeline(LOD const&, const ASCIILayer*) const -> ASCIIPipeline*;
 
    void Refresh();
    void Teardown();

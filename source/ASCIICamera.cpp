@@ -104,7 +104,7 @@ void ASCIICamera::Refresh() {
 /// Get view transformation for a given LOD state                             
 ///   @param lod - the level-of-detail state                                  
 ///   @return the view transformation for the camera                          
-Mat4 ASCIICamera::GetViewTransform(const LOD& lod) const {
+Mat4 ASCIICamera::GetViewTransform(LOD const& lod) const {
    if (not mInstances)
       return {};
 
@@ -114,7 +114,7 @@ Mat4 ASCIICamera::GetViewTransform(const LOD& lod) const {
 /// Get view transformation for a given level                                 
 ///   @param level - the level                                                
 ///   @return the view transformation for the camera                          
-Mat4 ASCIICamera::GetViewTransform(const Level& level) const {
+Mat4 ASCIICamera::GetViewTransform(Level const& level) const {
    if (not mInstances)
       return {};
 
