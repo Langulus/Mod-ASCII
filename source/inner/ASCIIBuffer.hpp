@@ -110,7 +110,7 @@ private:
    // provided by a filename                                            
    ASCIIRenderer* mRenderer;
 
-   bool CompareInner(const Things::Image&) const;
+   bool CompareInner(Things::Image const&) const;
 
 public:
    using CTTI_Abstract = No;

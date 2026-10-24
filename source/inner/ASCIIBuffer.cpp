@@ -11,7 +11,7 @@
 /// Default constructor                                                       
 ASCIIImage::ASCIIImage(ASCIIRenderer* renderer)
    : Downcastable {this}
-   , mRenderer  {renderer} {
+   , mRenderer    {renderer} {
    VERBOSE_ASCII("Initializing...");
    // Member arrays are commited as references to reduce boilerplate    
    // but beware of descriptor-content disparity if this Image class    
@@ -164,7 +164,7 @@ void ASCIIImage::Compare(Verb& verb) const {
 /// Accounts for inversed pixel formats                                       
 ///   @param rhs - the image to compare against                               
 ///   @return true if both images match exactly                               
-bool ASCIIImage::CompareInner(const Things::Image& rhs) const {
+bool ASCIIImage::CompareInner(Things::Image const& rhs) const {
    if (rhs.GetView() == GetView()
    and dynamic_cast<const ASCIIImage*>(&rhs)) {
       // We can batch-compare - both images are ASCII                   

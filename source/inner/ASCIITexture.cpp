@@ -12,17 +12,17 @@
 ///   @param producer - the texture producer                                  
 ///   @param descriptor - the texture descriptor                              
 ASCIITexture::ASCIITexture(ASCIIRenderer* producer, Many const& descriptor)
-   : Downcastable   {this}
+   : Downcastable {this}
    , ProducedFrom {producer, descriptor}
    , mImage       {producer} {
-   descriptor.ForEachDeep([&](const Things::Image& content) {
+   descriptor.ForEachDeep([&](Things::Image const& content) {
       Upload(content);
    });
 }
 
 /// Initialize from the provided content                                      
 ///   @param content - the abstract texture content interface                 
-void ASCIITexture::Upload(const Things::Image&) {
+void ASCIITexture::Upload(Things::Image const&) {
    TODO(); //compile into intermediate format
 }
 

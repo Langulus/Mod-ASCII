@@ -14,13 +14,13 @@
 ///   @param producer the producer of the part                                
 ///   @param descriptor the part descriptor                                   
 ASCIIGeometry::ASCIIGeometry(ASCIIRenderer* producer, Many const& descriptor)
-   : /*Resolvable   {this}
-   ,*/ ProducedFrom {producer, descriptor} {
+   : Downcastable {this}
+   , ProducedFrom {producer, descriptor} {
    bool firstVertex = true;
    Range4 dataRange;
 
    // Scan the descriptor                                               
-   descriptor.ForEachDeep([&](const Things::Mesh& mesh) {
+   descriptor.ForEachDeep([&](Things::Mesh const& mesh) {
       if (mesh.MadeOfTriangles()) {
          // Cache a triangle list                                       
          mesh.ForEachVertex(

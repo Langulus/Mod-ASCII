@@ -21,7 +21,7 @@ struct ASCIITexture : Things::Graphics, ProducedFrom<ASCIIRenderer> {
 private:
    ASCIIImage mImage;
 
-   void Upload(const Things::Image&);
+   void Upload(Things::Image const&);
 
 public:
    ASCIITexture(ASCIIRenderer*, Many const&);
