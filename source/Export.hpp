@@ -25,8 +25,8 @@ struct ASCIIImage;
 
 #if 1
    #define VERBOSE_ASCII_ENABLED()  1
-   #define VERBOSE_ASCII(...)       Logger::Verbose(Self(), __VA_ARGS__)
-   #define VERBOSE_ASCII_TAB(...)   const auto tab = Logger::VerboseTab(Self(), __VA_ARGS__)
+   #define VERBOSE_ASCII(...)       Logger::Verbose(this, __VA_ARGS__)
+   #define VERBOSE_ASCII_TAB(...)   const auto tab = Logger::VerboseTab(this, __VA_ARGS__)
 #else
    #define VERBOSE_ASCII_ENABLED()  0
    #define VERBOSE_ASCII(...)       LANGULUS(NOOP)

@@ -76,7 +76,7 @@ ASCIIGeometry::ASCIIGeometry(ASCIIRenderer* producer, Many const& descriptor)
       else TODO();
    });
 
-   Logger::Verbose(Self(), "Range is: ", dataRange);
+   Logger::Verbose(this, ": Range is: ", dataRange);
 }
 
 /// Check if the cached geometry is made of triangles                         

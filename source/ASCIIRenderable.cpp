@@ -49,7 +49,7 @@ auto ASCIIRenderable::GetGeometry(LOD const& lod) const -> const ASCIIGeometry* 
    if (not mLOD[i].mGeometry and mGeometryContent) {
       // Cache geometry to a more cache-friendly format                 
       Verbs::Create creator {
-         Recipe::From<ASCIIGeometry>(mGeometryContent->GetLOD(lod).Get())
+         Recipe::For<ASCIIGeometry>(mGeometryContent->GetLOD(lod).Get())
       };
       GetRenderer()->Create(creator);
       mLOD[i].mGeometry = creator->template As<ASCIIGeometry*>();
@@ -67,7 +67,7 @@ auto ASCIIRenderable::GetTexture(LOD const& lod) const -> const ASCIITexture* {
    if (not mLOD[i].mTexture and mTextureContent) {
       // Cache texture to a more cache-friendly format                  
       Verbs::Create creator {
-         Recipe::From<ASCIITexture>(mTextureContent->GetLOD(lod).Get())
+         Recipe::For<ASCIITexture>(mTextureContent->GetLOD(lod).Get())
       };
       GetRenderer()->Create(creator);
       mLOD[i].mTexture = creator->template As<ASCIITexture*>();
@@ -100,7 +100,7 @@ auto ASCIIRenderable::GetOrCreatePipeline(
 
    // Construct a pipeline                                              
    bool usingGlobalPipeline = false;
-   auto recipe = Recipe::From<ASCIIPipeline>();
+   auto recipe = Recipe::For<ASCIIPipeline>();
    auto color = SeekTag<Tags::Color>();
    if (color)
       recipe << color;

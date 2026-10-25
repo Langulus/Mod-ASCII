@@ -210,13 +210,13 @@ void ASCIILayer::CompileInstance(
          cachedCam = mHierarchicalSequence.FindIt(&cam);
       }
 
-      auto cachedLvl = cachedCam.GetValue().FindIt(-lod.mLevel);
+      auto cachedLvl = cachedCam.GetVal().FindIt(-lod.mLevel);
       if (not cachedLvl) {
-         cachedCam.GetValue().Insert(-lod.mLevel);
-         cachedLvl = cachedCam.GetValue().FindIt(-lod.mLevel);
+         cachedCam.GetVal().Insert(-lod.mLevel);
+         cachedLvl = cachedCam.GetVal().FindIt(-lod.mLevel);
       }
 
-      auto& cachedPipes = cachedLvl.GetValue().mPipelines;
+      auto& cachedPipes = cachedLvl.GetVal().mPipelines;
       cachedPipes << TPair { pipeline, PipeSubscriber {
          instance
             ? renderable->GetColor() * instance->GetColor()
@@ -233,19 +233,19 @@ void ASCIILayer::CompileInstance(
          cachedCam = mBatchSequence.FindIt(&cam);
       }
 
-      auto cachedLvl = cachedCam.GetValue().FindIt(-lod.mLevel);
+      auto cachedLvl = cachedCam.GetVal().FindIt(-lod.mLevel);
       if (not cachedLvl) {
-         cachedCam.GetValue().Insert(-lod.mLevel);
-         cachedLvl = cachedCam.GetValue().FindIt(-lod.mLevel);
+         cachedCam.GetVal().Insert(-lod.mLevel);
+         cachedLvl = cachedCam.GetVal().FindIt(-lod.mLevel);
       }
 
-      auto cachedPipe = cachedLvl.GetValue().mPipelines.FindIt(pipeline);
+      auto cachedPipe = cachedLvl.GetVal().mPipelines.FindIt(pipeline);
       if (not cachedPipe) {
-         cachedLvl.GetValue().mPipelines.Insert(pipeline);
-         cachedPipe = cachedLvl.GetValue().mPipelines.FindIt(pipeline);
+         cachedLvl.GetVal().mPipelines.Insert(pipeline);
+         cachedPipe = cachedLvl.GetVal().mPipelines.FindIt(pipeline);
       }
 
-      auto& cachedRends = cachedPipe.GetValue();
+      auto& cachedRends = cachedPipe.GetVal();
       cachedRends << PipeSubscriber {
          instance
             ? renderable->GetColor() * instance->GetColor()
@@ -290,7 +290,7 @@ void ASCIILayer::CompileLight(
       if (not cachedCam)
          return;
 
-      auto cachedLvl = cachedCam.GetValue().FindIt(-lod.mLevel);
+      auto cachedLvl = cachedCam.GetVal().FindIt(-lod.mLevel);
       if (not cachedLvl)
          return;
 
@@ -298,11 +298,11 @@ void ASCIILayer::CompileLight(
          ? instance->GetViewTransform(cachedLvl.GetKey())
          : Mat4 {};
 
-      cachedLvl.GetValue().mLights << LightSubscriber {
+      cachedLvl.GetVal().mLights << LightSubscriber {
          instance ? light->GetColor() * instance->GetColor()
                   : light->GetColor(),
-         instance ? light->GetProjection(cachedLvl.GetValue().mDepthRange) * MV.Invert()
-                  : light->GetProjection(cachedLvl.GetValue().mDepthRange),
+         instance ? light->GetProjection(cachedLvl.GetVal().mDepthRange) * MV.Invert()
+                  : light->GetProjection(cachedLvl.GetVal().mDepthRange),
          MV.GetPosition(),
          MV.GetView().Normalize(),
          light->mType
@@ -342,16 +342,16 @@ void ASCIILayer::RenderBatched(const RenderConfig& cfg) const {
    // Rendering from each custom camera's point of view                 
    for (const auto camera : mBatchSequence) {
       // Draw all relevant levels from the camera's POV                 
-      for (auto level : KeepIterator(camera.GetValue())) {
+      for (auto level : KeepIterator(camera.GetVal())) {
          const auto projectedView = camera.GetKey()->mProjection
             * camera.GetKey()->GetViewTransform(level.GetKey()).Invert();
 
          // Involve all relevant pipelines for that level               
-         for (const auto pipeline : level.GetValue().mPipelines) {
+         for (const auto pipeline : level.GetVal().mPipelines) {
             // Draw all renderables that use that pipeline in their     
             // current LOD state, from that particular level & POV      
-            for (auto const& instance : pipeline.GetValue())
-               pipeline.GetKey()->Render(this, projectedView, instance, level.GetValue().mLights);
+            for (auto const& instance : pipeline.GetVal())
+               pipeline.GetKey()->Render(this, projectedView, instance, level.GetVal().mLights);
 
             // Assemble after everything has been drawn                 
             pipeline.GetKey()->Assemble(this);
@@ -370,13 +370,13 @@ void ASCIILayer::RenderHierarchical(const RenderConfig& cfg) const {
    // Rendering from each custom camera's point of view                 
    for (const auto camera : mHierarchicalSequence) {
       // Draw all relevant levels from the camera's POV                 
-      for (auto level : KeepIterator(camera.GetValue())) {
+      for (auto level : KeepIterator(camera.GetVal())) {
          const auto projectedView = camera.GetKey()->mProjection
             * camera.GetKey()->GetViewTransform(level.GetKey()).Invert();
 
          // Render all relevant pipe-renderable pairs for that level    
-         for (auto const& instance : level.GetValue().mPipelines) {
-            instance.GetKey()->Render(this, projectedView, instance.GetValue(), level.GetValue().mLights);
+         for (auto const& instance : level.GetVal().mPipelines) {
+            instance.GetKey()->Render(this, projectedView, instance.GetVal(), level.GetVal().mLights);
 
             // Assemble after each draw in order to keep hierarchy      
             instance.GetKey()->Assemble(this);
