@@ -14,7 +14,7 @@
 ///                                                                           
 ///   ASCII intermediate geometry container                                   
 ///                                                                           
-/// Optimizes a geometry asset for cache friendly CPU bound rasterization     
+/// Optimizes a geometry art for cache friendly CPU bound rasterization       
 ///                                                                           
 struct ASCIIGeometry : Things::Graphics, ProducedFrom<ASCIIRenderer> {
    using CTTI_Abstract = No;

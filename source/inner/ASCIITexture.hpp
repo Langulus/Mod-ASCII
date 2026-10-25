@@ -12,7 +12,7 @@
 ///                                                                           
 ///   ASCII intermediate image container                                      
 ///                                                                           
-/// Optimizes a image asset for cache friendly CPU bound rasterization        
+/// Optimizes a image art for cache friendly CPU bound rasterization          
 ///                                                                           
 struct ASCIITexture : Things::Graphics, ProducedFrom<ASCIIRenderer> {
    using CTTI_Abstract = No;
