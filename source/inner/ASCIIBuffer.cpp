@@ -129,7 +129,7 @@ void ASCIIImage::Compare(Verb& verb) const {
       // Compare against colors                                         
       if (verb.GetCount() == 1) {
          // Check if texture is filled with a uniform color             
-         const auto cast = verb.AsCast<RGBA>();
+         const auto cast = verb.As<RGBA>();
          const auto color = mView.mReverseFormat
             ? RGBA (cast[2], cast[1], cast[0], cast[3])
             : cast;
@@ -141,22 +141,22 @@ void ASCIIImage::Compare(Verb& verb) const {
 
          verb << (matches == mView.GetPixelCount()
             ? Compared::Equal
-            : Compared::Unequal);
+            : Compared::Unordered);
       }
    }
    else if (verb.CastsTo<Things::Image>()) {
       // Compare against other images                                   
       verb << (CompareInner(verb->As<Image>())
          ? Compared::Equal
-         : Compared::Unequal);
+         : Compared::Unordered);
    }
    else if (verb.CastsTo<Text>()) {
       // Compare against other image files (need to be loaded by an     
       // art module)                                                    
-      Verbs::Create rhs {Recipe::For<Image>(verb.GetRHS())};
-      verb << (CompareInner(mRenderer->RunIn(rhs)->As<Image>())
+      Verbs::Create create {Recipe::For<Image>(verb.GetRHS())};
+      verb << (CompareInner(create.In(mRenderer)->template As<Image>())
          ? Compared::Equal
-         : Compared::Unequal);
+         : Compared::Unordered);
    }
 }
 

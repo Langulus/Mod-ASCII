@@ -62,7 +62,7 @@ ASCIIGeometry::ASCIIGeometry(ASCIIRenderer* producer, Many const& descriptor)
                }
 
                if (c)
-                  output.mCol = c.AsCast<RGBA, false>();
+                  output.mCol = c.As<RGBA/*, false*/>(); //TODO what was false about? Check AsCast in old code
 
                // Cache the vertex                                      
                mVertices << output;
@@ -76,13 +76,13 @@ ASCIIGeometry::ASCIIGeometry(ASCIIRenderer* producer, Many const& descriptor)
       else TODO();
    });
 
-   Logger::Verbose(this, ": Range is: ", dataRange);
+   Logger::Verbose(this, ": Range is ", dataRange);
 }
 
 /// Check if the cached geometry is made of triangles                         
 ///   @return true if made of triangle list, otherwise it is line list        
 auto ASCIIGeometry::MadeOfTriangles() const noexcept -> bool {
-   return mView.mTopology and mView.mTopology->IsSame<Math::Triangle>();
+   return mView.mTopology and mView.mTopology.IsSame(MetaDataOf<Triangle>());
 }
 
 /// Get the vertex array                                                      

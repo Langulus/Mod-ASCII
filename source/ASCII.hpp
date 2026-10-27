@@ -13,11 +13,10 @@
 ///   ASCII graphics module                                                   
 ///                                                                           
 /// Manages and produces ASCII renderers                                      
-///                                                                           
 struct ASCII final : Things::GraphicsModule {
-   using CTTI_Abstract = No;
-   LANGULUS_BASES(Things::GraphicsModule);
-   LANGULUS_VERBS(Verbs::Create);
+   using CTTI_Abstract  = No;
+   using CTTI_Bases     = Things::GraphicsModule;
+   using CTTI_Ability   = Verbs::Create;
 
 protected:
    friend struct ASCIIRenderer;
