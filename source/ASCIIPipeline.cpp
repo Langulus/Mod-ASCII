@@ -83,7 +83,7 @@ void ASCIIPipeline::Render(
 /// I modified the code, so that it works in clipspace.                       
 template<int AXIS>
 std::vector<Vec4> ClipLine(const std::vector<Vec4>& vertices) {
-   auto isInside = [](const Vec4& p) {
+   auto isInside = [](Vec4 const& p) {
       return p[AXIS] > -p.w and p[AXIS] < p.w;
    };
 
