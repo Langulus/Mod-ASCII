@@ -10,10 +10,10 @@
 
 
 /// Descriptor constructor                                                    
-///   @param producer - the renderable producer                               
-///   @param descriptor - the renderable descriptor                           
+///   @param producer the renderable producer                                 
+///   @param descriptor the renderable descriptor                             
 ASCIIRenderable::ASCIIRenderable(ASCIILayer* producer, Many const& descriptor)
-   : Downcastable   {this}
+   : Downcastable {this}
    , ProducedFrom {producer, descriptor} {
    VERBOSE_ASCII("Initializing...");
    Couple(descriptor);
@@ -42,9 +42,9 @@ auto ASCIIRenderable::GetRenderer() const noexcept -> ASCIIRenderer* {
 
 /// Get VRAM geometry corresponding to an octave of this renderable           
 /// This is the point where content might be generated upon request           
-///   @param lod - information used to extract the best LOD                   
+///   @param lod information used to extract the best LOD                     
 ///   @return the VRAM geometry or nullptr if content is not available        
-auto ASCIIRenderable::GetGeometry(LOD const& lod) const -> const ASCIIGeometry* {
+auto ASCIIRenderable::GetGeometry(LOD const& lod) const -> ASCIIGeometry const* {
    const auto i = lod.GetAbsoluteIndex();
    if (not mLOD[i].mGeometry and mGeometryContent) {
       // Cache geometry to a more cache-friendly format                 
@@ -60,9 +60,9 @@ auto ASCIIRenderable::GetGeometry(LOD const& lod) const -> const ASCIIGeometry* 
 
 /// Get VRAM texture corresponding to an octave of this renderable            
 /// This is the point where content might be generated upon request           
-///   @param lod - information used to extract the best LOD                   
+///   @param lod information used to extract the best LOD                     
 ///   @return the VRAM texture or nullptr if content is not available         
-auto ASCIIRenderable::GetTexture(LOD const& lod) const -> const ASCIITexture* {
+auto ASCIIRenderable::GetTexture(LOD const& lod) const -> ASCIITexture const* {
    const auto i = lod.GetAbsoluteIndex();
    if (not mLOD[i].mTexture and mTextureContent) {
       // Cache texture to a more cache-friendly format                  
@@ -77,17 +77,16 @@ auto ASCIIRenderable::GetTexture(LOD const& lod) const -> const ASCIITexture* {
 }
 
 /// Get uniform color                                                         
-///   @return the color                                                       
 auto ASCIIRenderable::GetColor() const -> RGBA {
    return *mColor;
 }
 
 /// Create GPU pipeline able to utilize geometry, textures and shaders        
-///   @param lod - information used to extract the best LOD                   
-///   @param layer - additional settings might be provided by the used layer  
+///   @param lod information used to extract the best LOD                     
+///   @param layer additional settings might be provided by the used layer    
 ///   @return the pipeline                                                    
 auto ASCIIRenderable::GetOrCreatePipeline(
-   LOD const& lod, const ASCIILayer* layer
+   LOD const& lod, ASCIILayer const* layer
 ) const -> ASCIIPipeline* {
    // Always return the predefined pipeline if available                
    if (mPredefinedPipeline)

@@ -20,7 +20,6 @@
 ///   This intermediate image is required, because depending on the pipeline's
 /// style, a different set of symbols are used, each requiring a different    
 /// resolution and pixel->symbol mapping.                                     
-///                                                                           
 template<class T>
 struct ASCIIBuffer final : Things::Image {
 private:
@@ -28,8 +27,8 @@ private:
    mutable TMany<T> mData;
 
 public:
-   using CTTI_Abstract = No;
-   LANGULUS_BASES(Things::Image);
+   using CTTI_Abstract  = No;
+   using CTTI_Bases     = Things::Image;
 
    ASCIIBuffer() : Downcastable {this} {}
 
@@ -64,8 +63,7 @@ public:
       using F = Deref<decltype(call)>;
       using A = ArgumentOf<F>;
       using R = ReturnOf<F>;
-      static_assert(CT::Similar<A, T>,
-         "Pixel iterator must be CT::Similar to T");
+      static_assert(Same<A, T>, "Pixel iterator must be CT::Similar to T");
 
       [[maybe_unused]] size_t counter = 0;
       for (uint32_t y = 0; y < mView.mHeight; ++y) {
@@ -96,7 +94,6 @@ public:
 ///                                                                           
 /// Used for a backbuffer by the ASCII renderer, as well as a target type     
 /// to Verbs::Interpret as, in order to render ASCII graphics                 
-///                                                                           
 struct ASCIIImage final : Things::Image {
    using Style = Logger::Emphasis;
 
@@ -113,9 +110,9 @@ private:
    bool CompareInner(Things::Image const&) const;
 
 public:
-   using CTTI_Abstract = No;
-   LANGULUS_BASES(Things::Image);
-   LANGULUS_VERBS(Verbs::Compare);
+   using CTTI_Abstract  = No;
+   using CTTI_Bases     = Things::Image;
+   using CTTI_Ability   = Verbs::Compare;
 
    ASCIIImage() = delete;
    ASCIIImage(ASCIIRenderer*);
@@ -134,7 +131,7 @@ public:
    auto GetPixel(int x, int y) const -> Pixel;
    void Fill(Token, RGBAf fg = Colors::White, RGBAf bg = Colors::Black, Style = {});
    void Compare(Verb&) const;
-   void Copy(const ASCIIImage&);
+   void Copy(ASCIIImage const&);
    auto ForEachPixel(auto&&) const;
    void Reset();
 };

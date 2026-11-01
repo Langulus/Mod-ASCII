@@ -34,8 +34,6 @@ void ASCIIImage::Reset() {
 }
 
 /// Resize the image                                                          
-///   @param x - new width                                                    
-///   @param y - new height                                                   
 void ASCIIImage::Resize(int x, int y) {
    LglsAssumeDev(x and y, "Invalid resize dimensions");
    if (x == static_cast<int>(mView.mWidth)
@@ -60,8 +58,6 @@ void ASCIIImage::Resize(int x, int y) {
 }
 
 /// Get a pixel at coordinates x, y                                           
-///   @param x - the x coordinate                                             
-///   @param y - the y coordinate                                             
 ///   @return the pixel interface                                             
 ASCIIImage::Pixel ASCIIImage::GetPixel(int x, int y) const {
    LglsAssumeDev(x < static_cast<int>(mView.mWidth) and x >= 0,
@@ -79,10 +75,10 @@ ASCIIImage::Pixel ASCIIImage::GetPixel(int x, int y) const {
 }
 
 /// Fill the image with a single symbol and style                             
-///   @param s - the symbol that will be displayed everywhere                 
-///   @param fg - the color that will be used for the background              
-///   @param bg - the color that will be used for the foreground              
-///   @param f - the emphasis that will be used                               
+///   @param s  the symbol that will be displayed everywhere                  
+///   @param fg the color that will be used for the background                
+///   @param bg the color that will be used for the foreground                
+///   @param f  the emphasis that will be used                                
 void ASCIIImage::Fill(::std::string_view s, RGBAf fg, RGBAf bg, Style f) {
    mSymbols.Fill(s);
    mFgColors.Fill(fg);
@@ -91,7 +87,7 @@ void ASCIIImage::Fill(::std::string_view s, RGBAf fg, RGBAf bg, Style f) {
 }
 
 /// Iterate all pixels using the local Pixel representation                   
-///   @param call - the function to execute for each pixel                    
+///   @param call the function to execute for each pixel                      
 ///   @return the number of pixels that were iterated                         
 auto ASCIIImage::ForEachPixel(auto&& call) const {
    using F = Deref<decltype(call)>;
@@ -123,7 +119,7 @@ bool ASCIIImage::Pixel::operator == (const RGBAf& color) const noexcept {
 }
 
 /// Compare image to another image/uniform color, etc.                        
-///   @param verb - the comparison verb                                       
+///   @param verb the comparison verb                                         
 void ASCIIImage::Compare(Verb& verb) const {
    if (verb.CastsTo<Math::Color>()) {
       // Compare against colors                                         
@@ -162,7 +158,7 @@ void ASCIIImage::Compare(Verb& verb) const {
 
 /// Inner pixel-by-pixel comparison                                           
 /// Accounts for inversed pixel formats                                       
-///   @param rhs - the image to compare against                               
+///   @param rhs the image to compare against                                 
 ///   @return true if both images match exactly                               
 bool ASCIIImage::CompareInner(Things::Image const& rhs) const {
    if (rhs.GetView() == GetView()
@@ -185,8 +181,8 @@ bool ASCIIImage::CompareInner(Things::Image const& rhs) const {
 }
 
 /// Copy another image                                                        
-///   @param other - the image to copy                                        
-void ASCIIImage::Copy(const ASCIIImage& other) {
+///   @param other the image to copy                                          
+void ASCIIImage::Copy(ASCIIImage const& other) {
    for (uint32_t y = 0; y < GetView().mHeight; ++y) {
       for (uint32_t x = 0; x < GetView().mWidth; ++x) {
          auto to = GetPixel(x, y);

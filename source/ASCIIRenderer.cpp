@@ -6,15 +6,16 @@
 /// SPDX-License-Identifier: GPL-3.0-or-later                                 
 ///                                                                           
 #include "ASCII.hpp"
+#include <Langulus/Profiler.hpp>
 #include <Langulus/CppAPI/Platform.hpp>
 #include <set>
 
 
 /// Descriptor constructor                                                    
-///   @param producer - the renderer producer                                 
-///   @param descriptor - the renderer descriptor                             
+///   @param producer the renderer producer                                   
+///   @param descriptor the renderer descriptor                               
 ASCIIRenderer::ASCIIRenderer(ASCII* producer, Many const& descriptor)
-   : Downcastable   {this}
+   : Downcastable {this}
    , ProducedFrom {producer, descriptor}
    , mBackbuffer  {this} {
    VERBOSE_ASCII("Initializing...");
@@ -59,7 +60,7 @@ void ASCIIRenderer::Refresh() {
 
 /// Introduce renderables, cameras, lights, shaders, textures, geometry       
 /// Also initialized the renderer if a window is provided                     
-///   @param verb - creation verb                                             
+///   @param verb creation verb                                               
 void ASCIIRenderer::Create(Verb& verb) {
    mLayers.Create(this, verb);
    mPipelines.Create(this, verb);
@@ -68,10 +69,10 @@ void ASCIIRenderer::Create(Verb& verb) {
 }
 
 /// Interpret the renderer as an image, i.e. take an ascii "screenshot"       
-///   @param verb - interpret verb                                            
+///   @param verb interpret verb                                              
 void ASCIIRenderer::Interpret(Verb& verb) {
    verb.ForEach([&](DMeta meta) {
-      if (meta->template CastsTo<Things::Image>())
+      if (meta.CastsTo(MetaDataOf<Things::Image>()))
          verb << &mBackbuffer;
    });
 }
@@ -118,7 +119,7 @@ void ASCIIRenderer::Draw() {
 
 /// Get the window interface                                                  
 ///   @return the window interface                                            
-auto ASCIIRenderer::GetWindow() const noexcept -> const Things::Window* {
+auto ASCIIRenderer::GetWindow() const noexcept -> Things::Window const* {
    return mWindow;
 }
 

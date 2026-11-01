@@ -21,9 +21,9 @@ struct PipeSubscriber {
    // Instance transformation                                           
    Mat4 transform;
    // Mesh                                                              
-   const ASCIIGeometry* mesh;
+   ASCIIGeometry const* mesh;
    // Texture                                                           
-   const ASCIITexture*  texture;
+   ASCIITexture const*  texture;
 };
 
 /// A compiled light                                                          
@@ -72,10 +72,9 @@ enum class ASCIIStyle {
 ///   ASCII pipeline                                                          
 ///                                                                           
 /// Rasterizes vector graphics into the backbuffer of an ASCIILayer           
-///                                                                           
 struct ASCIIPipeline : Things::Graphics, ProducedFrom<ASCIIRenderer> {
-   using CTTI_Abstract = No;
-   LANGULUS_BASES(Things::Graphics);
+   using CTTI_Abstract  = No;
+   using CTTI_Bases     = Things::Graphics;
 
 private:
    // Toggle depth testing and writing                                  
@@ -121,27 +120,27 @@ public:
 
    void Clear(const RGBAf&, float);
    void Resize(int x, int y);
-   void Render(const ASCIILayer*, const Mat4&, const PipeSubscriber&, const TMany<LightSubscriber>&) const;
-   void Assemble(const ASCIILayer*) const;
+   void Render(ASCIILayer const*, Mat4 const&, PipeSubscriber const&, const TMany<LightSubscriber>&) const;
+   void Assemble(ASCIILayer const*) const;
 
 private:
    struct PipelineState {
-      const ASCIILayer* mLayer;
+      ASCIILayer const* mLayer;
       const Scale2 mResolution;
-      const Mat4& mProjectedView;
-      const PipeSubscriber& mSubscriber;
+      Mat4 const& mProjectedView;
+      PipeSubscriber const& mSubscriber;
       const TMany<LightSubscriber>& mLights;
    };
 
-   void RasterizeMesh(const PipelineState&) const;
+   void RasterizeMesh(PipelineState const&) const;
 
    template<bool LIT, bool DEPTH, bool SMOOTH, bool FOG, bool COLORIZE, bool SHADOWED>
    void RasterizeTriangle(
-      const PipelineState&,
-      const Mat4&,
-      const ASCIIGeometry::Vertex*,
+      PipelineState const&,
+      Mat4 const&,
+      ASCIIGeometry::Vertex const*,
       const Triangle4&
    ) const;
 
-   void ClipTriangle(const Mat4&, const ASCIIGeometry::Vertex*, auto&&) const;
+   void ClipTriangle(Mat4 const&, ASCIIGeometry::Vertex const*, auto&&) const;
 };

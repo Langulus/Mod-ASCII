@@ -10,6 +10,7 @@
 #include <Langulus/CppAPI/Material.hpp>
 #include <Langulus/CppAPI/Graphics.hpp>
 #include <Langulus/CppAPI/Platform.hpp>
+#include <Langulus/Math/Range.hpp>
 
 using namespace Langulus;
 using namespace Math;
@@ -22,6 +23,8 @@ struct ASCIILight;
 struct ASCIIRenderable;
 struct ASCIIPipeline;
 struct ASCIIImage;
+
+using LevelRange = TRange<TVector<Level, 1>>;
 
 #if 1
    #define VERBOSE_ASCII_ENABLED()  1

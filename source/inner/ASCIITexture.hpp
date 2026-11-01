@@ -13,10 +13,9 @@
 ///   ASCII intermediate image container                                      
 ///                                                                           
 /// Optimizes a image art for cache friendly CPU bound rasterization          
-///                                                                           
 struct ASCIITexture : Things::Graphics, ProducedFrom<ASCIIRenderer> {
-   using CTTI_Abstract = No;
-   LANGULUS_BASES(Things::Graphics);
+   using CTTI_Abstract  = No;
+   using CTTI_Bases     = Things::Graphics;
 
 private:
    ASCIIImage mImage;
@@ -26,5 +25,5 @@ private:
 public:
    ASCIITexture(ASCIIRenderer*, Many const&);
 
-   auto GetImage() const noexcept -> const ASCIIImage&;
+   auto GetImage() const noexcept -> ASCIIImage const&;
 };

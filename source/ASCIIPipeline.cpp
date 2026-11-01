@@ -6,14 +6,15 @@
 /// SPDX-License-Identifier: GPL-3.0-or-later                                 
 ///                                                                           
 #include "ASCII.hpp"
+#include <Langulus/Profiler.hpp>
 #include <bitset>
 
 
 /// Descriptor constructor                                                    
-///   @param producer - the pipeline producer                                 
-///   @param descriptor - the pipeline descriptor                             
+///   @param producer the pipeline producer                                   
+///   @param descriptor the pipeline descriptor                               
 ASCIIPipeline::ASCIIPipeline(ASCIIRenderer* producer, Many const& descriptor)
-   : Downcastable   {this}
+   : Downcastable {this}
    , ProducedFrom {producer, descriptor} {
    VERBOSE_ASCII("Initializing graphics pipeline from: ", descriptor);
    descriptor.ForEach(
@@ -40,16 +41,14 @@ ASCIIPipeline::ASCIIPipeline(ASCIIRenderer* producer, Many const& descriptor)
 }
 
 /// Resize the pipeline's internal buffer                                     
-///   @param color - uniform color value                                      
-///   @param depth - uniform depth value                                      
+///   @param color uniform color value                                        
+///   @param depth uniform depth value                                        
 void ASCIIPipeline::Clear(const RGBAf& color, float depth) {
    mBuffer.Fill(color);
    mDepth.Fill(depth);
 }
 
 /// Resize the pipeline's internal buffer                                     
-///   @param x - buffer width                                                 
-///   @param y - buffer height                                                
 void ASCIIPipeline::Resize(int x, int y) {
    x *= mBufferScale.x;
    y *= mBufferScale.y;
@@ -59,14 +58,14 @@ void ASCIIPipeline::Resize(int x, int y) {
 }
 
 /// Draw a single renderable (used in hierarchical drawing)                   
-///   @param layer - the layer that we're rendering to                        
-///   @param pv - the projection-view matrix                                  
-///   @param sub - prepared renderable instance LOD to draw                   
-///   @param lights - list of lights to apply                                 
+///   @param layer the layer that we're rendering to                          
+///   @param pv the projection-view matrix                                    
+///   @param sub prepared renderable instance LOD to draw                     
+///   @param lights list of lights to apply                                   
 void ASCIIPipeline::Render(
-   const ASCIILayer* layer,
-   const Mat4& pv,
-   const PipeSubscriber& sub,
+   ASCIILayer const* layer,
+   Mat4 const& pv,
+   PipeSubscriber const& sub,
    const TMany<LightSubscriber>& lights
 ) const {
    LglsProfile();
@@ -129,11 +128,11 @@ std::vector<Vec4> ClipLine(const std::vector<Vec4>& vertices) {
 }
 
 /// Clip a triangle depending on how many vertices are in viewport            
-///   @param MVP - model*view*projection matrix                               
-///   @param triangle - the triangle to clip                                  
-///   @param rasterizer - rasterizer to use                                   
+///   @param MVP model*view*projection matrix                                 
+///   @param triangle the triangle to clip                                    
+///   @param rasterizer rasterizer to use                                     
 void ASCIIPipeline::ClipTriangle(
-   const Mat4& MVP, const ASCIIGeometry::Vertex* triangle, auto&& rasterizer
+   Mat4 const& MVP, ASCIIGeometry::Vertex const* triangle, auto&& rasterizer
 ) const {
    // Transform to viewspace                                            
    std::vector<Vec4> points;
@@ -160,20 +159,20 @@ void ASCIIPipeline::ClipTriangle(
 }
 
 /// Rasterize a single triangle                                               
-///   @tparam LIT - whether or not to calculate lights and speculars          
-///   @tparam DEPTH - whether or not to perform depth test and write depth    
-///   @tparam SMOOTH - interpolate normals/colors inside trianlges            
-///   @tparam FOG - apply fog                                                 
-///   @tparam COLORIZE - apply vertex colors                                  
-///   @tparam SHADOWED - apply shadowmaps                                     
-///   @param ps - the pipeline state                                          
-///   @param M - precomputed world matrix for light computation               
-///   @param triangle - three consecutive original vertices (object space)    
-///   @param clipped - a clipped triangle in NDC space                        
+///   @tparam LIT whether or not to calculate lights and speculars            
+///   @tparam DEPTH whether or not to perform depth test and write depth      
+///   @tparam SMOOTH interpolate normals/colors inside trianlges              
+///   @tparam FOG apply fog                                                   
+///   @tparam COLORIZE apply vertex colors                                    
+///   @tparam SHADOWED apply shadowmaps                                       
+///   @param ps the pipeline state                                            
+///   @param M precomputed world matrix for light computation                 
+///   @param triangle three consecutive original vertices (object space)      
+///   @param clipped a clipped triangle in NDC space                          
 template<bool LIT, bool DEPTH, bool SMOOTH, bool FOG, bool COLORIZE, bool SHADOWED>
 void ASCIIPipeline::RasterizeTriangle(
-   const PipelineState& ps, const Mat4& M,
-   const ASCIIGeometry::Vertex* triangle,
+   PipelineState const& ps, Mat4 const& M,
+   ASCIIGeometry::Vertex const* triangle,
    const Triangle4& clipped
 ) const {
    LglsProfile();
@@ -412,8 +411,8 @@ void ASCIIPipeline::RasterizeTriangle(
    }
 
 /// Rasterize all primitives inside a mesh                                    
-///   @param ps - pipeline state                                              
-void ASCIIPipeline::RasterizeMesh(const PipelineState& ps) const {
+///   @param ps pipeline state                                                
+void ASCIIPipeline::RasterizeMesh(PipelineState const& ps) const {
    const auto M   = ps.mSubscriber.transform;
    const auto MVP = ps.mProjectedView * M;
    auto& mesh     = ps.mSubscriber.mesh;
@@ -477,8 +476,8 @@ namespace
 }
 
 /// Merge the pipeline with the layer's image, assembling any symbols         
-///   @param layer - the layer that we're rendering to                        
-void ASCIIPipeline::Assemble(const ASCIILayer* layer) const {
+///   @param layer the layer that we're rendering to                          
+void ASCIIPipeline::Assemble(ASCIILayer const* layer) const {
    LglsProfile();
 
    auto gradient3x3 = [&](

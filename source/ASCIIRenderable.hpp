@@ -7,6 +7,7 @@
 ///                                                                           
 #pragma once
 #include "Export.hpp"
+#include <Langulus/TMany.hpp>
 
 
 ///                                                                           
@@ -15,7 +16,6 @@
 /// Gives things the ability to be drawn to screen. The part gathers relevant 
 /// graphical resources from the context, and generates a graphical pipeline  
 /// capable of visualizing them                                               
-///                                                                           
 struct ASCIIRenderable final : Things::Renderable, ProducedFrom<ASCIILayer> {
    using CTTI_Abstract  = No;
    using CTTI_Producer  = ASCIILayer;
@@ -26,8 +26,8 @@ protected:
 
    // Precompiled instances and levels, updated on Refresh()            
    Pin<RGBA, Tags::Color> mColor = Colors::White;
-   TMany<const Things::Instance*> mInstances;
-   TRange<Level> mLevelRange;
+   TMany<Things::Instance const*> mInstances;
+   LevelRange mLevelRange;
    Ref<Things::Mesh>  mGeometryContent;
    Ref<Things::Image> mTextureContent;
    mutable Ref<ASCIIPipeline> mPredefinedPipeline;
@@ -43,10 +43,10 @@ public:
    ASCIIRenderable(ASCIILayer*, Many const&);
 
    auto GetRenderer() const noexcept -> ASCIIRenderer*;
-   auto GetGeometry(LOD const&) const -> const ASCIIGeometry*;
-   auto GetTexture(LOD const&) const -> const ASCIITexture*;
+   auto GetGeometry(LOD const&) const -> ASCIIGeometry const*;
+   auto GetTexture(LOD const&) const -> ASCIITexture const*;
    auto GetColor() const -> RGBA;
-   auto GetOrCreatePipeline(LOD const&, const ASCIILayer*) const -> ASCIIPipeline*;
+   auto GetOrCreatePipeline(LOD const&, ASCIILayer const*) const -> ASCIIPipeline*;
 
    void Refresh();
    void Teardown();

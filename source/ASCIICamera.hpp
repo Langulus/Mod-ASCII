@@ -8,21 +8,17 @@
 #pragma once
 #include "Export.hpp"
 #include <Langulus/CppAPI/Physical.hpp>
-#include <Langulus/Math/Range.hpp>
  
-using LevelRange = TRange<Level>;
-
 
 ///                                                                           
 ///   ASCII Camera part                                                       
 ///                                                                           
 /// Provides fine control over camera properties, like field of view,         
 /// screen viewport, aspect ratio, etc.                                       
-///                                                                           
 struct ASCIICamera final : Things::Camera, ProducedFrom<ASCIILayer> {
-   using CTTI_Abstract = No;
-   using CTTI_Producer = ASCIILayer;
-   LANGULUS_BASES(Things::Camera);
+   using CTTI_Abstract  = No;
+   using CTTI_Producer  = ASCIILayer;
+   using CTTI_Bases     = Things::Camera;
 
 protected:
    friend struct ASCIILayer;
@@ -41,7 +37,7 @@ protected:
    // we can observe stuff slightly smaller than human level            
    LevelRange mObservableRange {Level::Default, Level::Max};
    // Camera instances, for different points of view                    
-   TMany<const Things::Instance*> mInstances;
+   TMany<Things::Instance const*> mInstances;
    // Inverse of mProjection                                            
    Mat4 mProjectionInverted;
    // The screen resolution (can be bigger than the viewport)           

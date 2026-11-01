@@ -15,10 +15,9 @@
 ///   ASCII intermediate geometry container                                   
 ///                                                                           
 /// Optimizes a geometry art for cache friendly CPU bound rasterization       
-///                                                                           
 struct ASCIIGeometry : Things::Graphics, ProducedFrom<ASCIIRenderer> {
-   using CTTI_Abstract = No;
-   LANGULUS_BASES(Things::Graphics);
+   using CTTI_Abstract  = No;
+   using CTTI_Bases     = Things::Graphics;
 
    // An interleaved cache-friendly vertex format                       
    // We can't really do that much detail with an ASCII renderer, so    

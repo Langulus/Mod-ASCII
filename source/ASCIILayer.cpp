@@ -8,13 +8,14 @@
 #include "ASCII.hpp"
 #include <Langulus/CppAPI/Platform.hpp>
 #include <Langulus/CppAPI/Physical.hpp>
+#include <Langulus/Profiler.hpp>
 
 
 /// Descriptor constructor                                                    
-///   @param producer - the camera producer                                   
-///   @param descriptor - the camera descriptor                               
+///   @param producer the camera producer                                     
+///   @param descriptor the camera descriptor                                 
 ASCIILayer::ASCIILayer(ASCIIRenderer* producer, Many const& descriptor)
-   : Downcastable      {this}
+   : Downcastable    {this}
    , ProducedFrom    {producer, descriptor}
    , mFallbackCamera {this}
    , mImage          {producer} {
@@ -36,7 +37,7 @@ void ASCIILayer::Teardown() {
 }
 
 /// Create/destroy renderables, cameras, lights                               
-///   @param verb - creation verb                                             
+///   @param verb creation verb                                               
 void ASCIILayer::Create(Verb& verb) {
    mCameras.Create(this, verb);
    mRenderables.Create(this, verb);
@@ -44,7 +45,7 @@ void ASCIILayer::Create(Verb& verb) {
 }
 
 /// Generate the draw list for the layer                                      
-///   @param pipelines - [out] a set of all used pipelines                    
+///   @param pipelines [out] a set of all used pipelines                      
 ///   @return true if anything renderable was generated                       
 void ASCIILayer::Generate() {
    mBatchSequence.Clear();
@@ -95,9 +96,9 @@ void ASCIILayer::CompileLevels() {
 }
 
 /// Compile a single level's instances hierarchical style                     
-///   @param cam - the camera to compile                                      
-///   @param level - the level to compile                                     
-void ASCIILayer::CompileLevelHierarchical(const ASCIICamera& cam, Level level) {
+///   @param cam the camera to compile                                        
+///   @param level the level to compile                                       
+void ASCIILayer::CompileLevelHierarchical(ASCIICamera const& cam, Level level) {
    // Construct view and frustum for culling                            
    LOD lod {level, cam.GetViewTransform(level), cam.mProjection};
 
@@ -107,9 +108,9 @@ void ASCIILayer::CompileLevelHierarchical(const ASCIICamera& cam, Level level) {
 }
 
 /// Compile a single level's instances batched style                          
-///   @param cam - the camera to compile                                      
-///   @param level - the level to compile                                     
-void ASCIILayer::CompileLevelBatched(const ASCIICamera& cam, Level level) {
+///   @param cam the camera to compile                                        
+///   @param level the level to compile                                       
+void ASCIILayer::CompileLevelBatched(ASCIICamera const& cam, Level level) {
    // Construct view and frustum for culling                            
    LOD lod {level, cam.GetViewTransform(level), cam.mProjection};
 
@@ -133,10 +134,10 @@ void ASCIILayer::CompileLevelBatched(const ASCIICamera& cam, Level level) {
 
 /// Compile an entity and all of its children entities                        
 /// Used only for hierarchical styled layers                                  
-///   @param thing - entity to compile                                        
-///   @param lod - the lod state to use                                       
-///   @param cam - the camera to compile                                      
-void ASCIILayer::CompileThing(Thing const* thing, LOD& lod, const ASCIICamera& cam) {
+///   @param thing entity to compile                                          
+///   @param lod the lod state to use                                         
+///   @param cam the camera to compile                                        
+void ASCIILayer::CompileThing(Thing const* thing, LOD& lod, ASCIICamera const& cam) {
    // Iterate all renderables of the entity, which are part of this     
    // layer - disregard all others layers                               
    auto renderables = thing->GatherParts<ASCIIRenderable, Seek::Here>();
@@ -171,14 +172,14 @@ void ASCIILayer::CompileThing(Thing const* thing, LOD& lod, const ASCIICamera& c
 
 /// Compile a single renderable instance, culling it if able                  
 /// This will create or reuse a pipeline, capable of rendering it             
-///   @param renderable - the renderable to compile                           
-///   @param instance - the instance to compile                               
-///   @param lod - the lod state to use                                       
-///   @param cam - the camera to compile                                      
+///   @param renderable the renderable to compile                             
+///   @param instance the instance to compile                                 
+///   @param lod the lod state to use                                         
+///   @param cam the camera to compile                                        
 void ASCIILayer::CompileInstance(
-   const ASCIIRenderable* renderable,
-   const Things::Instance* instance,
-   LOD& lod, const ASCIICamera& cam
+   ASCIIRenderable const* renderable,
+   Things::Instance const* instance,
+   LOD& lod, ASCIICamera const& cam
 ) {
    if (not instance) {
       // No instances, so culling based only on default level           
@@ -262,14 +263,14 @@ void ASCIILayer::CompileInstance(
 ///      and compiling them relies on the precompiled renderables to hint at  
 ///      what depth range is relevant in the scene, so that the shadowmaps    
 ///      are packed as tightly as possible                                    
-///   @param light - the light to compile                                     
-///   @param instance - the instance to compile                               
-///   @param lod - the lod state to use                                       
-///   @param cam - the camera to compile                                      
+///   @param light the light to compile                                       
+///   @param instance the instance to compile                                 
+///   @param lod the lod state to use                                         
+///   @param cam the camera to compile                                        
 void ASCIILayer::CompileLight(
-   const ASCIILight* light,
-   const Things::Instance* instance,
-   LOD& lod, const ASCIICamera& cam
+   ASCIILight const* light,
+   Things::Instance const* instance,
+   LOD& lod, ASCIICamera const& cam
 ) {
    if (not instance) {
       // No instances, so culling based only on default level           
@@ -317,8 +318,8 @@ void ASCIILayer::CompileLight(
 }
 
 /// Render the layer to a specific command buffer and framebuffer             
-///   @param config - where to render to                                      
-void ASCIILayer::Render(const RenderConfig& config) const {
+///   @param config where to render to                                        
+void ASCIILayer::Render(RenderConfig const& config) const {
    LglsProfile();
    const int sizex = static_cast<int>(GetWindow()->GetSize().x);
    const int sizey = static_cast<int>(GetWindow()->GetSize().y);
@@ -337,8 +338,8 @@ void ASCIILayer::Render(const RenderConfig& config) const {
 
 /// Render all instanced renderables in the order with least overhead         
 /// This is used only for Batched style layers                                
-///   @param cfg - render configuration                                       
-void ASCIILayer::RenderBatched(const RenderConfig& cfg) const {
+///   @param cfg render configuration                                         
+void ASCIILayer::RenderBatched(RenderConfig const& cfg) const {
    // Rendering from each custom camera's point of view                 
    for (const auto camera : mBatchSequence) {
       // Draw all relevant levels from the camera's POV                 
@@ -365,8 +366,8 @@ void ASCIILayer::RenderBatched(const RenderConfig& cfg) const {
 
 /// Render all instanced renderables in the order they appear in the scene    
 /// This is used only for Hierarchical style layers                           
-///   @param cfg - render configuration                                       
-void ASCIILayer::RenderHierarchical(const RenderConfig& cfg) const {
+///   @param cfg render configuration                                         
+void ASCIILayer::RenderHierarchical(RenderConfig const& cfg) const {
    // Rendering from each custom camera's point of view                 
    for (const auto camera : mHierarchicalSequence) {
       // Draw all relevant levels from the camera's POV                 
@@ -396,6 +397,6 @@ auto ASCIILayer::GetStyle() const noexcept -> Style {
 
 /// Get the window of a layer                                                 
 ///   @return the window interface                                            
-auto ASCIILayer::GetWindow() const noexcept -> const Things::Window* {
+auto ASCIILayer::GetWindow() const noexcept -> Things::Window const* {
    return mProducer->GetWindow();
 }

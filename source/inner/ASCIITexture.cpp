@@ -9,8 +9,8 @@
 
 
 /// Texture constructor                                                       
-///   @param producer - the texture producer                                  
-///   @param descriptor - the texture descriptor                              
+///   @param producer the texture producer                                    
+///   @param descriptor the texture descriptor                                
 ASCIITexture::ASCIITexture(ASCIIRenderer* producer, Many const& descriptor)
    : Downcastable {this}
    , ProducedFrom {producer, descriptor}
@@ -21,13 +21,13 @@ ASCIITexture::ASCIITexture(ASCIIRenderer* producer, Many const& descriptor)
 }
 
 /// Initialize from the provided content                                      
-///   @param content - the abstract texture content interface                 
+///   @param content the abstract texture content interface                   
 void ASCIITexture::Upload(Things::Image const&) {
    TODO(); //compile into intermediate format
 }
 
 /// Get the image                                                             
 ///   @return a reference to the image                                        
-auto ASCIITexture::GetImage() const noexcept -> const ASCIIImage& {
+auto ASCIITexture::GetImage() const noexcept -> ASCIIImage const& {
    return mImage;
 }

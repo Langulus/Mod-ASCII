@@ -53,7 +53,6 @@ using HierarchicalSequence = TMapUnsorted<const ASCIICamera*, TOrderedMap<Level,
 ///   A logical group of cameras, renderables, and lights, isolated from      
 /// other layers. Useful for capsulating a GUI, for example. Layers can blend 
 /// with each other, but never interact in any other way.                     
-///                                                                           
 struct ASCIILayer : Things::Layer, ProducedFrom<ASCIIRenderer> {
    using CTTI_Abstract  = No;
    using CTTI_Producer  = ASCIIRenderer;
@@ -133,23 +132,23 @@ public:
 
    void Create(Verb&);
    void Generate();
-   void Render(const RenderConfig&) const;
+   void Render(RenderConfig const&) const;
    void Teardown();
 
    auto GetStyle()  const noexcept -> Style;
-   auto GetWindow() const noexcept -> const Things::Window*;
+   auto GetWindow() const noexcept -> Things::Window const*;
 
 private:
    void CompileCameras();
 
    void CompileLevels();
-   void CompileLevelBatched(const ASCIICamera&, Level);
-   void CompileLevelHierarchical(const ASCIICamera&, Level);
+   void CompileLevelBatched(ASCIICamera const&, Level);
+   void CompileLevelHierarchical(ASCIICamera const&, Level);
 
-   void CompileThing(Thing const*, LOD&, const ASCIICamera&);
-   void CompileInstance(const ASCIIRenderable*, const Things::Instance*, LOD&, const ASCIICamera&);
-   void CompileLight(const ASCIILight*, const Things::Instance*, LOD&, const ASCIICamera&);
+   void CompileThing(Thing const*, LOD&, ASCIICamera const&);
+   void CompileInstance(ASCIIRenderable const*, Things::Instance const*, LOD&, ASCIICamera const&);
+   void CompileLight(ASCIILight const*, Things::Instance const*, LOD&, ASCIICamera const&);
 
-   void RenderBatched(const RenderConfig&) const;
-   void RenderHierarchical(const RenderConfig&) const;
+   void RenderBatched(RenderConfig const&) const;
+   void RenderHierarchical(RenderConfig const&) const;
 };
