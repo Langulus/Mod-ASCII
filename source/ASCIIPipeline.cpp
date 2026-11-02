@@ -13,7 +13,7 @@
 /// Descriptor constructor                                                    
 ///   @param producer the pipeline producer                                   
 ///   @param descriptor the pipeline descriptor                               
-ASCIIPipeline::ASCIIPipeline(ASCIIRenderer* producer, Many const& descriptor)
+ASCIIPipeline::ASCIIPipeline(ASCIIRenderer* producer, Neat const& descriptor)
    : Downcastable {this}
    , ProducedFrom {producer, descriptor} {
    VERBOSE_ASCII("Initializing graphics pipeline from: ", descriptor);
@@ -43,7 +43,7 @@ ASCIIPipeline::ASCIIPipeline(ASCIIRenderer* producer, Many const& descriptor)
 /// Resize the pipeline's internal buffer                                     
 ///   @param color uniform color value                                        
 ///   @param depth uniform depth value                                        
-void ASCIIPipeline::Clear(const RGBAf& color, float depth) {
+void ASCIIPipeline::Clear(RGBAf const& color, float depth) {
    mBuffer.Fill(color);
    mDepth.Fill(depth);
 }

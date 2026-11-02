@@ -23,7 +23,7 @@ private:
    void Upload(Things::Image const&);
 
 public:
-   ASCIITexture(ASCIIRenderer*, Many const&);
+   ASCIITexture(ASCIIRenderer*, Neat const&);
 
    auto GetImage() const noexcept -> ASCIIImage const&;
 };

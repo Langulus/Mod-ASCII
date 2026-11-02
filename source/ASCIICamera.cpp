@@ -9,10 +9,10 @@
 
 
 /// Descriptor constructor                                                    
-///   @param producer - the camera producer                                   
-///   @param descriptor - the camera descriptor                               
-ASCIICamera::ASCIICamera(ASCIILayer* producer, Many const& descriptor)
-   : Downcastable   {this}
+///   @param producer the camera producer                                     
+///   @param descriptor the camera descriptor                                 
+ASCIICamera::ASCIICamera(ASCIILayer* producer, Neat const& descriptor)
+   : Downcastable {this}
    , ProducedFrom {producer, descriptor} {
    VERBOSE_ASCII("Initializing...");
    Couple(descriptor);

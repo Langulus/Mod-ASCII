@@ -40,7 +40,7 @@ protected:
    } mLOD[LOD::IndexCount];
 
 public:
-   ASCIIRenderable(ASCIILayer*, Many const&);
+   ASCIIRenderable(ASCIILayer*, Neat const&);
 
    auto GetRenderer() const noexcept -> ASCIIRenderer*;
    auto GetGeometry(LOD const&) const -> ASCIIGeometry const*;

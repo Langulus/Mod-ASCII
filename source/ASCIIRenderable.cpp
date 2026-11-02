@@ -12,7 +12,7 @@
 /// Descriptor constructor                                                    
 ///   @param producer the renderable producer                                 
 ///   @param descriptor the renderable descriptor                             
-ASCIIRenderable::ASCIIRenderable(ASCIILayer* producer, Many const& descriptor)
+ASCIIRenderable::ASCIIRenderable(ASCIILayer* producer, Neat const& descriptor)
    : Downcastable {this}
    , ProducedFrom {producer, descriptor} {
    VERBOSE_ASCII("Initializing...");

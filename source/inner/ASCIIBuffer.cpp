@@ -114,7 +114,7 @@ auto ASCIIImage::ForEachPixel(auto&& call) const {
 }
 
 /// Compare with a true color                                                 
-bool ASCIIImage::Pixel::operator == (const RGBAf& color) const noexcept {
+bool ASCIIImage::Pixel::operator == (RGBAf const& color) const noexcept {
    return mSymbol == " " and mBgColor == color;
 }
 

@@ -44,7 +44,7 @@ protected:
    Scale2u32 mResolution {640, 480};
 
 public:
-   ASCIICamera(ASCIILayer*, Many const& = {});
+   ASCIICamera(ASCIILayer*, Neat const& = {});
 
    void Refresh();
    void Compile();

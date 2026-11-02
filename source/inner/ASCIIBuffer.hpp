@@ -124,7 +124,7 @@ public:
       RGBAf& mBgColor;
       Style& mStyle;
 
-      bool operator == (const RGBAf&) const noexcept;
+      bool operator == (RGBAf const&) const noexcept;
    };
 
    void Resize(int x, int y);

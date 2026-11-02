@@ -14,7 +14,7 @@
 /// Descriptor constructor                                                    
 ///   @param producer the camera producer                                     
 ///   @param descriptor the camera descriptor                                 
-ASCIILayer::ASCIILayer(ASCIIRenderer* producer, Many const& descriptor)
+ASCIILayer::ASCIILayer(ASCIIRenderer* producer, Neat const& descriptor)
    : Downcastable    {this}
    , ProducedFrom    {producer, descriptor}
    , mFallbackCamera {this}

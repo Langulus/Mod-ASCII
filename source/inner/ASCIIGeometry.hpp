@@ -38,8 +38,8 @@ private:
    TMany<Vertex> mVertices;
 
 public:
-   ASCIIGeometry(ASCIIRenderer*, Many const&);
+   ASCIIGeometry(ASCIIRenderer*, Neat const&);
 
    auto MadeOfTriangles() const noexcept -> bool;
-   auto GetVertices() const noexcept -> const TMany<Vertex>&;
+   auto GetVertices() const noexcept -> TMany<Vertex> const&;
 };

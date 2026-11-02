@@ -9,10 +9,10 @@
 
 
 /// Descriptor constructor                                                    
-///   @param producer - the light producer                                    
-///   @param descriptor - the light descriptor                                
-ASCIILight::ASCIILight(ASCIILayer* producer, Many const& descriptor)
-   : Downcastable   {this}
+///   @param producer the light producer                                      
+///   @param descriptor the light descriptor                                  
+ASCIILight::ASCIILight(ASCIILayer* producer, Neat const& descriptor)
+   : Downcastable {this}
    , ProducedFrom {producer, descriptor} {
    VERBOSE_ASCII("Initializing...");
    Couple(descriptor);

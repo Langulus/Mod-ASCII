@@ -6,6 +6,7 @@
 /// SPDX-License-Identifier: GPL-3.0-or-later                                 
 ///                                                                           
 #include "ASCII.hpp"
+#include <Langulus/Profiler.hpp>
 
 LANGULUS_DEFINE_MODULE(
    ASCII, 11, "ASCII",
@@ -15,11 +16,11 @@ LANGULUS_DEFINE_MODULE(
 
 
 /// ASCII module construction                                                 
-///   @param system - the system that owns the module instance                
-///   @param handle - the library handle                                      
-ASCII::ASCII(Runtime* runtime, Many const&)
+///   @param runtime the runtime that instantiates the module                 
+///   @param descriptor module configuration                                  
+ASCII::ASCII(Runtime* runtime, Neat const&)
    : Downcastable {this}
-   , Module     {runtime} {
+   , Module       {runtime} {
    VERBOSE_ASCII("Initializing...");
    VERBOSE_ASCII("Initialized");
 }
@@ -30,7 +31,7 @@ void ASCII::Teardown() {
 }
 
 /// Module update routine                                                     
-///   @param dt - time from last update                                       
+///   @param dt time from last update                                         
 bool ASCII::Update(Time) {
    LglsProfile();
    for (auto& renderer : mRenderers)
@@ -39,7 +40,7 @@ bool ASCII::Update(Time) {
 }
 
 /// Create/destroy renderers                                                  
-///   @param verb - the creation/destruction verb                             
+///   @param verb the creation/destruction verb                               
 void ASCII::Create(Verb& verb) {
    mRenderers.Create(this, verb);
 }

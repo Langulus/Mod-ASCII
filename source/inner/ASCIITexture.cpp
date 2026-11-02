@@ -11,7 +11,7 @@
 /// Texture constructor                                                       
 ///   @param producer the texture producer                                    
 ///   @param descriptor the texture descriptor                                
-ASCIITexture::ASCIITexture(ASCIIRenderer* producer, Many const& descriptor)
+ASCIITexture::ASCIITexture(ASCIIRenderer* producer, Neat const& descriptor)
    : Downcastable {this}
    , ProducedFrom {producer, descriptor}
    , mImage       {producer} {

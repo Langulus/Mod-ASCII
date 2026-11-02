@@ -60,7 +60,7 @@ protected:
    ASCIIImage mBackbuffer;
 
 public:
-   ASCIIRenderer(ASCII*, Many const&);
+   ASCIIRenderer(ASCII*, Neat const&);
 
    void Create(Verb&);
    void Interpret(Verb&);

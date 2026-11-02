@@ -14,7 +14,7 @@
 /// Descriptor constructor                                                    
 ///   @param producer the renderer producer                                   
 ///   @param descriptor the renderer descriptor                               
-ASCIIRenderer::ASCIIRenderer(ASCII* producer, Many const& descriptor)
+ASCIIRenderer::ASCIIRenderer(ASCII* producer, Neat const& descriptor)
    : Downcastable {this}
    , ProducedFrom {producer, descriptor}
    , mBackbuffer  {this} {
