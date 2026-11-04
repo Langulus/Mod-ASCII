@@ -40,11 +40,11 @@ struct CachedLevelHierarchical {
 
 /// For each enabled camera, there exist N cached levels optimized for batch  
 /// rendering                                                                 
-using BatchSequence = TMapUnsorted<const ASCIICamera*, TOrderedMap<Level, CachedLevelBatched>>;
+using BatchSequence = TMapUnsorted<const ASCIICamera*, TMapSorted<Level, CachedLevelBatched>>;
 
 /// For each enabled camera, there exist N cached levels sorted in a          
 /// descending hierarchical order                                             
-using HierarchicalSequence = TMapUnsorted<const ASCIICamera*, TOrderedMap<Level, CachedLevelHierarchical>>;
+using HierarchicalSequence = TMapUnsorted<const ASCIICamera*, TMapSorted<Level, CachedLevelHierarchical>>;
 
 
 ///                                                                           
