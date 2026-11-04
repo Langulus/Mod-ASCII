@@ -14,10 +14,11 @@
 ///                                                                           
 ///   ASCII intermediate geometry container                                   
 ///                                                                           
-/// Optimizes a geometry art for cache friendly CPU bound rasterization       
+/// Optimizes a geometry art for cache friendly CPU-bound rasterization       
 struct ASCIIGeometry : Things::Graphics, ProducedFrom<ASCIIRenderer> {
    using CTTI_Abstract  = No;
    using CTTI_Bases     = Things::Graphics;
+   using MeshView       = Things::MeshView;
 
    // An interleaved cache-friendly vertex format                       
    // We can't really do that much detail with an ASCII renderer, so    
@@ -38,7 +39,7 @@ private:
    TMany<Vertex> mVertices;
 
 public:
-   ASCIIGeometry(ASCIIRenderer*, Neat const&);
+   ASCIIGeometry(ASCIIRenderer const*, Neat const&);
 
    auto MadeOfTriangles() const noexcept -> bool;
    auto GetVertices() const noexcept -> TMany<Vertex> const&;

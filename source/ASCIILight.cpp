@@ -11,7 +11,7 @@
 /// Descriptor constructor                                                    
 ///   @param producer the light producer                                      
 ///   @param descriptor the light descriptor                                  
-ASCIILight::ASCIILight(ASCIILayer* producer, Neat const& descriptor)
+ASCIILight::ASCIILight(ASCIILayer const* producer, Neat const& descriptor)
    : Downcastable {this}
    , ProducedFrom {producer, descriptor} {
    VERBOSE_ASCII("Initializing...");

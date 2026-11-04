@@ -116,7 +116,7 @@ private:
    mutable TMany<ASCIIBuffer<float>> mShadowmaps;
 
 public:
-   ASCIIPipeline(ASCIIRenderer*, Neat const&);
+   ASCIIPipeline(ASCIIRenderer const*, Neat const&);
 
    void Clear(RGBAf const&, float);
    void Resize(int x, int y);

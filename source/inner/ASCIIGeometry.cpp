@@ -13,7 +13,7 @@
 /// Descriptor constructor                                                    
 ///   @param producer the producer of the part                                
 ///   @param descriptor the part descriptor                                   
-ASCIIGeometry::ASCIIGeometry(ASCIIRenderer* producer, Neat const& descriptor)
+ASCIIGeometry::ASCIIGeometry(ASCIIRenderer const* producer, Neat const& descriptor)
    : Downcastable {this}
    , ProducedFrom {producer, descriptor} {
    bool firstVertex = true;

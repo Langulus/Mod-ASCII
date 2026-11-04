@@ -11,7 +11,7 @@
 /// Descriptor constructor                                                    
 ///   @param producer the camera producer                                     
 ///   @param descriptor the camera descriptor                                 
-ASCIICamera::ASCIICamera(ASCIILayer* producer, Neat const& descriptor)
+ASCIICamera::ASCIICamera(ASCIILayer const* producer, Neat const& descriptor)
    : Downcastable {this}
    , ProducedFrom {producer, descriptor} {
    VERBOSE_ASCII("Initializing...");

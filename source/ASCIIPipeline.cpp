@@ -13,7 +13,7 @@
 /// Descriptor constructor                                                    
 ///   @param producer the pipeline producer                                   
 ///   @param descriptor the pipeline descriptor                               
-ASCIIPipeline::ASCIIPipeline(ASCIIRenderer* producer, Neat const& descriptor)
+ASCIIPipeline::ASCIIPipeline(ASCIIRenderer const* producer, Neat const& descriptor)
    : Downcastable {this}
    , ProducedFrom {producer, descriptor} {
    VERBOSE_ASCII("Initializing graphics pipeline from: ", descriptor);

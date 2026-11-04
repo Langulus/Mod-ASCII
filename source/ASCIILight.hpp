@@ -28,7 +28,7 @@ protected:
    Degrees mSpotlightSize = 90;
 
 public:
-   ASCIILight(ASCIILayer*, Neat const&);
+   ASCIILight(ASCIILayer const*, Neat const&);
 
    auto GetColor() const -> RGBA;
    auto GetProjection(Range1 depth) const -> Mat4;

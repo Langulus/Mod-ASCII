@@ -128,7 +128,7 @@ protected:
    Style mStyle = Style::Default;
 
 public:
-   ASCIILayer(ASCIIRenderer*, Neat const&);
+   ASCIILayer(ASCIIRenderer const*, Neat const&);
 
    void Create(Verb&);
    void Generate();
