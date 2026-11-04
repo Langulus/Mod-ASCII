@@ -37,7 +37,7 @@ SCENARIO("Renderer creation inside a window", "[renderer]") {
             REQUIRE(renderer.IsSparse());
             REQUIRE(renderer.CastsTo<Things::Renderer>());
 
-            REQUIRE(root.GetUnits().GetCount() == 2);
+            REQUIRE(root.GetParts().GetCount() == 2);
          }
 
       #if LANGULUS_FEATURE(MANAGED_REFLECTION)
@@ -54,7 +54,7 @@ SCENARIO("Renderer creation inside a window", "[renderer]") {
             REQUIRE(renderer.IsSparse());
             REQUIRE(renderer.CastsTo<Things::Renderer>());
 
-            REQUIRE(root.GetUnits().GetCount() == 2);
+            REQUIRE(root.GetParts().GetCount() == 2);
          }
       #endif
 
@@ -84,7 +84,7 @@ SCENARIO("Drawing an empty window", "[renderer]") {
             Verbs::InterpretAs<Things::Image*> interpret;
             root.Run(interpret);
 
-            REQUIRE(root.GetUnits().GetCount() == 2);
+            REQUIRE(root.GetParts().GetCount() == 2);
             REQUIRE_FALSE(root.HasParts<Things::Image>());
             REQUIRE(interpret.IsDone());
             REQUIRE(interpret->GetCount() == 1);
@@ -146,8 +146,8 @@ SCENARIO("Drawing solid polygons", "[renderer]") {
             Verbs::InterpretAs<Things::Image*> interpret;
             root.Run(interpret);
 
-            REQUIRE(root.GetUnits().GetCount() == 4);
-            REQUIRE(rect->GetUnits().GetCount() == 6);
+            REQUIRE(root.GetParts().GetCount() == 4);
+            REQUIRE(rect->GetParts().GetCount() == 6);
             REQUIRE(root.GetChildren().GetCount() == 1);
             REQUIRE_FALSE(root.HasParts<Things::Image>());
             REQUIRE(interpret.IsDone());
