@@ -6,11 +6,11 @@
 /// SPDX-License-Identifier: GPL-3.0-or-later                                 
 ///                                                                           
 #pragma once
-#include <Langulus/Math/Color.hpp>
 #include <Langulus/CppAPI/Material.hpp>
 #include <Langulus/CppAPI/Graphics.hpp>
 #include <Langulus/CppAPI/Platform.hpp>
 #include <Langulus/Math/Range.hpp>
+#include <Langulus/Math/Color.hpp>
 
 using namespace Langulus;
 using namespace Math;
@@ -23,6 +23,9 @@ struct ASCIILight;
 struct ASCIIRenderable;
 struct ASCIIPipeline;
 struct ASCIIImage;
+
+struct ASCIIGeometry;
+struct ASCIITexture;
 
 using LevelRange = TRange<TVector<Level, 1>>;
 

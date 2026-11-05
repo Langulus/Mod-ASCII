@@ -55,7 +55,7 @@ auto ASCIIRenderable::GetGeometry(LOD const& lod) const -> ASCIIGeometry const* 
       mLOD[i].mGeometry = creator->template As<ASCIIGeometry*>();
    }
 
-   return mLOD[i].mGeometry;
+   return *mLOD[i].mGeometry;
 }
 
 /// Get VRAM texture corresponding to an octave of this renderable            
@@ -73,7 +73,7 @@ auto ASCIIRenderable::GetTexture(LOD const& lod) const -> ASCIITexture const* {
       mLOD[i].mTexture = creator->template As<ASCIITexture*>();
    }
 
-   return mLOD[i].mTexture;
+   return *mLOD[i].mTexture;
 }
 
 /// Get uniform color                                                         
@@ -90,12 +90,12 @@ auto ASCIIRenderable::GetOrCreatePipeline(
 ) const -> ASCIIPipeline* {
    // Always return the predefined pipeline if available                
    if (mPredefinedPipeline)
-      return mPredefinedPipeline;
+      return *mPredefinedPipeline;
 
    // Always return the cached pipeline if available                    
    const auto i = lod.GetAbsoluteIndex();
    if (mLOD[i].mPipeline)
-      return mLOD[i].mPipeline;
+      return *mLOD[i].mPipeline;
 
    // Construct a pipeline                                              
    bool usingGlobalPipeline = false;
@@ -118,9 +118,9 @@ auto ASCIIRenderable::GetOrCreatePipeline(
    });
 
    if (mPredefinedPipeline)
-      return mPredefinedPipeline;
+      return *mPredefinedPipeline;
    else
-      return mLOD[i].mPipeline;
+      return *mLOD[i].mPipeline;
 }
 
 /// Called on environment change                                              

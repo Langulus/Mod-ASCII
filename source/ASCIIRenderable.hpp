@@ -8,6 +8,8 @@
 #pragma once
 #include "Export.hpp"
 #include <Langulus/TMany.hpp>
+#include <Langulus/CppAPI/Mesh.hpp>
+#include <Langulus/CppAPI/Physical.hpp>
 
 
 ///                                                                           
