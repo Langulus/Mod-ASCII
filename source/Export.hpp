@@ -15,6 +15,8 @@
 using namespace Langulus;
 using namespace Math;
 
+using Things::Thing;
+
 struct ASCII;
 struct ASCIIRenderer;
 struct ASCIILayer;
