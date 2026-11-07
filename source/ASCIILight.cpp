@@ -40,11 +40,11 @@ auto ASCIILight::GetColor() const -> RGBA {
 auto ASCIILight::GetProjection(Range1 depth) const -> Mat4 {
    switch (mType) {
    case Type::Directional:
-      return A::Matrix::Orthographic<Real>(mShadowmapSize.x, mShadowmapSize.y, depth.mMin, depth.mMax);
+      return Matrix::Orthographic<Real>(mShadowmapSize.x, mShadowmapSize.y, depth.mMin, depth.mMax);
    case Type::Point:
-      return A::Matrix::PerspectiveFOV<Real>(90_deg, 1, depth.mMin, depth.mMax);
+      return Matrix::PerspectiveFOV<Real>(90_deg, 1, depth.mMin, depth.mMax);
    case Type::Spot:
-      return A::Matrix::PerspectiveFOV<Real>(mSpotlightSize, 1, depth.mMin, depth.mMax);
+      return Matrix::PerspectiveFOV<Real>(mSpotlightSize, 1, depth.mMin, depth.mMax);
    case Type::Domain:
       return {};
    }

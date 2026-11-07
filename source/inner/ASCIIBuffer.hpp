@@ -105,7 +105,7 @@ private:
 
    // Required only in case we're comparing against other images,       
    // provided by a filename                                            
-   ASCIIRenderer* mRenderer;
+   ASCIIRenderer const* mRenderer;
 
    bool CompareInner(Things::Image const&) const;
 
@@ -115,7 +115,7 @@ public:
    using CTTI_Ability   = Verbs::Compare;
 
    ASCIIImage() = delete;
-   ASCIIImage(ASCIIRenderer*);
+   ASCIIImage(ASCIIRenderer const*);
 
    /// A single pixel from the image                                          
    struct Pixel {

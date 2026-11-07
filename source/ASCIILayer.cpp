@@ -32,7 +32,7 @@ void ASCIILayer::Teardown() {
    mBatchSequence.Reset();
    mLights.Teardown();
    mRenderables.Teardown();
-   mFallbackCamera.TeardownInner();
+   mFallbackCamera.Teardown();
    mCameras.Teardown();
 }
 
@@ -142,7 +142,7 @@ void ASCIILayer::CompileThing(Thing const* thing, LOD& lod, ASCIICamera const& c
    // layer - disregard all others layers                               
    auto renderables = thing->GatherParts<ASCIIRenderable, Seek::Here>();
    for (auto renderable : renderables) {
-      if (not mRenderables.Owns(renderable))
+      if (not mRenderables.Contains(renderable))
          continue;
 
       if (not renderable->mInstances)
@@ -156,7 +156,7 @@ void ASCIILayer::CompileThing(Thing const* thing, LOD& lod, ASCIICamera const& c
    // if there are renderables for the given camera                     
    auto lights = thing->GatherParts<ASCIILight, Seek::Here>();
    for (auto light : lights) {
-      if (not mLights.Owns(light))
+      if (not mLights.Contains(light))
          continue;
 
       if (not light->mInstances)
@@ -205,16 +205,16 @@ void ASCIILayer::CompileInstance(
 
    // Cache the instance in the appropriate sequence                    
    if (mStyle & Style::Hierarchical) {
-      auto cachedCam = mHierarchicalSequence.FindIt(&cam);
+      auto cachedCam = mHierarchicalSequence.Find(&cam);
       if (not cachedCam) {
-         mHierarchicalSequence.Insert(&cam);
-         cachedCam = mHierarchicalSequence.FindIt(&cam);
+         mHierarchicalSequence.Merge(&cam);
+         cachedCam = mHierarchicalSequence.Find(&cam);
       }
 
-      auto cachedLvl = cachedCam.GetVal().FindIt(-lod.mLevel);
+      auto cachedLvl = cachedCam.GetVal().Find(-lod.mLevel);
       if (not cachedLvl) {
-         cachedCam.GetVal().Insert(-lod.mLevel);
-         cachedLvl = cachedCam.GetVal().FindIt(-lod.mLevel);
+         cachedCam.GetVal().Merge(-lod.mLevel);
+         cachedLvl = cachedCam.GetVal().Find(-lod.mLevel);
       }
 
       auto& cachedPipes = cachedLvl.GetVal().mPipelines;
@@ -228,22 +228,22 @@ void ASCIILayer::CompileInstance(
       }};
    }
    else {
-      auto cachedCam = mBatchSequence.FindIt(&cam);
+      auto cachedCam = mBatchSequence.Find(&cam);
       if (not cachedCam) {
-         mBatchSequence.Insert(&cam);
-         cachedCam = mBatchSequence.FindIt(&cam);
+         mBatchSequence.Merge(&cam);
+         cachedCam = mBatchSequence.Find(&cam);
       }
 
-      auto cachedLvl = cachedCam.GetVal().FindIt(-lod.mLevel);
+      auto cachedLvl = cachedCam.GetVal().Find(-lod.mLevel);
       if (not cachedLvl) {
-         cachedCam.GetVal().Insert(-lod.mLevel);
-         cachedLvl = cachedCam.GetVal().FindIt(-lod.mLevel);
+         cachedCam.GetVal().Merge(-lod.mLevel);
+         cachedLvl = cachedCam.GetVal().Find(-lod.mLevel);
       }
 
-      auto cachedPipe = cachedLvl.GetVal().mPipelines.FindIt(pipeline);
+      auto cachedPipe = cachedLvl.GetVal().mPipelines.Find(pipeline);
       if (not cachedPipe) {
-         cachedLvl.GetVal().mPipelines.Insert(pipeline);
-         cachedPipe = cachedLvl.GetVal().mPipelines.FindIt(pipeline);
+         cachedLvl.GetVal().mPipelines.Merge(pipeline);
+         cachedPipe = cachedLvl.GetVal().mPipelines.Find(pipeline);
       }
 
       auto& cachedRends = cachedPipe.GetVal();
@@ -287,11 +287,11 @@ void ASCIILayer::CompileLight(
    }
 
    auto push_in = [&](auto& sequence) {
-      auto cachedCam = sequence.FindIt(&cam);
+      auto cachedCam = sequence.Find(&cam);
       if (not cachedCam)
          return;
 
-      auto cachedLvl = cachedCam.GetVal().FindIt(-lod.mLevel);
+      auto cachedLvl = cachedCam.GetVal().Find(-lod.mLevel);
       if (not cachedLvl)
          return;
 

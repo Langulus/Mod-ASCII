@@ -37,7 +37,7 @@ void ASCIIRenderable::Teardown() {
 /// Get the renderer                                                          
 ///   @return a pointer to the renderer                                       
 auto ASCIIRenderable::GetRenderer() const noexcept -> ASCIIRenderer* {
-   return GetProducer()->GetProducer();
+   return const_cast<ASCIIRenderer*>(GetProducer()->GetProducer());
 }
 
 /// Get VRAM geometry corresponding to an octave of this renderable           

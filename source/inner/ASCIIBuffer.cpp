@@ -9,7 +9,7 @@
 
 
 /// Default constructor                                                       
-ASCIIImage::ASCIIImage(ASCIIRenderer* renderer)
+ASCIIImage::ASCIIImage(ASCIIRenderer const* renderer)
    : Downcastable {this}
    , mRenderer    {renderer} {
    VERBOSE_ASCII("Initializing...");

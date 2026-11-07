@@ -33,11 +33,11 @@ ASCIIGeometry::ASCIIGeometry(ASCIIRenderer const* producer, Neat const& descript
                LglsAssert(p, "No vertex position");
 
                if (p.IsSame<Vec3>())
-                  output.mPos = Vec4(*p.GetRaw<Vec3>(), 1);
+                  output.mPos = Vec4(*p.GetRawAs<Vec3>(), 1);
                else if (p.IsSame<Vec2>())
-                  output.mPos = Vec4(*p.GetRaw<Vec2>(), 0, 1);
+                  output.mPos = Vec4(*p.GetRawAs<Vec2>(), 0, 1);
                else if (p.IsSame<Vec4>())
-                  output.mPos = *p.GetRaw<Vec4>();
+                  output.mPos = *p.GetRawAs<Vec4>();
                else
                   LglsError("Unsupported place type");
 
@@ -49,14 +49,14 @@ ASCIIGeometry::ASCIIGeometry(ASCIIRenderer const* producer, Neat const& descript
 
                if (n) {
                   if (n.IsSame<Vec3>())
-                     output.mNor = *n.GetRaw<Vec3>();
+                     output.mNor = *n.GetRawAs<Vec3>();
                   else
                      LglsError("Unsupported normal type");
                }
 
                if (t) {
                   if (t and t.IsSame<Vec2>())
-                     output.mTex = *t.GetRaw<Vec2>();
+                     output.mTex = *t.GetRawAs<Vec2>();
                   else
                      LglsError("Unsupported sampler type");
                }
