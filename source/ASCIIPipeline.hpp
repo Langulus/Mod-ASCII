@@ -126,7 +126,7 @@ public:
 private:
    struct PipelineState {
       ASCIILayer const* mLayer;
-      const Scale2 mResolution;
+      Scale2 const mResolution;
       Mat4 const& mProjectedView;
       PipeSubscriber const& mSubscriber;
       const TMany<LightSubscriber>& mLights;
