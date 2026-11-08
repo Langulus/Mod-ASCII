@@ -25,8 +25,8 @@ SCENARIO("Renderer creation inside a window", "[renderer]") {
          auto root = Thing::Root<false>("FTXUI", "ASCII");
          
          WHEN("A renderer is created via abstractions") {
-            auto window = root.CreateUnit<Things::Window>();
-            auto renderer = root.CreateUnit<Things::Renderer>();
+            auto window = root.CreatePart<Things::Window>();
+            auto renderer = root.CreatePart<Things::Renderer>();
             root.DumpHierarchy();
                
             REQUIRE(window);
@@ -70,7 +70,7 @@ SCENARIO("Drawing an empty window", "[renderer]") {
    GIVEN("A window with a renderer") {
       // Create the scene                                               
       auto root = Thing::Root<false>("FTXUI", "ASCII");
-      root.CreateUnits<Things::Window, Things::Renderer>();
+      root.CreateParts<Things::Window, Things::Renderer>();
 
       static Allocator::State memoryState2;
 
@@ -123,15 +123,15 @@ SCENARIO("Drawing solid polygons", "[renderer]") {
          "AssetsGeometry",
          "Physics"
       );
-      root.CreateUnits<Things::Window, Things::Renderer, Things::Layer, Things::World>();
+      root.CreateParts<Things::Window, Things::Renderer, Things::Layer, Things::World>();
 
       auto rect = root.CreateChild(Tags::Size {10, 5}, "Rectangles");
-      rect->CreateUnit<Things::Renderable>();
-      rect->CreateUnit<Things::Mesh>(Math::Box2 {});
-      rect->CreateUnit<Things::Instance>(Tags::Place(10, 10), Colors::Black);
-      rect->CreateUnit<Things::Instance>(Tags::Place(50, 10), Colors::Green);
-      rect->CreateUnit<Things::Instance>(Tags::Place(10, 30), Colors::Blue);
-      rect->CreateUnit<Things::Instance>(Tags::Place(50, 30), Colors::White);
+      rect->CreatePart<Things::Renderable>();
+      rect->CreatePart<Things::Mesh>(Math::Box2 {});
+      rect->CreatePart<Things::Instance>(Tags::Place(10, 10), Colors::Black);
+      rect->CreatePart<Things::Instance>(Tags::Place(50, 10), Colors::Green);
+      rect->CreatePart<Things::Instance>(Tags::Place(10, 30), Colors::Blue);
+      rect->CreatePart<Things::Instance>(Tags::Place(50, 30), Colors::White);
       root.DumpHierarchy();
 
       //static Allocator::State memoryState2;

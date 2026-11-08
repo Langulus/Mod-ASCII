@@ -15,8 +15,6 @@
 
 using namespace Langulus;
 
-LANGULUS_RTTI_BOUNDARY(RTTI::MainBoundary)
-
 
 int main(int, char**) {
    LglsProfile();
@@ -37,7 +35,7 @@ int main(int, char**) {
       "Physics",
       "InputSDL"
    );
-   root.CreateUnits<
+   root.CreateParts<
       Things::Window,
       Things::Renderer,
       Things::Layer,
@@ -47,8 +45,8 @@ int main(int, char**) {
 
    // Create a player entity with controllable camera                   
    auto player = root.CreateChild("Player");
-   player->CreateUnits<Things::Camera, Things::InputListener>();
-   player->CreateUnit<Things::Instance>(Tags::Place {0, 20, 20});
+   player->CreateParts<Things::Camera, Things::InputListener>();
+   player->CreatePart<Things::Instance>(Tags::Place {0, 20, 20});
    player->Run("? create Anticipator(MouseMove,          {thing? move (Yaw(?.x * 0.05), Pitch(?.y * 0.05))})");
    player->Run("? create Anticipator(Keys::W,            {thing? move (Axes::Forward  * 4, relative)})");
    player->Run("? create Anticipator(Keys::S,            {thing? move (Axes::Backward * 4, relative)})");
@@ -59,14 +57,14 @@ int main(int, char**) {
 
    // Create a castle                                                   
    auto castle = root.CreateChild("Castle");
-   castle->CreateUnits<Things::Renderable>();
-   castle->CreateUnit<Things::Instance>(Tags::Size {450}, Tags::Place {0, -5, 0});
-   castle->CreateUnit<Things::Mesh>("castle.obj");
+   castle->CreateParts<Things::Renderable>();
+   castle->CreatePart<Things::Instance>(Tags::Size {450}, Tags::Place {0, -5, 0});
+   castle->CreatePart<Things::Mesh>("castle.obj");
 
    // Create a directional light source                                 
    auto sun = root.CreateChild("Sun");
-   sun->CreateUnits<Things::Light>();
-   sun->CreateUnit<Things::Instance>(Tags::Aim {-1, -1, 0});
+   sun->CreateParts<Things::Light>();
+   sun->CreatePart<Things::Instance>(Tags::Aim {-1, -1, 0});
    sun->Run("? move^1 (Yaw(1), relative)");
 
    // Loop until quit                                                   
