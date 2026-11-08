@@ -128,7 +128,7 @@ void ASCIIRenderable::Refresh() {
    Teardown();
 
    // Gather all instances for this renderable, and calculate levels    
-   mInstances = GatherParts<Things::Instance, Seek::Here>();
+   mInstances = const_cast<ASCIIRenderable const*>(this)->GatherParts<Things::Instance, Seek::Here>();
    if (mInstances)
       mLevelRange = mInstances[0]->GetLevel();
    else

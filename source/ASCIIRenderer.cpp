@@ -120,7 +120,7 @@ void ASCIIRenderer::Draw() {
 /// Get the window interface                                                  
 ///   @return the window interface                                            
 auto ASCIIRenderer::GetWindow() const noexcept -> Things::Window const* {
-   return mWindow;
+   return *mWindow;
 }
 
 /// Get the current resolution                                                
