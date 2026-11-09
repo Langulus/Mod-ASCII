@@ -10,10 +10,12 @@
 #include <Langulus/CppAPI/Physical.hpp>
 #include <Langulus/CppAPI/Mesh.hpp>
 #include <Langulus/CppAPI/Input.hpp>
-#include <Langulus/Time.hpp>
+#include <Langulus/Framerate.hpp>
+#include <Langulus/Profiler.hpp>
 #include <thread>
 
 using namespace Langulus;
+using Things::Thing;
 
 
 int main(int, char**) {
