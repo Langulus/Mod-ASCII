@@ -41,17 +41,17 @@ void ASCIIImage::Resize(int x, int y) {
       return;
 
    const auto count = x * y;
-   mSymbols.Clear();
-   mSymbols.New(count, " ");
+   //mSymbols.Clear();
+   mSymbols.Resize(count, Token{" "});
 
-   mFgColors.Clear();
-   mFgColors.New(count, RGBAf {Colors::White});
+   //mFgColors.Clear();
+   mFgColors.Resize(count, RGBAf {Colors::White});
 
-   mBgColors.Clear();
-   mBgColors.New(count, RGBAf {Colors::Black});
+   //mBgColors.Clear();
+   mBgColors.Resize(count, RGBAf {Colors::Black});
 
-   mStyle.Clear();
-   mStyle.New(count);
+   //mStyle.Clear();
+   mStyle.Resize(count);
 
    mView.mWidth  = static_cast<uint32_t>(x);
    mView.mHeight = static_cast<uint32_t>(y);
@@ -94,8 +94,8 @@ auto ASCIIImage::ForEachPixel(auto&& call) const {
    using A = ArgumentOf<F>;
    using R = ReturnOf<F>;
 
-   static_assert(CT::Exact<A, const Pixel&>,
-      "Pixel iterator must be constant ASCIIImage::Pixel reference");
+   static_assert(Exact<A, const Pixel&>,
+      "Pixel iterator _must_ be constant ASCIIImage::Pixel reference");
 
    [[maybe_unused]] size_t counter = 0;
    for (uint32_t y = 0; y < mView.mHeight; ++y) {
@@ -168,7 +168,7 @@ bool ASCIIImage::CompareInner(Things::Image const& rhs) const {
       return GetDataListMap() == rhs.GetDataListMap();
    }
    else if (rhs.GetView().mHeight == GetView().mHeight
-   and rhs.GetView().mWidth  == GetView().mWidth) {
+   and      rhs.GetView().mWidth  == GetView().mWidth) {
       // We have to compare pixel-by-pixel, because formats differ      
       auto rit = rhs.begin();
       return mView.GetPixelCount() == ForEachPixel(

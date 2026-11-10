@@ -39,8 +39,8 @@ public:
          return;
 
       const auto count = x * y;
-      mData.Clear();
-      mData.New(count);
+      //mData.Clear();
+      mData.Resize(count);
       mView.mWidth = static_cast<uint32_t>(x);
       mView.mHeight = static_cast<uint32_t>(y);
    }

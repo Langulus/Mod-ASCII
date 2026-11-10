@@ -12,6 +12,7 @@
 #include <Langulus/CppAPI/Input.hpp>
 #include <Langulus/Framerate.hpp>
 #include <Langulus/Profiler.hpp>
+#include <Langulus/Logger/HTML.hpp>
 #include <thread>
 
 using namespace Langulus;

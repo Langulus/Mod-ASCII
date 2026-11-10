@@ -9,6 +9,7 @@
 #include <Langulus/CppAPI/Platform.hpp>
 #include <Langulus/CppAPI/Physical.hpp>
 #include <Langulus/Profiler.hpp>
+#include <Langulus/Things/Hierarchy-Gather.inl>
 
 
 /// Descriptor constructor                                                    
@@ -142,7 +143,7 @@ void ASCIILayer::CompileThing(Thing const* thing, LOD& lod, ASCIICamera const& c
    // layer - disregard all others layers                               
    auto renderables = thing->GatherParts<ASCIIRenderable, Seek::Here>();
    for (auto renderable : renderables) {
-      if (not mRenderables.Contains(renderable))
+      if (not mRenderables.Owns(renderable))
          continue;
 
       if (not renderable->mInstances)
@@ -156,7 +157,7 @@ void ASCIILayer::CompileThing(Thing const* thing, LOD& lod, ASCIICamera const& c
    // if there are renderables for the given camera                     
    auto lights = thing->GatherParts<ASCIILight, Seek::Here>();
    for (auto light : lights) {
-      if (not mLights.Contains(light))
+      if (not mLights.Owns(light))
          continue;
 
       if (not light->mInstances)
@@ -341,14 +342,14 @@ void ASCIILayer::Render(RenderConfig const& config) const {
 ///   @param cfg render configuration                                         
 void ASCIILayer::RenderBatched(RenderConfig const& cfg) const {
    // Rendering from each custom camera's point of view                 
-   for (const auto camera : mBatchSequence) {
+   for (const auto& camera : mBatchSequence) {
       // Draw all relevant levels from the camera's POV                 
-      for (auto level : KeepIterator(camera.GetVal())) {
+      for (const auto& level : camera.GetVal()) {
          const auto projectedView = camera.GetKey()->mProjection
             * camera.GetKey()->GetViewTransform(level.GetKey()).Invert();
 
          // Involve all relevant pipelines for that level               
-         for (const auto pipeline : level.GetVal().mPipelines) {
+         for (const auto& pipeline : level.GetVal().mPipelines) {
             // Draw all renderables that use that pipeline in their     
             // current LOD state, from that particular level & POV      
             for (auto const& instance : pipeline.GetVal())
@@ -369,9 +370,9 @@ void ASCIILayer::RenderBatched(RenderConfig const& cfg) const {
 ///   @param cfg render configuration                                         
 void ASCIILayer::RenderHierarchical(RenderConfig const& cfg) const {
    // Rendering from each custom camera's point of view                 
-   for (const auto camera : mHierarchicalSequence) {
+   for (const auto& camera : mHierarchicalSequence) {
       // Draw all relevant levels from the camera's POV                 
-      for (auto level : KeepIterator(camera.GetVal())) {
+      for (const auto& level : camera.GetVal()) {
          const auto projectedView = camera.GetKey()->mProjection
             * camera.GetKey()->GetViewTransform(level.GetKey()).Invert();
 

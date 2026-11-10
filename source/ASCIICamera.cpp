@@ -6,6 +6,7 @@
 /// SPDX-License-Identifier: GPL-3.0-or-later                                 
 ///                                                                           
 #include "ASCII.hpp"
+#include <Langulus/Things/Hierarchy-Gather.inl>
 
 
 /// Descriptor constructor                                                    
@@ -102,7 +103,7 @@ void ASCIICamera::Refresh() {
 }
 
 /// Get view transformation for a given LOD state                             
-///   @param lod - the level-of-detail state                                  
+///   @param lod the level-of-detail state                                    
 ///   @return the view transformation for the camera                          
 Mat4 ASCIICamera::GetViewTransform(LOD const& lod) const {
    if (not mInstances)
@@ -112,7 +113,7 @@ Mat4 ASCIICamera::GetViewTransform(LOD const& lod) const {
 }
 
 /// Get view transformation for a given level                                 
-///   @param level - the level                                                
+///   @param level the level                                                  
 ///   @return the view transformation for the camera                          
 Mat4 ASCIICamera::GetViewTransform(Level const& level) const {
    if (not mInstances)

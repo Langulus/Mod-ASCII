@@ -7,6 +7,7 @@
 ///                                                                           
 #include "ASCII.hpp"
 #include <Langulus/CppAPI/Physical.hpp>
+#include <Langulus/Things/Hierarchy-Seek.inl>
 
 
 /// Descriptor constructor                                                    
