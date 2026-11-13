@@ -14,13 +14,17 @@
 #include <Langulus/Verbs/Interpret.hpp>
 #include <Langulus/Verbs/Compare.hpp>
 #include <Langulus/Testing.hpp>
+#include <Langulus/Allocator.hpp>
+
+using namespace Langulus;
+using Things::Thing;
 
 
 SCENARIO("Renderer creation inside a window") {
-   static Allocator::State memoryState;
+   static MemoryState memoryState;
 
-   for (int repeat = 0; repeat != 10; ++repeat) {
-      GIVEN(std::string("Init and shutdown cycle #") + std::to_string(repeat)) {
+   GIVEN("Init and shutdown cycles") {
+      for (int repeat = 0; repeat != 10; ++repeat) {
          // Create root entity                                          
          auto root = Thing::Root<false>("FTXUI", "ASCII");
          
@@ -62,27 +66,30 @@ SCENARIO("Renderer creation inside a window") {
          REQUIRE(memoryState.Assert());
       }
    }
+
+   REQUIRE(memoryState.Assert());
+   REQUIRE_FALSE(Allocator::CollectGarbage());
 }
 
 SCENARIO("Drawing an empty window") {
-   static Allocator::State memoryState;
+   static MemoryState memoryState;
 
    GIVEN("A window with a renderer") {
       // Create the scene                                               
       auto root = Thing::Root<false>("FTXUI", "ASCII");
       root.CreateParts<Things::Window, Things::Renderer>();
 
-      static Allocator::State memoryState2;
+      static MemoryState memoryState2;
 
-      for (int repeat = 0; repeat != 10; ++repeat) {
-         WHEN(std::string("Update cycle #") + std::to_string(repeat)) {
+      WHEN("Update cycles") {
+         for (int repeat = 0; repeat != 10; ++repeat) {
             // Update the scene                                         
             root.Update(16ms);
 
             // And interpret the scene as an image, i.e. taking a       
             // screenshot                                               
-            Verbs::InterpretAs<Things::Image*> interpret;
-            root.Run(interpret);
+            Verbs::Interpret interpret(MetaDataOf<Things::Image*>());
+            interpret.In(root).Run();
 
             REQUIRE(root.GetParts().GetCount() == 2);
             REQUIRE_FALSE(root.HasParts<Things::Image>());
@@ -96,7 +103,7 @@ SCENARIO("Drawing an empty window") {
 
             REQUIRE(compare.IsDone());
             REQUIRE(compare->GetCount() == 1);
-            REQUIRE(compare->IsDense());
+            REQUIRE(not compare->IsSparse());
             REQUIRE(compare.GetOutput() == Compared::Equal);
 
             root.DumpHierarchy();
@@ -107,12 +114,12 @@ SCENARIO("Drawing an empty window") {
       }
    }
 
-   // Check for memory leaks after each initialization cycle            
    REQUIRE(memoryState.Assert());
+   REQUIRE_FALSE(Allocator::CollectGarbage());
 }
 
 SCENARIO("Drawing solid polygons") {
-   static Allocator::State memoryState;
+   static MemoryState memoryState;
 
    GIVEN("A window with a renderer") {
       // Create the scene                                               
@@ -134,17 +141,15 @@ SCENARIO("Drawing solid polygons") {
       rect->CreatePart<Things::Instance>(Tags::Place(50, 30), Colors::White);
       root.DumpHierarchy();
 
-      //static Allocator::State memoryState2;
-
-      for (int repeat = 0; repeat != 10; ++repeat) {
-         WHEN(std::string("Update cycle #") + std::to_string(repeat)) {
+      WHEN("Update cycles") {
+         for (int repeat = 0; repeat != 10; ++repeat) {
             // Update the scene                                         
             root.Update(16ms);
 
             // And interpret the scene as an image, i.e. taking a       
             // screenshot                                               
-            Verbs::InterpretAs<Things::Image*> interpret;
-            root.Run(interpret);
+            Verbs::Interpret interpret(MetaDataOf<Things::Image*>());
+            interpret.In(root).Run();
 
             REQUIRE(root.GetParts().GetCount() == 4);
             REQUIRE(rect->GetParts().GetCount() == 6);
@@ -171,7 +176,7 @@ SCENARIO("Drawing solid polygons") {
       }
    }
 
-   // Check for memory leaks after each initialization cycle            
    REQUIRE(memoryState.Assert());
+   REQUIRE_FALSE(Allocator::CollectGarbage());
 }
 
