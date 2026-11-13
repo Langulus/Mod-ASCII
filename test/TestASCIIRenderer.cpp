@@ -10,13 +10,13 @@
 #include <Langulus/CppAPI/Graphics.hpp>
 #include <Langulus/CppAPI/Physical.hpp>
 #include <Langulus/CppAPI/Mesh.hpp>
-#include <Langulus/Image.hpp>
+#include <Langulus/CppAPI/Image.hpp>
 #include <Langulus/Verbs/Interpret.hpp>
 #include <Langulus/Verbs/Compare.hpp>
 #include <Langulus/Testing.hpp>
 
 
-SCENARIO("Renderer creation inside a window", "[renderer]") {
+SCENARIO("Renderer creation inside a window") {
    static Allocator::State memoryState;
 
    for (int repeat = 0; repeat != 10; ++repeat) {
@@ -64,7 +64,7 @@ SCENARIO("Renderer creation inside a window", "[renderer]") {
    }
 }
 
-SCENARIO("Drawing an empty window", "[renderer]") {
+SCENARIO("Drawing an empty window") {
    static Allocator::State memoryState;
 
    GIVEN("A window with a renderer") {
@@ -111,7 +111,7 @@ SCENARIO("Drawing an empty window", "[renderer]") {
    REQUIRE(memoryState.Assert());
 }
 
-SCENARIO("Drawing solid polygons", "[renderer]") {
+SCENARIO("Drawing solid polygons") {
    static Allocator::State memoryState;
 
    GIVEN("A window with a renderer") {
