@@ -15,6 +15,7 @@
 #include <Langulus/Verbs/Compare.hpp>
 #include <Langulus/Testing.hpp>
 #include <Langulus/Allocator.hpp>
+#include <Langulus/Primitives/TBox.hpp>
 
 using namespace Langulus;
 using Things::Thing;
@@ -89,7 +90,7 @@ SCENARIO("Drawing an empty window") {
             // And interpret the scene as an image, i.e. taking a       
             // screenshot                                               
             Verbs::Interpret interpret(MetaDataOf<Things::Image*>());
-            interpret.In(root).Run();
+            interpret.In(&root).Run();
 
             REQUIRE(root.GetParts().GetCount() == 2);
             REQUIRE_FALSE(root.HasParts<Things::Image>());
@@ -149,7 +150,7 @@ SCENARIO("Drawing solid polygons") {
             // And interpret the scene as an image, i.e. taking a       
             // screenshot                                               
             Verbs::Interpret interpret(MetaDataOf<Things::Image*>());
-            interpret.In(root).Run();
+            interpret.In(&root).Run();
 
             REQUIRE(root.GetParts().GetCount() == 4);
             REQUIRE(rect->GetParts().GetCount() == 6);
