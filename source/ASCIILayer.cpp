@@ -141,7 +141,7 @@ void ASCIILayer::CompileLevelBatched(ASCIICamera const& cam, Level level) {
 void ASCIILayer::CompileThing(Thing const* thing, LOD& lod, ASCIICamera const& cam) {
    // Iterate all renderables of the entity, which are part of this     
    // layer - disregard all others layers                               
-   auto renderables = thing->GatherParts<ASCIIRenderable, Seek::Here>();
+   const auto renderables = thing->GatherParts<ASCIIRenderable, Seek::Here>();
    for (auto renderable : renderables) {
       if (not mRenderables.Owns(renderable))
          continue;
@@ -155,7 +155,7 @@ void ASCIILayer::CompileThing(Thing const* thing, LOD& lod, ASCIICamera const& c
    // Iterate all lights of the entity, which are part of this          
    // layer - disregard all others layers. Lights will be added only    
    // if there are renderables for the given camera                     
-   auto lights = thing->GatherParts<ASCIILight, Seek::Here>();
+   const auto lights = thing->GatherParts<ASCIILight, Seek::Here>();
    for (auto light : lights) {
       if (not mLights.Owns(light))
          continue;
