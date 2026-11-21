@@ -26,6 +26,11 @@ struct PipeSubscriber {
    ASCIITexture const*  texture;
 };
 
+/// Convert to text, by writing a short name and address                      
+LANGULUS_MORPHISM_CUSTOM(PipeSubscriber, {
+   return Annies::Text::Mention(from);
+}, Annies::Text);
+
 /// A compiled light                                                          
 struct LightSubscriber {
    // Light color premultiplied by intensity                            
@@ -39,6 +44,11 @@ struct LightSubscriber {
    // Type of the light                                                 
    Things::Light::Type type;
 };
+
+/// Convert to text, by writing a short name and address                      
+LANGULUS_MORPHISM_CUSTOM(LightSubscriber, {
+   return Annies::Text::Mention(from);
+}, Annies::Text);
 
 
 /// Defines how pixels are mapped onto symbols                                
