@@ -65,7 +65,7 @@ public:
    void Create(Verb&);
    void Interpret(Verb&);
 
-   void Teardown();
+   void Teardown() override;
    void Refresh() override;
    void Draw();
 

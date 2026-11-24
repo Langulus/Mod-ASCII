@@ -36,7 +36,7 @@ ASCIIRenderer::ASCIIRenderer(ASCII const* producer, Neat const& descriptor)
 }
 
 /// First stage destruction                                                   
-void ASCIIRenderer::Teardown()  {
+void ASCIIRenderer::Teardown() {
    mBackbuffer.Reset();
 
    mTextures.Teardown();
@@ -48,6 +48,8 @@ void ASCIIRenderer::Teardown()  {
    mMousePosition.Reset();
    mTime.Reset();
    mWindow.Reset();
+
+   Things::Renderer::Teardown();
 }
 
 /// React to changes in environment                                           
